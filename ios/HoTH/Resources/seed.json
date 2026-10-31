@@ -1,0 +1,255 @@
+{
+  "version": 1,
+  "_comment": "Demo community for HoTH. Everything here is fictional demo data and must be labelled 'Demo community' in the UI. Place names are generic and do not refer to official facilities. Times are relative (hours before first launch) so the feed always looks fresh. photo values are placeholder asset names; the UI falls back to the category SF Symbol when missing.",
+  "area": { "name": "Khalifa City", "nameAR": "مدينة خليفة", "latitude": 24.4200, "longitude": 54.5750 },
+  "neighbours": [
+    { "key": "you",    "displayName": "You",    "avatarSymbol": "person.crop.circle.fill", "hay": "Khalifa City", "points": 360, "trust": 6, "isCurrentUser": true },
+    { "key": "fatima", "displayName": "Fatima", "avatarSymbol": "person.crop.circle.fill", "hay": "Khalifa City", "points": 420, "trust": 9, "isCurrentUser": false },
+    { "key": "omar",   "displayName": "Omar",   "avatarSymbol": "person.crop.circle.fill", "hay": "Khalifa City", "points": 185, "trust": 4, "isCurrentUser": false },
+    { "key": "priya",  "displayName": "Priya",  "avatarSymbol": "person.crop.circle.fill", "hay": "Khalifa City", "points": 240, "trust": 6, "isCurrentUser": false },
+    { "key": "ahmed",  "displayName": "Ahmed",  "avatarSymbol": "person.crop.circle.fill", "hay": "Khalifa City", "points": 310, "trust": 7, "isCurrentUser": false },
+    { "key": "maria",  "displayName": "Maria",  "avatarSymbol": "person.crop.circle.fill", "hay": "Khalifa City", "points": 95,  "trust": 3, "isCurrentUser": false },
+    { "key": "yousef", "displayName": "Yousef", "avatarSymbol": "person.crop.circle.fill", "hay": "Khalifa City", "points": 150, "trust": 5, "isCurrentUser": false },
+    { "key": "aisha",  "displayName": "Aisha",  "avatarSymbol": "person.crop.circle.fill", "hay": "Khalifa City", "points": 205, "trust": 5, "isCurrentUser": false },
+    { "key": "rahul",  "displayName": "Rahul",  "avatarSymbol": "person.crop.circle.fill", "hay": "Khalifa City", "points": 70,  "trust": 2, "isCurrentUser": false }
+  ],
+  "reports": [
+    {
+      "key": "r1", "hoursAgo": 6, "category": "playground_equipment",
+      "titleEN": "Spring rider seat snapped, sharp metal exposed", "titleAR": "مقعد اللعبة الزنبركية مكسور ومعدن حاد مكشوف",
+      "summaryEN": "The seat of a spring rider has broken off, leaving a jagged metal bracket at child height.", "summaryAR": "انكسر مقعد اللعبة الزنبركية وبقيت قطعة معدنية حادة على ارتفاع الأطفال.",
+      "latitude": 24.4213, "longitude": 54.5768, "placeName": "Al Nakheel Park", "photo": "seed_1",
+      "priority": "critical", "priorityScore": 94,
+      "priorityReasonEN": "Broken children's equipment with sharp metal in a busy playground; five neighbours confirmed it.", "priorityReasonAR": "لعبة أطفال مكسورة بمعدن حاد في ملعب مزدحم، وأكد خمسة جيران البلاغ.",
+      "signals": ["child_equipment", "sharp_edge", "playground", "confirmed_x5"],
+      "status": "open", "reporter": "fatima", "isAnonymous": false, "confirmations": 5,
+      "voters": ["omar", "priya", "ahmed", "maria", "yousef", "aisha", "rahul", "you"],
+      "comments": [
+        { "author": "priya", "hoursAgo": 5, "text": "My kids play here every evening. Please tape it off until it's fixed.", "moderation": "allowed" },
+        { "author": "ahmed", "hoursAgo": 4, "text": "شفتها اليوم الصبح، الحديد بارز وخطير جداً على الصغار.", "moderation": "allowed" },
+        { "author": "maria", "hoursAgo": 3, "text": "I put a bin bag over it for now as a warning.", "moderation": "allowed" },
+        { "author": "aisha", "hoursAgo": 1, "text": "شكراً فاطمة على البلاغ، الله يعطيك العافية.", "moderation": "allowed" }
+      ]
+    },
+    {
+      "key": "r2", "hoursAgo": 30, "category": "pothole_pavement",
+      "titleEN": "Deep pothole in the right lane", "titleAR": "حفرة عميقة في المسار الأيمن",
+      "summaryEN": "A deep pothole about half a metre wide sits in the right lane near the roundabout exit.", "summaryAR": "حفرة عميقة بعرض نصف متر تقريباً في المسار الأيمن قرب مخرج الدوار.",
+      "latitude": 24.4172, "longitude": 54.5711, "placeName": "Al Yasmeen Street", "photo": "seed_2",
+      "priority": "high", "priorityScore": 72,
+      "priorityReasonEN": "A deep pothole in a traffic lane can damage cars and cause sudden swerving.", "priorityReasonAR": "حفرة عميقة في مسار السيارات قد تتلف المركبات وتسبب انحرافاً مفاجئاً.",
+      "signals": ["traffic", "street", "confirmed_x3"],
+      "status": "inProgress", "reporter": "omar", "isAnonymous": false, "confirmations": 3,
+      "voters": ["fatima", "ahmed", "rahul", "yousef", "you"],
+      "comments": [
+        { "author": "rahul", "hoursAgo": 26, "text": "Hit it last night, nearly lost a hubcap.", "moderation": "allowed" },
+        { "author": "yousef", "hoursAgo": 12, "text": "شفت فريق صيانة واقف عندها اليوم.", "moderation": "allowed" }
+      ]
+    },
+    {
+      "key": "r3", "hoursAgo": 52, "category": "electrical_hazard",
+      "titleEN": "Streetlight base open with exposed wires", "titleAR": "قاعدة عمود إنارة مفتوحة وأسلاك مكشوفة",
+      "summaryEN": "The access panel of a streetlight is missing and wires are visible at ground level beside the footpath.", "summaryAR": "غطاء عمود الإنارة مفقود والأسلاك ظاهرة على مستوى الأرض بجانب الممشى.",
+      "latitude": 24.4236, "longitude": 54.5802, "placeName": "Al Sidr Street", "photo": "seed_3",
+      "priority": "critical", "priorityScore": 90,
+      "priorityReasonEN": "Exposed wiring at ground level next to a footpath used by children walking to school.", "priorityReasonAR": "أسلاك مكشوفة على مستوى الأرض بجانب ممشى يستخدمه الأطفال في طريقهم إلى المدرسة.",
+      "signals": ["electrical", "sidewalk", "school_route"],
+      "status": "inProgress", "reporter": "ahmed", "isAnonymous": false, "confirmations": 4,
+      "voters": ["fatima", "priya", "aisha", "maria", "omar", "you"],
+      "comments": [
+        { "author": "fatima", "hoursAgo": 50, "text": "خطير جداً، الأطفال يمرون من هنا كل يوم.", "moderation": "allowed" },
+        { "author": "priya", "hoursAgo": 40, "text": "Someone placed a cone next to it, at least it's visible now.", "moderation": "allowed" },
+        { "author": "ahmed", "hoursAgo": 20, "text": "Update: a crew opened a ticket and fenced it off.", "moderation": "allowed" }
+      ]
+    },
+    {
+      "key": "r4", "hoursAgo": 14, "category": "waste_overflow_dumping",
+      "titleEN": "Bins overflowing behind the villas", "titleAR": "حاويات النفايات ممتلئة خلف الفلل",
+      "summaryEN": "Three communal bins are full and bags are piled on the ground, attracting cats.", "summaryAR": "ثلاث حاويات ممتلئة والأكياس متراكمة على الأرض وتجذب القطط.",
+      "latitude": 24.4158, "longitude": 54.5779, "placeName": "Al Reem Service Lane", "photo": "seed_4",
+      "priority": "medium", "priorityScore": 48,
+      "priorityReasonEN": "Overflowing waste is a hygiene problem but poses no immediate injury risk.", "priorityReasonAR": "تراكم النفايات مشكلة نظافة لكنه لا يشكل خطر إصابة فورياً.",
+      "signals": ["sanitation", "residential"],
+      "status": "open", "reporter": "priya", "isAnonymous": false, "confirmations": 2,
+      "voters": ["maria", "aisha", "rahul"],
+      "comments": [
+        { "author": "maria", "hoursAgo": 10, "text": "Same at the other end of the lane.", "moderation": "allowed" },
+        { "author": "omar", "hoursAgo": 8, "text": "الرائحة قوية، يا ليت يزيدون عدد مرات الجمع.", "moderation": "allowed" }
+      ]
+    },
+    {
+      "key": "r5", "hoursAgo": 220, "category": "open_manhole",
+      "titleEN": "Manhole cover missing on the footpath", "titleAR": "غطاء فتحة تصريف مفقود على الرصيف",
+      "summaryEN": "An uncovered manhole on the footpath with no barrier around it.", "summaryAR": "فتحة تصريف مكشوفة على الرصيف بدون أي حاجز حولها.",
+      "latitude": 24.4189, "longitude": 54.5694, "placeName": "Al Ghaf Walkway", "photo": "seed_5",
+      "priority": "critical", "priorityScore": 96,
+      "priorityReasonEN": "An open manhole on a walkway is an immediate fall risk, especially after dark.", "priorityReasonAR": "فتحة مكشوفة على ممشى تشكل خطر سقوط فورياً، خاصة بعد حلول الظلام.",
+      "signals": ["fall", "sidewalk", "confirmed_x6"],
+      "status": "fixed", "fixedHoursAgo": 190, "fixPhoto": "seed_fix_5",
+      "reporter": "yousef", "isAnonymous": false, "confirmations": 6,
+      "voters": ["fatima", "omar", "priya", "ahmed", "aisha", "rahul", "maria"],
+      "comments": [
+        { "author": "aisha", "hoursAgo": 218, "text": "كادت ابنتي تسقط فيها! أرجو الإسراع.", "moderation": "allowed" },
+        { "author": "rahul", "hoursAgo": 200, "text": "Cover is back on, looks solid. Thanks everyone!", "moderation": "allowed" }
+      ]
+    },
+    {
+      "key": "r6", "hoursAgo": 20, "category": "blocked_accessibility",
+      "titleEN": "Wheelchair ramp blocked by barrier", "titleAR": "منحدر الكراسي المتحركة مغلق بحاجز",
+      "summaryEN": "A temporary metal barrier has been left across the only kerb ramp at the crossing.", "summaryAR": "حاجز معدني مؤقت تُرك أمام المنحدر الوحيد عند معبر المشاة.",
+      "latitude": 24.4247, "longitude": 54.5736, "placeName": "Al Bustan Crossing", "photo": "seed_6",
+      "priority": "high", "priorityScore": 66,
+      "priorityReasonEN": "Wheelchair and stroller users cannot use the crossing safely while the ramp is blocked.", "priorityReasonAR": "لا يستطيع مستخدمو الكراسي المتحركة وعربات الأطفال عبور الطريق بأمان مع إغلاق المنحدر.",
+      "signals": ["accessibility", "street"],
+      "status": "open", "reporter": "maria", "isAnonymous": true, "confirmations": 1,
+      "voters": ["priya", "fatima", "you"],
+      "comments": [
+        { "author": "fatima", "hoursAgo": 18, "text": "والدي يستخدم الكرسي المتحرك ولم يستطع العبور أمس.", "moderation": "allowed" },
+        { "author": "omar", "hoursAgo": 9, "text": "Whoever left this should move it, it's been days.", "moderation": "softened" }
+      ]
+    },
+    {
+      "key": "r7", "hoursAgo": 130, "category": "water_leak",
+      "titleEN": "Irrigation pipe leaking onto the walkway", "titleAR": "تسرب من أنبوب الري على الممشى",
+      "summaryEN": "Water is spraying from a broken irrigation line and pooling across the jogging track.", "summaryAR": "الماء يتدفق من خط ري مكسور ويتجمع على مسار الجري.",
+      "latitude": 24.4221, "longitude": 54.5683, "placeName": "Al Zahra Park", "photo": "seed_7",
+      "priority": "medium", "priorityScore": 44,
+      "priorityReasonEN": "Wasted water and a slippery track, with limited immediate danger.", "priorityReasonAR": "هدر للمياه ومسار زلق، مع خطر فوري محدود.",
+      "signals": ["slip", "park"],
+      "status": "fixed", "fixedHoursAgo": 96, "fixPhoto": "seed_fix_7",
+      "reporter": "aisha", "isAnonymous": false, "confirmations": 2,
+      "voters": ["yousef", "priya", "you"],
+      "comments": [
+        { "author": "priya", "hoursAgo": 125, "text": "Slipped here on my morning run, careful!", "moderation": "allowed" },
+        { "author": "aisha", "hoursAgo": 95, "text": "تم الإصلاح، المسار جاف الآن.", "moderation": "allowed" }
+      ]
+    },
+    {
+      "key": "r8", "hoursAgo": 40, "category": "fitness_equipment",
+      "titleEN": "Pull-up bar loose on its frame", "titleAR": "عارضة السحب مرتخية في إطارها",
+      "summaryEN": "The pull-up bar at the outdoor gym rotates and wobbles when used.", "summaryAR": "عارضة السحب في الصالة الخارجية تدور وتهتز عند استخدامها.",
+      "latitude": 24.4202, "longitude": 54.5822, "placeName": "Al Nakheel Fitness Corner", "photo": "seed_8",
+      "priority": "medium", "priorityScore": 52,
+      "priorityReasonEN": "Loose gym equipment can cause a fall, but it is clearly visible and avoidable.", "priorityReasonAR": "أجهزة الرياضة المرتخية قد تسبب السقوط، لكنها ظاهرة ويمكن تجنبها.",
+      "signals": ["fall", "park"],
+      "status": "open", "reporter": "rahul", "isAnonymous": false, "confirmations": 1,
+      "voters": ["omar", "ahmed"],
+      "comments": [
+        { "author": "omar", "hoursAgo": 36, "text": "صحيح، جربتها وكانت تتحرك.", "moderation": "allowed" }
+      ]
+    },
+    {
+      "key": "r9", "hoursAgo": 236, "category": "playground_equipment",
+      "titleEN": "Cracked slide with a sharp edge", "titleAR": "زحليقة متشققة بحافة حادة",
+      "summaryEN": "A crack runs across the slide surface and the plastic edge is raised and sharp.", "summaryAR": "شق يمتد على سطح الزحليقة والحافة البلاستيكية بارزة وحادة.",
+      "latitude": 24.4229, "longitude": 54.5759, "placeName": "Al Nakheel Park", "photo": "seed_9",
+      "priority": "high", "priorityScore": 78,
+      "priorityReasonEN": "Children's equipment with a sharp raised edge can cut hands and legs.", "priorityReasonAR": "لعبة أطفال بحافة حادة بارزة قد تجرح الأيدي والأرجل.",
+      "signals": ["child_equipment", "sharp_edge", "playground"],
+      "status": "fixed", "fixedHoursAgo": 150, "fixPhoto": "seed_fix_9",
+      "reporter": "you", "isAnonymous": false, "confirmations": 3,
+      "voters": ["fatima", "priya", "aisha", "maria"],
+      "comments": [
+        { "author": "fatima", "hoursAgo": 230, "text": "Good catch, my son scratched his leg there last week.", "moderation": "allowed" },
+        { "author": "maria", "hoursAgo": 148, "text": "New slide panel installed, looks great!", "moderation": "allowed" },
+        { "author": "ahmed", "hoursAgo": 140, "text": "ممتاز، شكراً على المتابعة.", "moderation": "allowed" }
+      ]
+    },
+    {
+      "key": "r10", "hoursAgo": 9, "category": "pothole_pavement",
+      "titleEN": "Broken paving at the school drop-off", "titleAR": "بلاط مكسور عند نقطة إنزال الطلاب",
+      "summaryEN": "Several paving tiles are lifted and broken where parents drop children off in the morning.", "summaryAR": "عدة بلاطات مرفوعة ومكسورة في المكان الذي ينزل فيه الأهالي أطفالهم صباحاً.",
+      "latitude": 24.4183, "longitude": 54.5803, "placeName": "Al Falah Street drop-off area", "photo": "seed_10",
+      "priority": "high", "priorityScore": 70,
+      "priorityReasonEN": "A trip hazard in a crowded spot where many children walk every morning.", "priorityReasonAR": "خطر تعثر في مكان مزدحم يمشي فيه كثير من الأطفال كل صباح.",
+      "signals": ["trip", "school_area"],
+      "status": "open", "reporter": "you", "isAnonymous": false, "confirmations": 2,
+      "voters": ["priya", "aisha", "yousef"],
+      "comments": [
+        { "author": "aisha", "hoursAgo": 7, "text": "نعم، تعثرت ابنتي هنا أمس.", "moderation": "allowed" },
+        { "author": "priya", "hoursAgo": 6, "text": "Thanks for reporting, it's a mess at 7:30.", "moderation": "allowed" }
+      ]
+    },
+    {
+      "key": "r11", "hoursAgo": 160, "category": "waste_overflow_dumping",
+      "titleEN": "Old furniture left by the bins", "titleAR": "أثاث قديم متروك بجانب الحاويات",
+      "summaryEN": "A sofa was reported as dumped, but it was inside a private villa yard.", "summaryAR": "تم الإبلاغ عن كنبة متروكة، لكنها كانت داخل فناء فيلا خاصة.",
+      "latitude": 24.4166, "longitude": 54.5742, "placeName": "Al Rawda Street", "photo": "seed_11",
+      "priority": "low", "priorityScore": 18,
+      "priorityReasonEN": "The item is on private property, not in a public space.", "priorityReasonAR": "الغرض موجود داخل ملكية خاصة وليس في مكان عام.",
+      "signals": ["private_property"],
+      "status": "rejected", "reporter": "omar", "isAnonymous": false, "confirmations": 0,
+      "voters": [],
+      "comments": [
+        { "author": "yousef", "hoursAgo": 155, "text": "I think this is inside the yard, not on the street.", "moderation": "allowed" }
+      ]
+    },
+    {
+      "key": "r12", "hoursAgo": 3, "category": "electrical_hazard",
+      "titleEN": "Junction box door hanging open", "titleAR": "باب صندوق كهرباء مفتوح",
+      "summaryEN": "The door of a roadside electrical cabinet is open and the inside panel is reachable.", "summaryAR": "باب خزانة كهرباء على جانب الطريق مفتوح ويمكن الوصول إلى اللوحة الداخلية.",
+      "latitude": 24.4254, "longitude": 54.5789, "placeName": "Al Sidr Street", "photo": "seed_12",
+      "priority": "high", "priorityScore": 74,
+      "priorityReasonEN": "An open electrical cabinet near a footpath is reachable by curious children.", "priorityReasonAR": "خزانة كهرباء مفتوحة قرب الممشى يمكن أن يصل إليها الأطفال.",
+      "signals": ["electrical", "sidewalk"],
+      "status": "open", "reporter": "rahul", "isAnonymous": false, "confirmations": 1,
+      "voters": ["ahmed", "fatima"],
+      "comments": [
+        { "author": "ahmed", "hoursAgo": 2, "text": "نفس الشارع اللي فيه عمود الإنارة، لازم فحص كامل.", "moderation": "allowed" },
+        { "author": "fatima", "hoursAgo": 1, "text": "Please don't touch it, wait for the crew.", "moderation": "allowed" }
+      ]
+    },
+    {
+      "key": "r13", "hoursAgo": 70, "category": "water_leak",
+      "titleEN": "Water bubbling up through the pavement", "titleAR": "مياه تتسرب من تحت الرصيف",
+      "summaryEN": "Clean water is seeping through the pavement joints and running into the road.", "summaryAR": "مياه نظيفة تتسرب من فواصل الرصيف وتجري نحو الطريق.",
+      "latitude": 24.4196, "longitude": 54.5727, "placeName": "Al Yasmeen Street", "photo": "seed_13",
+      "priority": "medium", "priorityScore": 46,
+      "priorityReasonEN": "A continuous leak wastes water and may undermine the pavement over time.", "priorityReasonAR": "التسرب المستمر يهدر المياه وقد يضعف الرصيف مع الوقت.",
+      "signals": ["water", "sidewalk"],
+      "status": "inProgress", "reporter": "you", "isAnonymous": false, "confirmations": 2,
+      "voters": ["omar", "rahul", "maria"],
+      "comments": [
+        { "author": "omar", "hoursAgo": 60, "text": "لاحظت هذا التسرب منذ أسبوع تقريباً.", "moderation": "allowed" },
+        { "author": "maria", "hoursAgo": 30, "text": "Crew marked the spot with paint this morning.", "moderation": "allowed" }
+      ]
+    },
+    {
+      "key": "r14", "hoursAgo": 210, "category": "blocked_accessibility",
+      "titleEN": "Tactile paving missing at crossing", "titleAR": "بلاط إرشادي مفقود عند المعبر",
+      "summaryEN": "The tactile warning strip at a pedestrian crossing has been removed, leaving bare concrete.", "summaryAR": "أُزيل شريط البلاط الإرشادي عند معبر المشاة وبقي الخرسانة مكشوفة.",
+      "latitude": 24.4241, "longitude": 54.5711, "placeName": "Al Ghaf Street crossing", "photo": "seed_14",
+      "priority": "low", "priorityScore": 30,
+      "priorityReasonEN": "Makes the crossing harder for visually impaired residents, with low immediate risk to others.", "priorityReasonAR": "يجعل العبور أصعب على ذوي الإعاقة البصرية، مع خطر فوري منخفض للآخرين.",
+      "signals": ["accessibility"],
+      "status": "fixed", "fixedHoursAgo": 100, "fixPhoto": "seed_fix_14",
+      "reporter": "priya", "isAnonymous": false, "confirmations": 1,
+      "voters": ["maria", "you"],
+      "comments": [
+        { "author": "maria", "hoursAgo": 205, "text": "Important for our blind neighbour on this street.", "moderation": "allowed" },
+        { "author": "yousef", "hoursAgo": 98, "text": "تم تركيب البلاط الجديد، شكراً.", "moderation": "allowed" }
+      ]
+    }
+  ],
+  "pointsEvents": [
+    { "user": "you", "delta": 100, "reason": "welcomeBonus",   "hoursAgo": 239 },
+    { "user": "you", "delta": 20,  "reason": "reportPosted",   "hoursAgo": 236, "report": "r9" },
+    { "user": "you", "delta": 30,  "reason": "reportVerified", "hoursAgo": 230, "report": "r9" },
+    { "user": "you", "delta": 50,  "reason": "reportFixed",    "hoursAgo": 150, "report": "r9" },
+    { "user": "you", "delta": 20,  "reason": "reportPosted",   "hoursAgo": 70,  "report": "r13" },
+    { "user": "you", "delta": 30,  "reason": "reportVerified", "hoursAgo": 60,  "report": "r13" },
+    { "user": "you", "delta": 5,   "reason": "confirmation",   "hoursAgo": 120, "report": "r7" },
+    { "user": "you", "delta": 5,   "reason": "confirmation",   "hoursAgo": 48,  "report": "r3" },
+    { "user": "you", "delta": 5,   "reason": "confirmation",   "hoursAgo": 28,  "report": "r2" },
+    { "user": "you", "delta": 5,   "reason": "confirmation",   "hoursAgo": 5,   "report": "r1" },
+    { "user": "you", "delta": 20,  "reason": "reportPosted",   "hoursAgo": 9,   "report": "r10" },
+    { "user": "you", "delta": 50,  "reason": "reportFixed",    "hoursAgo": 100, "report": "r14" },
+    { "user": "you", "delta": 20,  "reason": "helpfulComment", "hoursAgo": 140 },
+    { "user": "fatima", "delta": 20, "reason": "reportPosted",  "hoursAgo": 6,   "report": "r1" },
+    { "user": "fatima", "delta": 30, "reason": "reportVerified","hoursAgo": 4,   "report": "r1" },
+    { "user": "yousef", "delta": 50, "reason": "reportFixed",   "hoursAgo": 190, "report": "r5" },
+    { "user": "aisha",  "delta": 50, "reason": "reportFixed",   "hoursAgo": 96,  "report": "r7" },
+    { "user": "priya",  "delta": 50, "reason": "reportFixed",   "hoursAgo": 100, "report": "r14" },
+    { "user": "omar",   "delta": -10,"reason": "rejectedSubmission", "hoursAgo": 158, "report": "r11" }
+  ]
+}

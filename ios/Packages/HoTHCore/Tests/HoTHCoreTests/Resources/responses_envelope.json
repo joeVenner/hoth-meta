@@ -1,0 +1,16 @@
+{
+  "id": "resp_test_123",
+  "object": "response",
+  "status": "completed",
+  "model": "gpt-6.1-sol",
+  "output": [
+    { "id": "rs_1", "type": "reasoning", "summary": [] },
+    {
+      "id": "msg_1",
+      "type": "message",
+      "role": "assistant",
+      "status": "completed",
+      "content": [ { "type": "output_text", "annotations": [], "text": "__PAYLOAD__" } ]
+    }
+  ]
+}

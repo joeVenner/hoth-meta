@@ -1,0 +1,25 @@
+{
+  "category": "playground_equipment",
+  "title_en": "Broken spring rider with sharp metal",
+  "title_ar": "لعبة نابضية مكسورة بحواف معدنية حادة",
+  "description_en": "The seat of a spring rider has snapped off, leaving a jagged metal post exposed.",
+  "description_ar": "انكسر مقعد اللعبة النابضية وظهر عمود معدني بحواف حادة.",
+  "hazards": [
+    { "label": "exposed sharp metal post", "kind": "sharp_edge", "box": { "x": 0.41, "y": 0.52, "w": 0.12, "h": 0.1 } },
+    { "label": "unstable spring base", "kind": "fall", "box": { "x": 0.35, "y": 0.6, "w": 0.25, "h": 0.3 } }
+  ],
+  "child_use_equipment": true,
+  "child_present": false,
+  "scene_type": "playground",
+  "severity_proposal": "high",
+  "severity_reason_en": "A jagged metal post is exposed on equipment children ride.",
+  "severity_reason_ar": "يوجد عمود معدني حاد مكشوف في لعبة يركبها الأطفال.",
+  "plausibility": {
+    "shows_reported_issue": true,
+    "looks_like_screen_or_print": false,
+    "looks_like_stock_or_watermarked": false,
+    "notes": "Outdoor daylight photo of playground equipment."
+  },
+  "suggested_questions": ["Are children using it right now?"],
+  "confidence": "high"
+}

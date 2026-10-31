@@ -1,0 +1,6 @@
+{
+  "images" : [
+    { "filename" : "empty_feed.jpg", "idiom" : "universal" }
+  ],
+  "info" : { "author" : "xcode", "version" : 1 }
+}
