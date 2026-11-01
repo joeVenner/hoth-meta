@@ -193,6 +193,21 @@ final class FileVoiceRecorderTests: XCTestCase {
         XCTAssertNil(recorder.stop())
     }
 
+    func testClipSwappedAfterLoadingIsNotHandedOver() throws {
+        try writeClip("01.wav")
+        let recorder = makeRecorder(clips: try loadClips().get())
+        try Data("not audio".utf8).write(to: clipsDirectory.appendingPathComponent("01.wav"))
+
+        try recorder.start()
+        XCTAssertNil(recorder.stop(), "The copy is validated again; junk never reaches Meta")
+        XCTAssertEqual(try fileManager.contentsOfDirectory(atPath: copiesDirectory.path), [], "The bad copy is deleted")
+    }
+
+    func testAudioCheckFailsClosedWhenTheFileIsMissing() {
+        let missing = clipsDirectory.appendingPathComponent("gone.wav")
+        XCTAssertEqual(FileVoicePlaylist.audio(at: missing).map(\.durationMs), .failure(.notRegularFile("gone.wav")))
+    }
+
     func testLevelPlaysTheEnvelopeOverTime() throws {
         try writeClip("01.wav", durationMs: 1_000, loudMs: 500)
         var clock = Date(timeIntervalSince1970: 0)

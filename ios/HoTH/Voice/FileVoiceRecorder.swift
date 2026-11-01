@@ -85,7 +85,7 @@ enum FileVoicePlaylist {
         guard fileManager.fileExists(atPath: directory.path, isDirectory: &isDirectory), isDirectory.boolValue else {
             return .failure(.notADirectory(path))
         }
-        let keys: [URLResourceKey] = [.isRegularFileKey, .isSymbolicLinkKey, .fileSizeKey]
+        let keys: [URLResourceKey] = [.isRegularFileKey, .isSymbolicLinkKey]
         let entries: [URL]
         do {
             entries = try fileManager.contentsOfDirectory(at: directory, includingPropertiesForKeys: keys,
@@ -118,7 +118,24 @@ enum FileVoicePlaylist {
         // Belt and braces: the directory itself was resolved, so a plain child must stay under it.
         let resolved = url.resolvingSymlinksInPath().path
         guard resolved.hasPrefix(directory.path + "/") else { return .failure(.outsideDirectory(name)) }
-        let size = values.fileSize ?? 0
+        switch audio(at: url, maxBytes: maxBytes, fileManager: .default) {
+        case .success(let wav):
+            return .success(FileVoiceClip(url: url, durationMs: wav.durationMs,
+                                          envelope: envelope(of: wav, window: envelopeWindow)))
+        case .failure(let error):
+            return .failure(error)
+        }
+    }
+
+    /// Size cap (fail closed when the size is unknown), canonical PCM16 and the minimum duration.
+    /// Also re-run on the temp copy in `FileVoiceRecorder.stop()`, so a clip swapped after loading is
+    /// never sent to Meta.
+    static func audio(at url: URL, maxBytes: Int = defaultMaxBytes,
+                      fileManager: FileManager = .default) -> Result<PCMWAV, LoadError> {
+        let name = url.lastPathComponent
+        guard let size = ((try? fileManager.attributesOfItem(atPath: url.path))?[.size] as? NSNumber)?.intValue else {
+            return .failure(.notRegularFile(name))
+        }
         guard size <= maxBytes else { return .failure(.tooLarge(name, bytes: size)) }
 
         let wav: PCMWAV
@@ -130,8 +147,7 @@ enum FileVoicePlaylist {
         guard wav.durationMs >= minimumDurationMs else {
             return .failure(.tooShort(name, durationMs: wav.durationMs))
         }
-        return .success(FileVoiceClip(url: url, durationMs: wav.durationMs,
-                                      envelope: envelope(of: wav, window: envelopeWindow)))
+        return .success(wav)
     }
 
     /// RMS per window, mapped to 0...1 with the same dB curve as the live mic meter.
@@ -241,6 +257,12 @@ final class FileVoiceRecorder: VoiceRecording {
             try fileManager.copyItem(at: turn.clip.url, to: copy)
         } catch {
             Self.logger.error("Could not copy clip \(turn.clip.url.lastPathComponent, privacy: .public): \(String(describing: error))")
+            return nil
+        }
+        // The clip was validated at load; check the copy too, since it is what goes to Meta.
+        if case .failure(let error) = FileVoicePlaylist.audio(at: copy, fileManager: fileManager) {
+            Self.logger.error("Clip changed since loading: \(error.description, privacy: .public)")
+            try? fileManager.removeItem(at: copy)
             return nil
         }
         return copy
