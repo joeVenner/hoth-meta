@@ -6,13 +6,15 @@ import Vision
 
 /// On-device face and licence-plate blurring with Apple Vision (P0-18).
 ///
-/// The blurred image is the only one ever posted to the neighbourhood feed; the original stays on
-/// the device for the ticket. Only detected faces and plate-like text (a short alphanumeric string
-/// with a digit, in a small, wide rectangle) are obscured; everything else is left untouched.
-/// If detection or rendering fails, the result is marked unsafe and carries no image, so the
-/// caller keeps the report private instead of posting either the original or a smeared photo.
+/// The blurred image is the only one ever posted to the neighbourhood feed AND the only one ever sent
+/// to Meta (vision, SAM, duplicate judge, fix check, the intake agent's `segment_hazard`): see
+/// `redactForUpload`. The original stays on the device for the ticket. Only detected faces and
+/// plate-like text (a short alphanumeric string with a digit, in a small, wide rectangle) are
+/// obscured; everything else is left untouched. If detection or rendering fails, the result is
+/// marked unsafe and carries no image, so the caller keeps the report private and sends nothing,
+/// instead of posting or uploading either the original or a smeared photo.
 enum FaceAndPlateBlur {
-    struct Result {
+    struct Result: @unchecked Sendable {
         /// The redacted image; nil whenever redaction could not be guaranteed.
         let image: UIImage?
         let faceCount: Int
@@ -32,12 +34,78 @@ enum FaceAndPlateBlur {
 
     private static let logger = Logger(subsystem: "io.fomy.hoth", category: "Privacy")
 
+    /// The redacted JPEG for a Meta request, plus the blur result it came from (reused for posting).
+    struct Upload: @unchecked Sendable {
+        /// JPEG bytes of `result.image`: the only photo bytes that may leave the phone.
+        let jpegData: Data
+        /// Always a successful result (`isSafeToPost == true`).
+        let result: Result
+    }
+
+    /// Upper bound for the blur before an upload. Detection normally takes well under this; past it
+    /// the photo is treated as unredactable and nothing is sent (the resident can retake).
+    static let uploadTimeout: Duration = .seconds(10)
+
+    /// Blurs `image` and encodes the result for a Meta request. Nil when blurring fails or exceeds
+    /// `timeout`: the caller must then send nothing (fail closed), never fall back to the original.
+    static func redactForUpload(_ image: UIImage, quality: CGFloat,
+                                timeout: Duration = uploadTimeout) async -> Upload? {
+        let result = await blur(image, timeout: timeout)
+        guard let redacted = result.image, let data = redacted.jpegData(compressionQuality: quality) else {
+            logger.error("Upload blocked: the photo could not be redacted")
+            return nil
+        }
+        return Upload(jpegData: data, result: result)
+    }
+
     /// Detects faces and plate-like text and blurs only those regions. Never throws: on failure the
     /// result is `Result.failed` (`isSafeToPost == false`).
     static func blur(_ image: UIImage) async -> Result {
         await Task.detached(priority: .userInitiated) {
             blurSync(image)
         }.value
+    }
+
+    /// `blur`, but `.failed` once `timeout` passes. Vision work cannot be cancelled mid-request, so a
+    /// late result is simply dropped.
+    static func blur(_ image: UIImage, timeout: Duration) async -> Result {
+        await firstResult(timeout: timeout, fallback: .failed) { blurSync(image) }
+    }
+
+    /// Runs `work` off the caller and returns its value, or `fallback` if `timeout` passes first.
+    static func firstResult<Value: Sendable>(timeout: Duration, fallback: Value,
+                                             work: @escaping @Sendable () -> Value) async -> Value {
+        await withCheckedContinuation { continuation in
+            let gate = ResumeOnce(continuation)
+            let timer = Task.detached {
+                try await Task.sleep(for: timeout)
+                if gate.resume(with: fallback) { logger.error("On-device redaction timed out") }
+            }
+            Task.detached(priority: .userInitiated) {
+                let value = work()
+                timer.cancel()
+                gate.resume(with: value)
+            }
+        }
+    }
+
+    /// Resumes a continuation exactly once, from whichever task gets there first.
+    private final class ResumeOnce<Value: Sendable>: @unchecked Sendable {
+        private let lock = NSLock()
+        private var continuation: CheckedContinuation<Value, Never>?
+
+        init(_ continuation: CheckedContinuation<Value, Never>) { self.continuation = continuation }
+
+        /// True if this call resumed the continuation.
+        @discardableResult
+        func resume(with value: Value) -> Bool {
+            let pending: CheckedContinuation<Value, Never>? = lock.withLock {
+                defer { continuation = nil }
+                return continuation
+            }
+            pending?.resume(returning: value)
+            return pending != nil
+        }
     }
 
     static func blurSync(_ image: UIImage) -> Result {
