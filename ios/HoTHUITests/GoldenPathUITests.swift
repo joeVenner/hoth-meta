@@ -58,10 +58,10 @@ final class GoldenPathUITests: XCTestCase {
         continueButton.tap()
         tapSafetyContinueIfShown()
 
-        // 4. Interview: switch to Type and answer the two slot questions.
+        // 4. Interview: switch to Type when the Talk/Type picker is shown (only when a voice interview is
+        //    available), then answer the two slot questions.
         let typeSegment = app.buttons["Type"]
-        XCTAssertTrue(typeSegment.waitForExistence(timeout: 15), "Interview mode picker missing")
-        typeSegment.tap()
+        if typeSegment.waitForExistence(timeout: 5) { typeSegment.tap() }
 
         let noReply = app.buttons["No"]
         XCTAssertTrue(noReply.waitForExistence(timeout: 20), "First question (children using it now?) missing")
