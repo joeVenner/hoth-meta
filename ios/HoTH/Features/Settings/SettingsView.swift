@@ -32,6 +32,7 @@ struct SettingsView: View {
                 .padding(.bottom, 120)
             }
             .background(Color.hothBackground.ignoresSafeArea())
+            .hothStatusBarBackdrop()
             .toolbar(.hidden, for: .navigationBar)
             .onAppear { keyStatus = services.keyProvider.maskedStatus() }
             .confirmationDialog(

@@ -40,6 +40,7 @@ The format follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/
 - The realtime-only mid-call urgency path in `ReportFlowModel` (`voiceFlaggedUrgent`, `SafetyAlert.keepsInterview`, `urgentAnswers`); push-to-talk urgency goes through the chat like typing.
 
 ### Fixed
+- Feed and Settings scroll content no longer runs under the status bar clock (page-colour backdrop behind the status bar).
 - A `find_nearby_reports` call with a huge `radius_m` (such as 1e30) no longer crashes the app: the radius is clamped to 10...500 m before it becomes an `Int`.
 - Leaving the interview cancels the chat turn in flight: a late Muse Spark reply no longer adds bubbles, falls back to the offline chat, or finishes the report. Interview results also carry the report's run id, so a reply from an abandoned report (retake, close) cannot complete, flag or merge the new one.
 - Switching to typing (or leaving the interview) while a voice turn is being transcribed no longer shows "Couldn't turn your voice into text", and a transcript that comes back for an abandoned turn is dropped instead of being sent into a newer turn.

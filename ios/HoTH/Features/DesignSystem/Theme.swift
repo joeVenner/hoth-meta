@@ -276,6 +276,22 @@ struct SectionHeader: View {
     }
 }
 
+// MARK: Status bar backdrop
+
+extension View {
+    /// Page colour behind the status bar so scrolled content does not run under the clock
+    /// (screens that hide the navigation bar).
+    func hothStatusBarBackdrop() -> some View {
+        // A zero-height inset sits on the safe-area edge; its background extends up under the status bar.
+        safeAreaInset(edge: .top, spacing: 0) {
+            Color.clear
+                .frame(height: 0)
+                .background(Color.hothBackground, ignoresSafeAreaEdges: .top)
+                .allowsHitTesting(false)
+        }
+    }
+}
+
 // MARK: RTL-safe tracking
 
 private struct HoTHTrackingModifier: ViewModifier {

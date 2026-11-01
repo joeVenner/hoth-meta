@@ -73,6 +73,7 @@ struct FeedView: View {
                 }
             }
             .background(Color.hothBackground.ignoresSafeArea())
+            .hothStatusBarBackdrop()
             .navigationDestination(for: UUID.self) { id in
                 if let report = reports.first(where: { $0.id == id }) {
                     CaseDetailView(report: report)
