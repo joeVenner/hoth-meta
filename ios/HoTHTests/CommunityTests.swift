@@ -94,12 +94,12 @@ final class CommunityTests: XCTestCase {
     }
 
     private struct ThrowingKeyProvider: APIKeyProvider {
-        func apiKey() async throws -> String { throw OpenAIError.missingKey }
+        func apiKey() async throws -> String { throw ModelAPIError.missingKey }
     }
 
-    private func makeModerator(hasKey: Bool) throws -> OpenAICommentModerator {
+    private func makeModerator(hasKey: Bool) throws -> ModelCommentModerator {
         let prompts = try Prompts(bundle: .main)
-        return OpenAICommentModerator(client: OpenAIClient(keyProvider: ThrowingKeyProvider()),
+        return ModelCommentModerator(client: MetaModelClient(keyProvider: ThrowingKeyProvider()),
                                       prompts: prompts, hasKey: { hasKey })
     }
 }

@@ -13,7 +13,7 @@ struct ChatBubble: Identifiable, Equatable {
 
 /// Text quick-chat intake (P0-15).
 ///
-/// Uses the `chat_intake` prompt through `OpenAIClient` when a key is available; on a missing key or
+/// Uses the `chat_intake` prompt through `MetaModelClient` when a key is available; on a missing key or
 /// any API/network error it switches, mid-conversation if needed, to a deterministic local flow that
 /// asks the category's slot questions in order, reads back, and asks about posting.
 @MainActor
@@ -36,7 +36,7 @@ final class ChatIntakeModel: ObservableObject {
 
     let context: InterviewContext
     private let slots: [SlotQuestion]
-    private let client: OpenAIClient?
+    private let client: MetaModelClient?
     private let prompts: Prompts
     private let onComplete: (SubmitReportArgs) -> Void
     private let onUrgent: (String) -> Void
@@ -45,7 +45,7 @@ final class ChatIntakeModel: ObservableObject {
     private var phase: LocalPhase = .asking(0)
     private static let logger = Logger(subsystem: "io.fomy.hoth", category: "ChatIntake")
 
-    init(context: InterviewContext, slots: [SlotQuestion], client: OpenAIClient?, prompts: Prompts,
+    init(context: InterviewContext, slots: [SlotQuestion], client: MetaModelClient?, prompts: Prompts,
          onComplete: @escaping (SubmitReportArgs) -> Void, onUrgent: @escaping (String) -> Void) {
         self.context = context
         self.slots = Array(slots.prefix(2))

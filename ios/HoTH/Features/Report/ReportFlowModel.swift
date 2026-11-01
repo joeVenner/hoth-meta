@@ -70,7 +70,7 @@ final class ReportFlowModel: ObservableObject {
 
     // MARK: Dependencies
 
-    private let client: OpenAIClient
+    private let client: MetaModelClient
     private let prompts: Prompts
     private let isDemoModeProvider: () -> Bool
     private let hasAPIKeyProvider: () -> Bool
@@ -93,7 +93,7 @@ final class ReportFlowModel: ObservableObject {
     ///   - isDemoMode: read live; demo mode allows bundled photos and the offline canned analysis.
     ///   - hasAPIKey: read live; without a key a demo photo uses its canned analysis (no doomed call).
     ///   - visionModel: read live; the Settings override (nil/blank → prompts.json `models.vision`).
-    init(client: OpenAIClient, prompts: Prompts, language: @escaping () -> String,
+    init(client: MetaModelClient, prompts: Prompts, language: @escaping () -> String,
          isDemoMode: @escaping () -> Bool, hasAPIKey: @escaping () -> Bool = { true },
          visionModel: @escaping () -> String? = { nil }) {
         self.visionModelProvider = visionModel
@@ -602,7 +602,7 @@ final class ReportFlowModel: ObservableObject {
     }
 
     static func friendlyMessage(for error: Error, arabic: Bool) -> String {
-        switch error as? OpenAIError {
+        switch error as? ModelAPIError {
         case .missingKey, .invalidKey:
             return arabic
                 ? "مفتاح الذكاء الاصطناعي غير مضبوط. أضفه من الإعدادات أو فعّل الوضع التجريبي."

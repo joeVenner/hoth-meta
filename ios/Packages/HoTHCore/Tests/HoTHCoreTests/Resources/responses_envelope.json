@@ -2,7 +2,7 @@
   "id": "resp_test_123",
   "object": "response",
   "status": "completed",
-  "model": "gpt-6.1-sol",
+  "model": "muse-spark-1.3",
   "output": [
     { "id": "rs_1", "type": "reasoning", "summary": [] },
     {
@@ -12,5 +12,6 @@
       "status": "completed",
       "content": [ { "type": "output_text", "annotations": [], "text": "__PAYLOAD__" } ]
     }
-  ]
+  ],
+  "usage": { "input_tokens": 69, "output_tokens": 163, "total_tokens": 232 }
 }

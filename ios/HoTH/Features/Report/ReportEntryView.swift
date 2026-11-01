@@ -15,7 +15,7 @@ struct ReportEntryView: View {
         self.onClose = onClose
         let services = AppServices.shared
         _flow = StateObject(wrappedValue: ReportFlowModel(
-            client: services.openAI,
+            client: services.modelClient,
             prompts: services.prompts,
             language: { AppServices.shared.isArabic ? "ar" : "en" },
             isDemoMode: { AppServices.shared.demoMode },
@@ -101,7 +101,7 @@ struct ReportEntryView: View {
                     context: context,
                     slots: flow.slots,
                     // UI tests use the local chat so the golden path costs one live call (vision).
-                    client: services.hasAPIKey() && !AppServices.isUITestRun ? services.openAI : nil,
+                    client: services.hasAPIKey() && !AppServices.isUITestRun ? services.modelClient : nil,
                     prompts: services.prompts,
                     // No voice builder yet: Talk is hidden and the interview runs as text until the
                     // push-to-talk interview (Muse Voice Transcribe + on-device speech) lands.

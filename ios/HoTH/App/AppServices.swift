@@ -75,7 +75,7 @@ struct KeychainAPIKeyProvider: APIKeyProvider {
     static let service = "HoTH.OpenAIKey"
 
     func apiKey() async throws -> String {
-        guard let key = currentKey() else { throw OpenAIError.missingKey }
+        guard let key = currentKey() else { throw ModelAPIError.missingKey }
         return key
     }
 
@@ -131,7 +131,7 @@ final class AppServices: ObservableObject {
     }
 
     let keyProvider: KeychainAPIKeyProvider
-    var openAI: OpenAIClient
+    var modelClient: MetaModelClient
     var prompts: Prompts
 
     // Settings are UserDefaults-backed (same keys work with `@AppStorage` in views). Explicit
@@ -179,7 +179,7 @@ final class AppServices: ObservableObject {
     private init() {
         let provider = KeychainAPIKeyProvider()
         keyProvider = provider
-        openAI = OpenAIClient(keyProvider: provider)
+        modelClient = MetaModelClient(keyProvider: provider)
         do {
             prompts = try Prompts(bundle: .main)
         } catch {

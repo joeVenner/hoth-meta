@@ -362,7 +362,7 @@ struct CaseDetailView: View {
         isComposerFocused = false
         save()
         isPostingComment = false
-        let activeModerator = moderator ?? OpenAICommentModerator.live()
+        let activeModerator = moderator ?? ModelCommentModerator.live()
         let reportTitle = report.titleEN.isEmpty ? report.titleAR : report.titleEN
         Task { @MainActor in
             let status = await activeModerator.moderate(text, reportTitle: reportTitle)

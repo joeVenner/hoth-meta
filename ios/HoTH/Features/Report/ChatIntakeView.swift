@@ -13,7 +13,7 @@ typealias VoiceInterviewBuilder = (
 struct InterviewStepView: View {
     let context: InterviewContext
     let slots: [SlotQuestion]
-    let client: OpenAIClient?
+    let client: MetaModelClient?
     let prompts: Prompts
     let voiceBuilder: VoiceInterviewBuilder?
     let onComplete: (SubmitReportArgs) -> Void
@@ -26,7 +26,7 @@ struct InterviewStepView: View {
     /// - Parameter initialMode: the segment selected on entry (see `initialMode(prefersVoice:isUITestRun:)`).
     ///   Talk is used even without a key: the voice screen then explains why it can't start instead of
     ///   silently switching to Type.
-    init(context: InterviewContext, slots: [SlotQuestion], client: OpenAIClient?, prompts: Prompts,
+    init(context: InterviewContext, slots: [SlotQuestion], client: MetaModelClient?, prompts: Prompts,
          voiceBuilder: VoiceInterviewBuilder?, initialMode: Mode = .talk,
          onComplete: @escaping (SubmitReportArgs) -> Void, onUrgent: @escaping (String) -> Void) {
         self.context = context
@@ -78,7 +78,7 @@ struct ChatIntakeView: View {
     @State private var draft = ""
     @FocusState private var isFocused: Bool
 
-    init(context: InterviewContext, slots: [SlotQuestion], client: OpenAIClient?, prompts: Prompts,
+    init(context: InterviewContext, slots: [SlotQuestion], client: MetaModelClient?, prompts: Prompts,
          onComplete: @escaping (SubmitReportArgs) -> Void, onUrgent: @escaping (String) -> Void) {
         _model = StateObject(wrappedValue: ChatIntakeModel(
             context: context, slots: slots, client: client, prompts: prompts,

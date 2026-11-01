@@ -58,8 +58,8 @@ struct LocalCommentModerator: CommentModerator {
 
 /// P1-06: local checks first (no call when they already block), then the `moderation` prompt.
 /// Missing key, offline or any API error falls back to the local verdict (allow).
-struct OpenAICommentModerator: CommentModerator {
-    let client: OpenAIClient
+struct ModelCommentModerator: CommentModerator {
+    let client: MetaModelClient
     let prompts: Prompts
     let hasKey: @Sendable () -> Bool
 
@@ -88,14 +88,14 @@ struct OpenAICommentModerator: CommentModerator {
     }
 }
 
-extension OpenAICommentModerator {
+extension ModelCommentModerator {
     /// App moderator: local-only in UI-test runs (no live calls), else OpenAI-backed.
     @MainActor
     static func live() -> CommentModerator {
         if AppServices.isUITestRun { return LocalCommentModerator() }
         let services = AppServices.shared
         let provider = services.keyProvider
-        return OpenAICommentModerator(client: services.openAI, prompts: services.prompts,
+        return ModelCommentModerator(client: services.modelClient, prompts: services.prompts,
                                       hasKey: { provider.currentKey() != nil })
     }
 }
