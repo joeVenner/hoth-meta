@@ -600,6 +600,22 @@
         }
       }
     },
+    "App reset, but the Meta API key could not be removed." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تمت إعادة ضبط التطبيق، لكن تعذّر حذف مفتاح Meta API."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App reset, but the Meta API key could not be removed."
+          }
+        }
+      }
+    },
     "Back to work" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1179,6 +1195,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Critical"
+          }
+        }
+      }
+    },
+    "Deletes all reports, comments, points, photos and settings on this device, reloads the demo community and shows the welcome screens again. Your Meta API key is kept unless you remove it." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يحذف كل البلاغات والتعليقات والنقاط والصور والإعدادات على هذا الجهاز، ويعيد تحميل المجتمع التجريبي، ويعرض شاشات الترحيب من جديد. يبقى مفتاح Meta API محفوظًا ما لم تختر حذفه."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deletes all reports, comments, points, photos and settings on this device, reloads the demo community and shows the welcome screens again. Your Meta API key is kept unless you remove it."
           }
         }
       }
@@ -3198,6 +3230,54 @@
         }
       }
     },
+    "Reset" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إعادة الضبط"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset"
+          }
+        }
+      }
+    },
+    "Reset app" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إعادة ضبط التطبيق"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset app"
+          }
+        }
+      }
+    },
+    "Reset app and remove Meta API key" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إعادة ضبط التطبيق وحذف مفتاح Meta API"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset app and remove Meta API key"
+          }
+        }
+      }
+    },
     "Reset demo community" : {
       "localizations" : {
         "ar" : {
@@ -3259,6 +3339,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reset failed."
+          }
+        }
+      }
+    },
+    "Reset failed. Please try again." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فشلت إعادة الضبط. يُرجى المحاولة مرة أخرى."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset failed. Please try again."
+          }
+        }
+      }
+    },
+    "Reset HoTH?" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إعادة ضبط HoTH؟"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset HoTH?"
           }
         }
       }
@@ -3583,6 +3695,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Start interview with voice"
+          }
+        }
+      }
+    },
+    "Start over as on first launch. Your Meta API key stays unless you choose to remove it." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ابدأ من جديد كما في أول تشغيل. يبقى مفتاح Meta API محفوظًا ما لم تختر حذفه."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start over as on first launch. Your Meta API key stays unless you choose to remove it."
           }
         }
       }

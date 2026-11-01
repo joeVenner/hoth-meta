@@ -2,7 +2,7 @@ import OSLog
 import SwiftData
 import SwiftUI
 
-/// Settings (P0-22): API key (Keychain), demo mode, role, language, model overrides, reset, privacy.
+/// Settings (P0-22): API key (Keychain), demo mode, role, language, model overrides, privacy, reset.
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @ObservedObject private var services = AppServices.shared
@@ -11,6 +11,8 @@ struct SettingsView: View {
     @State private var keyError: LocalizedStringKey?
     @State private var isConfirmingReset = false
     @State private var resetMessage: LocalizedStringKey?
+    @State private var isConfirmingAppReset = false
+    @State private var isResettingApp = false
 
     private static let logger = Logger(subsystem: "io.fomy.hoth", category: "Settings")
 
@@ -24,6 +26,7 @@ struct SettingsView: View {
                     languageSection
                     modelsSection
                     aboutSection
+                    resetAppSection
                 }
                 .padding(.horizontal, HoTHSpacing.m)
                 .padding(.bottom, 120)
@@ -40,6 +43,23 @@ struct SettingsView: View {
                 Button(role: .cancel) {} label: { Text("Cancel") }
             } message: {
                 Text("This deletes all reports, comments and points on this device and reloads the demo community.")
+            }
+            .confirmationDialog(
+                Text("Reset HoTH?"),
+                isPresented: $isConfirmingAppReset,
+                titleVisibility: .visible
+            ) {
+                Button(role: .destructive) { resetApp(removingAPIKey: false) } label: { Text("Reset app") }
+                    .accessibilityIdentifier("confirmResetAppButton")
+                if services.hasAPIKey() && !services.keyProvider.isUsingEnvironmentFallback {
+                    Button(role: .destructive) { resetApp(removingAPIKey: true) } label: {
+                        Text("Reset app and remove Meta API key")
+                    }
+                    .accessibilityIdentifier("confirmResetAppRemoveKeyButton")
+                }
+                Button(role: .cancel) {} label: { Text("Cancel") }
+            } message: {
+                Text("Deletes all reports, comments, points, photos and settings on this device, reloads the demo community and shows the welcome screens again. Your Meta API key is kept unless you remove it.")
             }
         }
     }
@@ -261,6 +281,36 @@ struct SettingsView: View {
         }
     }
 
+    private var resetAppSection: some View {
+        VStack(alignment: .leading, spacing: HoTHSpacing.s) {
+            SectionHeader(title: "Reset")
+            HoTHCard {
+                VStack(alignment: .leading, spacing: HoTHSpacing.s) {
+                    Button(role: .destructive) {
+                        services.appResetNotice = nil
+                        isConfirmingAppReset = true
+                    } label: {
+                        Label { Text("Reset app") } icon: { Image(systemName: "trash") }
+                            .font(.hothHeadline)
+                            .foregroundStyle(Color.hothCritical)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(isResettingApp)
+                    .accessibilityIdentifier("resetAppButton")
+                    Text("Start over as on first launch. Your Meta API key stays unless you choose to remove it.")
+                        .font(.hothCaption)
+                        .foregroundStyle(Color.hothInkSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    if let notice = services.appResetNotice {
+                        Text(notice).font(.hothCaption).foregroundStyle(Color.hothCritical)
+                    }
+                }
+            }
+        }
+    }
+
     private func privacyRow(symbol: String, text: LocalizedStringKey) -> some View {
         HStack(alignment: .top, spacing: HoTHSpacing.m) {
             Image(systemName: symbol)
@@ -295,6 +345,27 @@ struct SettingsView: View {
         } catch {
             Self.logger.error("Removing API key failed: \(String(describing: error))")
             keyError = "Could not remove the key."
+        }
+    }
+
+    /// Runs after the dialog has gone, so the onboarding cover it brings back does not collide with it.
+    private func resetApp(removingAPIKey: Bool) {
+        guard !isResettingApp else { return }
+        isResettingApp = true
+        Task { @MainActor in
+            defer { isResettingApp = false }
+            try? await Task.sleep(for: .milliseconds(400))
+            do {
+                let outcome = try AppResetter().reset(context: modelContext, removingAPIKey: removingAPIKey)
+                NeighbourAlertCenter.shared.dismissBanner()
+                Haptics.success()
+                // Rebuilds the whole tab tree (this view included) on the fresh state.
+                services.didResetApp(notice: outcome.failedToRemoveAPIKey
+                    ? "App reset, but the Meta API key could not be removed." : nil)
+            } catch {
+                Self.logger.error("App reset failed: \(String(describing: error))")
+                services.didResetApp(notice: "Reset failed. Please try again.")
+            }
         }
     }
 

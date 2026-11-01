@@ -47,6 +47,7 @@ private struct AppRootView: View {
     var body: some View {
         ZStack {
             RootTabs(isLaunching: isLaunching)
+                .id(services.resetGeneration)
             if isSplashVisible {
                 LaunchSplashView(onFinish: finishSplash)
                     .environment(\.locale, services.localeOverride ?? Locale.autoupdatingCurrent)
