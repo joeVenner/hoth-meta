@@ -81,4 +81,28 @@ final class DemoCaptureLaunchTests: XCTestCase {
         XCTAssertFalse(NeighbourAlertPolicy.shouldAlert(priority: .critical, distance: distance, lastAlertAt: nil))
     }
 }
+
+/// C2: the system banner for the demo neighbour alert must not cover the in-app "Demo" banner in capture.
+final class CaptureNotificationPresentationTests: XCTestCase {
+    private let alert = FixedMomentNotifier.Kind.neighbourAlert.rawValue
+    private let fixed = FixedMomentNotifier.Kind.fixedMoment.rawValue
+
+    func testCaptureModeListsNeighbourAlertWithoutBanner() {
+        let options = FixedMomentNotifier.foregroundPresentationOptions(kindRaw: alert, isDemoCapture: true)
+        XCTAssertEqual(options, [.list])
+        XCTAssertFalse(options.contains(.banner))
+    }
+
+    func testOutsideCaptureNeighbourAlertStillShowsBanner() {
+        XCTAssertEqual(FixedMomentNotifier.foregroundPresentationOptions(kindRaw: alert, isDemoCapture: false),
+                       [.banner, .sound])
+    }
+
+    func testCaptureModeKeepsFixedMomentAndUntaggedBanners() {
+        XCTAssertEqual(FixedMomentNotifier.foregroundPresentationOptions(kindRaw: fixed, isDemoCapture: true),
+                       [.banner, .sound])
+        XCTAssertEqual(FixedMomentNotifier.foregroundPresentationOptions(kindRaw: nil, isDemoCapture: true),
+                       [.banner, .sound])
+    }
+}
 #endif

@@ -128,7 +128,8 @@ final class NeighbourAlertCenter: ObservableObject {
         withAnimation(HoTHMotion.spring) {
             banner = NeighbourAlertBanner(reportID: report.id, message: message, isDemo: isDemo)
         }
-        FixedMomentNotifier.shared.schedule(title: arabic ? "تنبيه الجيران" : "Neighbour alert", body: message)
+        FixedMomentNotifier.shared.schedule(title: arabic ? "تنبيه الجيران" : "Neighbour alert", body: message,
+                                             kind: .neighbourAlert)
 
         dismissTask?.cancel()
         dismissTask = Task { [weak self] in
