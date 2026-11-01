@@ -35,7 +35,7 @@ struct ReportEntryView: View {
             }
         }
         .animation(HoTHMotion.spring, value: stepKey)
-        // A sheet (not a full-screen cover or a step swap) so a voice call underneath keeps running.
+        // A sheet (not a full-screen cover or a step swap) so the step underneath stays put.
         .sheet(item: $flow.safetyAlert, onDismiss: { flow.safetySheetDismissed() }) { alert in
             SafetySheet(reason: alert.reason) { flow.continueAfterSafety() }
         }

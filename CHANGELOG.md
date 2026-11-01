@@ -24,3 +24,4 @@ The format follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/
 - The previous provider's realtime (WebRTC) voice interview, replaced by Meta push-to-talk.
 - Localized strings left over from the realtime voice screens.
 - The unused WebRTC Swift package from `ios/project.yml`.
+- The realtime-only mid-call urgency path in `ReportFlowModel` (`voiceFlaggedUrgent`, `SafetyAlert.keepsInterview`, `urgentAnswers`); push-to-talk urgency goes through the chat like typing.
