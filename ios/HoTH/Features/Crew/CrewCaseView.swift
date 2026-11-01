@@ -205,10 +205,15 @@ struct CrewCaseView: View {
                 .accessibilityIdentifier(verdict.resolved ? "fixVerdictResolved" : "fixVerdictRejected")
 
                 if let after = fixCheck.afterImage {
-                    RemainingIssuesImage(image: after, regions: verdict.resolved ? [] : verdict.remaining)
+                    let remaining = FixCheckModel.remainingRegions(verdict: verdict, sam: fixCheck.samRemaining)
+                    RemainingIssuesImage(image: after, regions: remaining.regions)
                         .overlay(alignment: .topLeading) {
                             if fixCheck.isDemoPhoto { DemoPhotoTag().padding(8) }
                         }
+                        .animation(.easeOut(duration: 0.35), value: remaining.isFromSAM)
+                    if remaining.isFromSAM, let concept = fixCheck.samRemaining?.concept {
+                        SAMOutlineChip(concept: concept)
+                    }
                 }
                 Text(verdict.reasonEN)
                     .font(.hothBody)
