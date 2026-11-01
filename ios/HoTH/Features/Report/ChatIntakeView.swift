@@ -154,6 +154,7 @@ struct ChatIntakeView: View {
                     RoundedRectangle(cornerRadius: 20, style: .continuous)
                         .strokeBorder(Color.hothInk.opacity(isAssistant ? 0.06 : 0))
                 )
+                .accessibilityIdentifier(isAssistant ? "chatBubble_assistant" : "chatBubble_resident")
             if isAssistant { Spacer(minLength: 48) }
         }
     }

@@ -428,6 +428,7 @@ private struct CommentRow: View {
                             ProgressView().controlSize(.mini)
                             Text("Checking…")
                         }
+                        .accessibilityIdentifier("commentPending")
                         .font(.caption2)
                         .foregroundStyle(Color.hothInkSecondary)
                     }
