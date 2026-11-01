@@ -207,6 +207,22 @@ struct SettingsView: View {
                     Text("Leave empty to use the defaults.")
                         .font(.hothCaption)
                         .foregroundStyle(Color.hothInkSecondary)
+                    Divider()
+                    VStack(alignment: .leading, spacing: HoTHSpacing.xs) {
+                        Label { Text("Powered by Meta AI") } icon: { Image(systemName: "sparkles") }
+                            .font(.hothHeadline)
+                            .foregroundStyle(Color.hothInk)
+                        // Model names stay in Latin script in every language.
+                        Text(verbatim: "Muse Spark 1.3 · Muse Voice Transcribe · SAM 3.1")
+                            .font(.hothCaption.weight(.semibold))
+                            .foregroundStyle(Color.hothAccent)
+                        Text("Photo understanding, the interview agent, fix checks and comment moderation; voice to text; hazard outlines.")
+                            .font(.hothCaption)
+                            .foregroundStyle(Color.hothInkSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityIdentifier("settingsPoweredByMeta")
                 }
             }
         }

@@ -1347,6 +1347,22 @@
         }
       }
     },
+    "Each one has a single job in HoTH. You always review the report before it is posted." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لكل نموذج مهمة واحدة في HoTH، وأنت تراجع البلاغ دائمًا قبل نشره."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Each one has a single job in HoTH. You always review the report before it is posted."
+          }
+        }
+      }
+    },
     "Electrical hazard" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2584,6 +2600,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Outlined by SAM 3.1"
+          }
+        }
+      }
+    },
+    "Outlines the hazard on your photo." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يحدّد مكان الخطر على صورتك."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outlines the hazard on your photo."
+          }
+        }
+      }
+    },
+    "Photo understanding, the interview agent, fix checks and comment moderation; voice to text; hazard outlines." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فهم الصور ووكيل المقابلة والتحقق من الإصلاحات ومراجعة التعليقات؛ تحويل الصوت إلى نص؛ تحديد الأخطار على الصور."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photo understanding, the interview agent, fix checks and comment moderation; voice to text; hazard outlines."
+          }
+        }
+      }
+    },
+    "Powered by Meta AI" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مدعوم بالذكاء الاصطناعي من Meta"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Powered by Meta AI"
           }
         }
       }
@@ -3870,6 +3934,22 @@
         }
       }
     },
+    "Three Meta models, one neighbourhood." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ثلاثة نماذج من Meta، وحيّ واحد."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Three Meta models, one neighbourhood."
+          }
+        }
+      }
+    },
     "Ticket saved" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4054,6 +4134,22 @@
         }
       }
     },
+    "Turns your Arabic or English voice into text." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يحوّل صوتك بالعربية أو الإنجليزية إلى نص."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turns your Arabic or English voice into text."
+          }
+        }
+      }
+    },
     "Type instead" : {
       "localizations" : {
         "ar" : {
@@ -4083,6 +4179,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Type your answer…"
+          }
+        }
+      }
+    },
+    "Understands your photo, runs the interview agent, checks fixes and moderates comments." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يفهم صورتك، ويدير وكيل المقابلة، ويتحقق من الإصلاحات، ويراجع التعليقات."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Understands your photo, runs the interview agent, checks fixes and moderates comments."
           }
         }
       }
@@ -4448,6 +4560,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Your photo and location are sent to Meta's Muse Spark model to analyse the hazard."
+          }
+        }
+      }
+    },
+    "Your photo and voice go to the Meta Model API only when you report." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا تُرسَل صورتك وصوتك إلى Meta Model API إلا عندما تُبلغ."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your photo and voice go to the Meta Model API only when you report."
           }
         }
       }
