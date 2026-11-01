@@ -11,7 +11,11 @@ import XCTest
 /// Inputs (pass with the `TEST_RUNNER_` prefix to xcodebuild; the runner sees them without it):
 /// - `META_API_KEY`: the Meta key, forwarded to the app's environment. Never logged.
 /// - `CAPTURE_LOG`: host JSONL path for `mark()` events (scene, event, time, tap position).
-/// - `HOTH_PTT_WAV_DIR`: host directory of push-to-talk WAV clips for C1, played in name order.
+/// - `HOTH_PTT_WAV_DIR`: host directory of push-to-talk WAV clips for C1, played in name order (Arabic
+///   clips for the Arabic UI, English clips for the English UI: transcription uses the UI language).
+/// - `CAPTURE_LANG`: `en` or `ar`, the app UI language for C1, C2 and C3. Defaults: C1/C2 Arabic,
+///   C3 English (the original v3 takes). The method names stay the storyboard contract in both.
+/// - `CAPTURE_COMMENT`: optional override for the C2 comment text.
 /// - `HOTH_CAPTURE_LOG_DIR`: host directory for the app's own log (tool calls); defaults to the
 ///   directory of `CAPTURE_LOG`.
 ///
@@ -29,6 +33,36 @@ final class DemoCaptureUITests: XCTestCase {
     private static let speakingValues = ["Speaking… hold to interrupt", "أتكلم… اضغط مطوّل للمقاطعة"]
     /// Clips the agent may need: two scripted answers plus two spares (capture plan §3).
     private static let maxClips = 4
+
+    /// Text the scenes look up or type, per UI language (seed titles from `seed.json` / NeighbourAlerts).
+    private struct SceneText {
+        let r10Title: String
+        let alertCaseTitle: String
+        let comment: String
+        let crewQueueTitle: String
+        let crewCaseTitle: String
+
+        static let en = SceneText(
+            r10Title: "Broken paving at the school drop-off",
+            alertCaseTitle: "Open power cabinet with exposed wires",
+            comment: "Careful — the cabinet door is open and the wires are bare, right by the school walkway.",
+            crewQueueTitle: "City Crew",
+            crewCaseTitle: "Broken paving at the school drop-off")
+        static let ar = SceneText(
+            r10Title: "بلاط مكسور عند نقطة إنزال الطلاب",
+            alertCaseTitle: "خزانة كهرباء مفتوحة وأسلاك مكشوفة",
+            comment: "انتبهوا، الخزانة مفتوحة والأسلاك مكشوفة جنب ممشى المدرسة. خلّوا اليهال بعيد.",
+            crewQueueTitle: "فريق البلدية",
+            crewCaseTitle: "بلاط مكسور عند نقطة إنزال الطلاب")
+    }
+
+    /// `CAPTURE_LANG` when set to `en` or `ar`, else the scene's default.
+    private func captureLanguage(default fallback: String) -> String {
+        let requested = ProcessInfo.processInfo.environment["CAPTURE_LANG"]?.lowercased() ?? ""
+        return ["en", "ar"].contains(requested) ? requested : fallback
+    }
+
+    private func text(for language: String) -> SceneText { language == "ar" ? .ar : .en }
     /// The app's capture log in `HOTH_CAPTURE_LOG_DIR` (`CaptureLog.fileName` in the app target).
     private static let appLogFileName = "hoth_app_log.jsonl"
     private var appLogDirectory: String?
@@ -99,8 +133,9 @@ final class DemoCaptureUITests: XCTestCase {
         mark("warm_up_done")
     }
 
-    /// C1 → storyboard S03–S06: splash, spring rider photo, live analysis + SAM + CRITICAL, Arabic
-    /// push-to-talk interview from the WAV playlist, ticket, posted, feed, r10 card, map.
+    /// C1 → storyboard S03–S06: splash, spring rider photo, live analysis + SAM + CRITICAL, push-to-talk
+    /// interview from the WAV playlist (Arabic by default; `CAPTURE_LANG=en` for the English UI and
+    /// English clips), ticket, posted, feed, r10 card, map.
     @MainActor
     func test02_SpringRiderVoiceAR() throws {
         let environment = ProcessInfo.processInfo.environment
@@ -109,8 +144,9 @@ final class DemoCaptureUITests: XCTestCase {
         let clips = try clipDurations(in: clipDirectory)
         XCTAssertFalse(clips.isEmpty, "No .wav clips in the playlist")
 
+        let language = captureLanguage(default: "ar")
         let launchedAt = Date().timeIntervalSince1970
-        launch(scene: "C1", language: "ar", role: "resident", extraEnvironment: [:], startMark: "splash_start")
+        launch(scene: "C1", language: language, role: "resident", extraEnvironment: [:], startMark: "splash_start")
         try assertAppLoadedPlaylist(clipNames: clipNames(in: clipDirectory), since: launchedAt)
 
         let reportTab = app.buttons["reportTabButton"]
@@ -148,7 +184,7 @@ final class DemoCaptureUITests: XCTestCase {
         beat(2)
 
         tap(continueButton, mark: "continue_tapped")
-        try runInterview(clips: clips)
+        try runInterview(clips: clips, language: language)
 
         // Ticket.
         let submit = app.buttons["ticketSubmitButton"]
@@ -168,7 +204,7 @@ final class DemoCaptureUITests: XCTestCase {
         beat(3)
 
         // §6.3: hold on the seeded r10 card ("Mariam's other report") before the map.
-        let r10 = app.staticTexts["بلاط مكسور عند نقطة إنزال الطلاب"].firstMatch
+        let r10 = app.staticTexts[text(for: language).r10Title].firstMatch
         if scrollIntoView(r10, maxSwipes: 8) {
             mark("r10_card", element: r10)
             beat(2.5)
@@ -183,11 +219,15 @@ final class DemoCaptureUITests: XCTestCase {
         mark("scene_end")
     }
 
-    /// C2 → storyboard S07: demo neighbour alert, open the case, "I saw it too", one moderated comment.
+    /// C2 → storyboard S07: demo neighbour alert, open the case, "I saw it too", one moderated comment
+    /// (Arabic by default; `CAPTURE_LANG=en` for the English UI and comment).
     @MainActor
     func test06_NeighbourAlertConfirmCommentAR() throws {
-        let skipsSplash = ProcessInfo.processInfo.environment["CAPTURE_SKIP_SPLASH"] == "1"
-        launch(scene: "C2", language: "ar", role: "resident",
+        let environment = ProcessInfo.processInfo.environment
+        let skipsSplash = environment["CAPTURE_SKIP_SPLASH"] == "1"
+        let language = captureLanguage(default: "ar")
+        let sceneText = text(for: language)
+        launch(scene: "C2", language: language, role: "resident",
                extraEnvironment: skipsSplash ? ["HOTH_CAPTURE_SKIP_SPLASH": "1"] : [:])
 
         let wordmark = app.staticTexts["hothWordmark"]
@@ -202,7 +242,7 @@ final class DemoCaptureUITests: XCTestCase {
         mark("banner_shown", element: banner)
         beat(4)
 
-        let cardTitle = app.staticTexts["خزانة كهرباء مفتوحة وأسلاك مكشوفة"].firstMatch
+        let cardTitle = app.staticTexts[sceneText.alertCaseTitle].firstMatch
         XCTAssertTrue(cardTitle.waitForExistence(timeout: 10), "Alert case card missing from the feed")
         tap(cardTitle, mark: "case_open")
         let confirm = app.buttons["caseConfirmButton"]
@@ -218,7 +258,9 @@ final class DemoCaptureUITests: XCTestCase {
         XCTAssertTrue(scrollIntoView(field, maxSwipes: 8), "Comment field not reachable")
         tap(field, mark: "composer")
         beat(1)
-        field.typeText("انتبهوا، الخزانة مفتوحة والأسلاك مكشوفة جنب ممشى المدرسة. خلّوا اليهال بعيد.")
+        let comment = environment["CAPTURE_COMMENT"].flatMap { $0.isEmpty ? nil : $0 } ?? sceneText.comment
+        field.typeText(comment)
+        mark("comment_typed", extra: ["text": comment])
         let send = app.buttons["commentSendButton"]
         XCTAssertTrue(send.waitForExistence(timeout: 5), "Send button missing")
         tap(send, mark: "comment_sent")
@@ -234,18 +276,20 @@ final class DemoCaptureUITests: XCTestCase {
     }
 
     /// C3 → storyboard S09–S10: crew rejects a partial repair, accepts the full one, celebration and
-    /// "Hero of the Hay" level-up (fresh launch at 360 points).
+    /// "Hero of the Hay" level-up (fresh launch at 360 points). English by default (`CAPTURE_LANG=ar` for Arabic).
     @MainActor
     func test08_CrewFixCheck() throws {
-        launch(scene: "C3", language: "en", role: "crew", extraEnvironment: ["HOTH_CAPTURE_SKIP_SPLASH": "1"])
+        let language = captureLanguage(default: "en")
+        let sceneText = text(for: language)
+        launch(scene: "C3", language: language, role: "crew", extraEnvironment: ["HOTH_CAPTURE_SKIP_SPLASH": "1"])
 
         let crewTab = app.buttons["crewTabButton"]
         XCTAssertTrue(crewTab.waitForExistence(timeout: 30), "Crew tab missing")
         tap(crewTab, mark: "crew_queue")
-        XCTAssertTrue(app.staticTexts["City Crew"].waitForExistence(timeout: 10), "Crew queue did not appear")
+        XCTAssertTrue(app.staticTexts[sceneText.crewQueueTitle].waitForExistence(timeout: 10), "Crew queue did not appear")
         beat(2.5)
 
-        let row = app.staticTexts["Broken paving at the school drop-off"].firstMatch
+        let row = app.staticTexts[sceneText.crewCaseTitle].firstMatch
         XCTAssertTrue(row.waitForExistence(timeout: 10), "Pothole case missing from the queue")
         scrollIntoView(row)
         tap(row, mark: "case_open")
@@ -309,7 +353,7 @@ final class DemoCaptureUITests: XCTestCase {
     /// Plays playlist clips by holding the orb until the ticket shows (or the urgent safety sheet,
     /// which is tapped through after a 3 s hold). Waits never use fixed sleeps.
     @MainActor
-    private func runInterview(clips: [TimeInterval]) throws {
+    private func runInterview(clips: [TimeInterval], language: String) throws {
         let talk = app.descendants(matching: .any)["pushToTalkButton"].firstMatch
         let ticket = app.buttons["ticketSubmitButton"]
         let safety = app.buttons["safetyContinueButton"]
@@ -366,7 +410,7 @@ final class DemoCaptureUITests: XCTestCase {
             } else {
                 let notice = app.descendants(matching: .any)["voiceNotice"].firstMatch
                 mark("transcript_\(label)_failed", extra: ["notice": notice.exists ? notice.label : "timeout"])
-                XCTFail("No transcript for clip \(label) (voice_transcribe_ar)")
+                XCTFail("No transcript for clip \(label) (voice_transcribe_\(language))")
                 return
             }
         }
@@ -496,7 +540,7 @@ final class DemoCaptureUITests: XCTestCase {
         ]
         app.launchEnvironment["HOTH_CAPTURE_SCENE"] = scene
         for (key, value) in extraEnvironment { app.launchEnvironment[key] = value }
-        mark(startMark)
+        mark(startMark, extra: ["lang": language])
         app.launch()
         mark("launched")
     }
