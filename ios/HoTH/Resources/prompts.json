@@ -1,11 +1,21 @@
 {
   "version": 1,
-  "_comment": "Single source of prompts for the iOS app and tools/eval. Model ids from dev.meta.ai/docs/models on 2026-11-01; NOT yet confirmed against GET /v1/models (no key at migration time). Schemas avoid minimum/maximum/maxItems; the app clamps instead. Boxes use Muse Spark's 0-1000 grounding grid. Placeholders use {{name}}.",
+  "_comment": "Single source of prompts for the iOS app and tools/eval. Model ids from dev.meta.ai/docs/models on 2026-11-01; NOT yet confirmed against GET /v1/models (no key at migration time). Schemas avoid minimum/maximum/maxItems; the app clamps instead. Boxes use Muse Spark's 0-1000 grounding grid. Placeholders use {{name}}. segment_concepts: one short SAM 3.1 noun phrase per category (one concept per request); other and not_an_issue have none, so no SAM call.",
   "models": {
     "vision": "muse-spark-1.3",
     "text": "muse-spark-1.3",
     "transcribe": "muse-voice-transcribe-1.0",
     "segment": "sam-3.1"
+  },
+  "segment_concepts": {
+    "playground_equipment": "broken playground equipment",
+    "fitness_equipment": "broken fitness equipment",
+    "pothole_pavement": "pothole",
+    "electrical_hazard": "exposed cable",
+    "open_manhole": "manhole",
+    "waste_overflow_dumping": "garbage",
+    "blocked_accessibility": "obstruction",
+    "water_leak": "water"
   },
   "categories": [
     "playground_equipment",
