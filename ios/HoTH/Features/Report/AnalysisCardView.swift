@@ -10,6 +10,8 @@ struct AnalysisCardView: View {
     let isArabic: Bool
     let isDemoAnalysis: Bool
     let source: CaptureSource
+    /// SAM 3.1 boxes; nil until (unless) they arrive. They draw in on top of the photo when they do.
+    var outline: SegmentOutline?
     let onContinue: () -> Void
     let onRetake: () -> Void
 
@@ -18,7 +20,7 @@ struct AnalysisCardView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: HoTHSpacing.m) {
-                HazardPhotoView(image: image, hazards: analysis.hazards)
+                HazardPhotoView(image: image, hazards: analysis.hazards, samBoxes: outline?.boxes ?? [])
                     .clipShape(RoundedRectangle(cornerRadius: HoTHRadius.card, style: .continuous))
                     .shadow(color: .black.opacity(0.12), radius: 18, x: 0, y: 10)
 
@@ -93,7 +95,12 @@ struct AnalysisCardView: View {
                 if plausibility?.status == .accepted {
                     trustChip(symbol: "checkmark.seal.fill", text: "Checks passed")
                 }
+                if let outline, !outline.boxes.isEmpty {
+                    SAMOutlineChip(concept: outline.concept)
+                        .transition(.opacity.combined(with: .scale))
+                }
             }
+            .animation(.easeOut(duration: 0.35), value: outline)
         }
     }
 
@@ -293,6 +300,8 @@ func hazardTint(for kind: HazardKind) -> Color {
 struct HazardPhotoView: View {
     let image: UIImage
     let hazards: [Hazard]
+    /// SAM 3.1 boxes, drawn under Spark's numbered tags in their own style.
+    var samBoxes: [NormalizedBox] = []
 
     @State private var progress: CGFloat = 0
 
@@ -303,6 +312,11 @@ struct HazardPhotoView: View {
             .resizable()
             .aspectRatio(contentMode: .fit)
             // The overlay matches the aspect-fit image frame, so normalized boxes map 1:1.
+            .overlay {
+                if !samBoxes.isEmpty {
+                    SAMOutlineOverlay(boxes: samBoxes, imageSize: image.size)
+                }
+            }
             .overlay {
                 GeometryReader { proxy in
                     let items = layoutItems(in: proxy.size)

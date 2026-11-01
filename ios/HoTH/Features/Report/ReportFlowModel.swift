@@ -64,6 +64,9 @@ final class ReportFlowModel: ObservableObject {
     @Published private(set) var nearbyPlace: LocationType?
     /// Set while the interview records an optional voice note for a merged duplicate.
     @Published private(set) var voiceNoteTarget: DuplicateOutcome?
+    /// SAM 3.1 boxes for the analysed category, on `photo` (the exact JPEG vision saw). Arrives after the
+    /// analysis card is up; nil while pending, on failure, or for canned/demo analyses.
+    @Published private(set) var outline: SegmentOutline?
 
     // MARK: Dependencies
 
@@ -73,6 +76,8 @@ final class ReportFlowModel: ObservableObject {
     private let hasAPIKeyProvider: () -> Bool
     private let languageProvider: () -> String
     private let visionModelProvider: () -> String?
+    private let outlinerProvider: () -> HazardOutlining?
+    private var outlineTask: Task<Void, Never>?
     private var blurTask: Task<FaceAndPlateBlur.Result, Never>?
     private var nearbyPlaceTask: Task<LocationType?, Never>?
     private var hasShownSafety = false
@@ -88,10 +93,13 @@ final class ReportFlowModel: ObservableObject {
     ///   - isDemoMode: read live; demo mode allows bundled photos and the offline canned analysis.
     ///   - hasAPIKey: read live; without a key a demo photo uses its canned analysis (no doomed call).
     ///   - visionModel: read live; the Settings override (nil/blank → prompts.json `models.vision`).
+    ///   - outliner: read per photo; nil (no key, UI tests) means no SAM overlay.
     init(client: MetaModelClient, prompts: Prompts, language: @escaping () -> String,
          isDemoMode: @escaping () -> Bool, hasAPIKey: @escaping () -> Bool = { true },
-         visionModel: @escaping () -> String? = { nil }) {
+         visionModel: @escaping () -> String? = { nil },
+         outliner: @escaping () -> HazardOutlining? = { nil }) {
         self.visionModelProvider = visionModel
+        self.outlinerProvider = outliner
         self.client = client
         self.prompts = prompts
         self.languageProvider = language
@@ -178,6 +186,9 @@ final class ReportFlowModel: ObservableObject {
             return
         }
 
+        // SAM runs alongside priority and dedup; the card never waits for it.
+        if !isDemoAnalysis { startOutline(jpegData: captured.jpegData, category: vision.category, run: run) }
+
         // 3. Priority (before the interview; refined with the answers afterwards). Computed before the
         // duplicate check so a merged duplicate can still record an optional voice note.
         let place = await nearbyPlaceTask?.value
@@ -189,6 +200,7 @@ final class ReportFlowModel: ObservableObject {
         let outcome = await mergeIfDuplicate(vision: vision, captured: captured, run: run, context: context)
         guard run == runID else { return }
         if let outcome {
+            cancelOutline()  // the merged screen shows no photo
             step = .duplicate(outcome)
             return
         }
@@ -498,9 +510,39 @@ final class ReportFlowModel: ObservableObject {
                                 distanceMeters: Int(distance.rounded()))
     }
 
+    // MARK: SAM outline
+
+    /// SAM on the same JPEG the vision model saw, so its boxes line up with `photo.image`. Any failure
+    /// (timeout included) is logged and leaves the photo without the overlay; it never blocks the report.
+    private func startOutline(jpegData: Data, category: ReportCategory, run: UUID) {
+        guard let outliner = outlinerProvider() else { return }
+        outlineTask = Task { [weak self] in
+            do {
+                let result = try await outliner.outline(jpegData: jpegData, category: category)
+                guard let self, run == self.runID, !Task.isCancelled else { return }
+                self.outline = result
+            } catch {
+                guard !Task.isCancelled, !(error is CancellationError) else { return }
+                Self.logger.error("SAM outline unavailable: \(String(describing: error))")
+            }
+        }
+    }
+
+    private func cancelOutline() {
+        outlineTask?.cancel()
+        outlineTask = nil
+    }
+
+    /// Waits for the in-flight SAM call (tests only; the UI just observes `outline`).
+    func waitForOutline() async {
+        await outlineTask?.value
+    }
+
     // MARK: Helpers
 
     private func reset(keepingStep: Bool) {
+        cancelOutline()
+        outline = nil
         blurTask?.cancel()
         blurTask = nil
         nearbyPlaceTask?.cancel()
