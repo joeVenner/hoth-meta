@@ -164,3 +164,34 @@ final class HazardLabelLayoutTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(frame?.minY ?? 0, box.maxY)
     }
 }
+
+/// Trust-chip / signal-chip wrapping (`ReportWrapLayout.arrange`).
+final class ReportWrapLayoutTests: XCTestCase {
+    private let chip = CGSize(width: 120, height: 30)
+
+    func testChipsThatFitStayOnOneRow() {
+        let rows = ReportWrapLayout.arrange(sizes: [chip, chip], width: 300, spacing: 8)
+        XCTAssertEqual(rows.map(\.indices), [[0, 1]])
+        XCTAssertEqual(rows[0].width, 248)
+    }
+
+    func testOverflowingChipWrapsToNextRow() {
+        // Four chips at 120 pt on a 402 pt screen minus padding (370 pt): the fourth (SAM) must wrap.
+        let rows = ReportWrapLayout.arrange(sizes: [chip, chip, chip, chip], width: 370, spacing: 8)
+        XCTAssertEqual(rows.map(\.indices), [[0, 1], [2, 3]])
+        XCTAssertTrue(rows.allSatisfy { $0.width <= 370 }, "A row is wider than the container")
+        XCTAssertEqual(rows[1].y, 38)
+    }
+
+    func testOversizedChipGetsItsOwnRowAndStartsAtLeadingEdge() {
+        let wide = CGSize(width: 370, height: 48) // already fitted to the row width, text on two lines
+        let rows = ReportWrapLayout.arrange(sizes: [chip, wide, chip], width: 370, spacing: 8)
+        XCTAssertEqual(rows.map(\.indices), [[0], [1], [2]])
+        XCTAssertEqual(rows[1].height, 48)
+        XCTAssertEqual(rows[2].y, 30 + 8 + 48 + 8)
+    }
+
+    func testEmptyInputHasNoRows() {
+        XCTAssertTrue(ReportWrapLayout.arrange(sizes: [], width: 370, spacing: 8).isEmpty)
+    }
+}

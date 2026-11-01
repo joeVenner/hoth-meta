@@ -82,26 +82,25 @@ struct AnalysisCardView: View {
         }
     }
 
+    /// Wraps rather than scrolls: in a horizontal scroll view the last chip (SAM) ran off the edge.
     private var trustChips: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: HoTHSpacing.s) {
-                trustChip(symbol: source == .liveCamera ? "camera.fill" : "photo.stack",
-                          text: source == .liveCamera ? "Live camera" : "Demo photo")
-                // Capture-time claims only hold for live shots; demo photos carry neither.
-                if source == .liveCamera {
-                    trustChip(symbol: "clock.fill", text: "Fresh capture")
-                    trustChip(symbol: "location.fill", text: "Location stamped")
-                }
-                if plausibility?.status == .accepted {
-                    trustChip(symbol: "checkmark.seal.fill", text: "Checks passed")
-                }
-                if let outline, !outline.boxes.isEmpty {
-                    SAMOutlineChip(concept: outline.concept)
-                        .transition(.opacity.combined(with: .scale))
-                }
+        ReportWrapLayout(spacing: HoTHSpacing.s) {
+            trustChip(symbol: source == .liveCamera ? "camera.fill" : "photo.stack",
+                      text: source == .liveCamera ? "Live camera" : "Demo photo")
+            // Capture-time claims only hold for live shots; demo photos carry neither.
+            if source == .liveCamera {
+                trustChip(symbol: "clock.fill", text: "Fresh capture")
+                trustChip(symbol: "location.fill", text: "Location stamped")
             }
-            .animation(.easeOut(duration: 0.35), value: outline)
+            if plausibility?.status == .accepted {
+                trustChip(symbol: "checkmark.seal.fill", text: "Checks passed")
+            }
+            if let outline, !outline.boxes.isEmpty {
+                SAMOutlineChip(concept: outline.concept)
+                    .transition(.opacity.combined(with: .scale))
+            }
         }
+        .animation(.easeOut(duration: 0.35), value: outline)
     }
 
     private func trustChip(symbol: String, text: LocalizedStringKey) -> some View {
@@ -159,41 +158,52 @@ struct ReportSignalChips: View {
     }
 }
 
-/// Minimal flow layout: places subviews left-to-right (leading-to-trailing), wrapping lines.
+/// Minimal flow layout: places subviews left-to-right (leading-to-trailing), wrapping lines. SwiftUI
+/// mirrors it in right-to-left layouts. A subview wider than the row is offered the row width, so a
+/// long chip wraps its text instead of running off-screen.
 struct ReportWrapLayout: Layout {
     var spacing: CGFloat
 
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let rows = arrange(width: proposal.width ?? .infinity, subviews: subviews)
+        let width = proposal.width ?? .infinity
+        let rows = Self.arrange(sizes: fittedSizes(subviews, width: width), width: width, spacing: spacing)
         let height = rows.last.map { $0.y + $0.height } ?? 0
-        let width = rows.map(\.width).max() ?? 0
-        return CGSize(width: proposal.width ?? width, height: height)
+        let widest = rows.map(\.width).max() ?? 0
+        return CGSize(width: proposal.width ?? widest, height: height)
     }
 
     func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        let rows = arrange(width: bounds.width, subviews: subviews)
-        for row in rows {
+        let sizes = fittedSizes(subviews, width: bounds.width)
+        for row in Self.arrange(sizes: sizes, width: bounds.width, spacing: spacing) {
             var x = bounds.minX
             for index in row.indices {
-                let size = subviews[index].sizeThatFits(.unspecified)
-                subviews[index].place(at: CGPoint(x: x, y: bounds.minY + row.y), proposal: ProposedViewSize(size))
-                x += size.width + spacing
+                subviews[index].place(at: CGPoint(x: x, y: bounds.minY + row.y), proposal: ProposedViewSize(sizes[index]))
+                x += sizes[index].width + spacing
             }
         }
     }
 
-    private struct Row {
+    /// Each subview's ideal size, or its size at the row width when its ideal is wider than the row.
+    private func fittedSizes(_ subviews: Subviews, width: CGFloat) -> [CGSize] {
+        subviews.map { subview in
+            let ideal = subview.sizeThatFits(.unspecified)
+            guard ideal.width > width, width.isFinite else { return ideal }
+            return subview.sizeThatFits(ProposedViewSize(width: width, height: nil))
+        }
+    }
+
+    struct Row: Equatable {
         var indices: [Int] = []
         var y: CGFloat = 0
         var width: CGFloat = 0
         var height: CGFloat = 0
     }
 
-    private func arrange(width: CGFloat, subviews: Subviews) -> [Row] {
+    /// Greedy line breaking over measured sizes. Pure so it can be unit tested.
+    static func arrange(sizes: [CGSize], width: CGFloat, spacing: CGFloat) -> [Row] {
         var rows: [Row] = []
         var current = Row()
-        for index in subviews.indices {
-            let size = subviews[index].sizeThatFits(.unspecified)
+        for (index, size) in sizes.enumerated() {
             let needed = current.indices.isEmpty ? size.width : current.width + spacing + size.width
             if needed > width, !current.indices.isEmpty {
                 rows.append(current)
