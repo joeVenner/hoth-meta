@@ -50,6 +50,30 @@ final class CaptureLogTests: XCTestCase {
         XCTAssertEqual(ToolCallLogLine.describe(.string("")), "\"\"")
     }
 
+    func testQuotesAndBackslashesInValuesAreEscaped() {
+        XCTAssertEqual(ToolCallLogLine.describe(.string(#"a"b"#)), #""a\"b""#)
+        XCTAssertEqual(ToolCallLogLine.describe(.string(#"a\b"#)), #""a\\b""#)
+        XCTAssertEqual(ToolCallLogLine.describe(.string("plain")), "plain")
+    }
+
+    func testAppendRefusesASymlinkedLogFile() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent("CaptureLogTests-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let target = directory.appendingPathComponent("target.txt")
+        let link = directory.appendingPathComponent(CaptureLog.fileName)
+
+        // Dangling link: must not create the target through it.
+        try FileManager.default.createSymbolicLink(at: link, withDestinationURL: target)
+        XCTAssertThrowsError(try CaptureLog.append(record: ["event": .string("x")], to: link))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: target.path))
+
+        // Link to an existing file: must not append to it.
+        try Data("keep".utf8).write(to: target)
+        XCTAssertThrowsError(try CaptureLog.append(record: ["event": .string("x")], to: link))
+        XCTAssertEqual(try String(contentsOf: target, encoding: .utf8), "keep")
+    }
+
     func testAppendWritesSortedJSONLines() throws {
         let file = FileManager.default.temporaryDirectory.appendingPathComponent("CaptureLogTests-\(UUID().uuidString).jsonl")
         defer { try? FileManager.default.removeItem(at: file) }

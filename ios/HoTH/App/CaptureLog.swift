@@ -54,7 +54,10 @@ enum ToolCallLogLine {
         switch value {
         case .string(let text):
             let clean = sanitized(text)
-            return clean.isEmpty || clean.contains(" ") || clean.contains("=") ? "\"\(clean)\"" : clean
+            guard clean.isEmpty || clean.contains(where: { " =\"\\".contains($0) }) else { return clean }
+            let escaped = clean.replacingOccurrences(of: "\\", with: "\\\\")
+                .replacingOccurrences(of: "\"", with: "\\\"")
+            return "\"\(escaped)\""
         case .number(let number):
             if number.isFinite, number == number.rounded(), abs(number) < 1e15 { return String(Int(number)) }
             return String(number)
@@ -89,7 +92,8 @@ enum CaptureLog {
     /// One intake-agent tool call and its result.
     static func recordToolCall(_ call: FunctionCall, output: String, durationMs: Int) {
         let line = ToolCallLogLine.format(name: call.name, arguments: call.argumentsObject, output: output)
-        logger.debug("tool \(line, privacy: .public) (\(durationMs, privacy: .public) ms)")
+        // Model-written arguments can carry coordinates or resident text; the JSONL has the detail.
+        logger.debug("tool \(line, privacy: .private) (\(durationMs, privacy: .public) ms)")
         let outputValue = (try? JSONDecoder().decode(JSONValue.self, from: Data(output.utf8))) ?? .string(output)
         append(event: "tool_call", fields: [
             "tool": .string(call.name),
@@ -137,12 +141,18 @@ enum CaptureLog {
         }
     }
 
-    /// Appends `record` as one sorted-key JSON line, creating the file when needed.
+    /// Appends `record` as one sorted-key JSON line, creating the file when needed. Refuses a log file
+    /// that is a symlink (dangling or not), so a planted link cannot redirect the writes.
     static func append(record: [String: JSONValue], to file: URL, fileManager: FileManager = .default) throws {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
         var data = try encoder.encode(JSONValue.object(record))
         data.append(0x0A)
+        // attributesOfItem does not follow a final symlink; fileExists does.
+        if let type = (try? fileManager.attributesOfItem(atPath: file.path))?[.type] as? FileAttributeType,
+           type != .typeRegular {
+            throw CocoaError(.fileWriteNoPermission)
+        }
         if !fileManager.fileExists(atPath: file.path) {
             guard fileManager.createFile(atPath: file.path, contents: nil) else {
                 throw CocoaError(.fileWriteUnknown)
