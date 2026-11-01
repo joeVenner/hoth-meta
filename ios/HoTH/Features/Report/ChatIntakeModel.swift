@@ -35,6 +35,8 @@ final class ChatIntakeModel: ObservableObject {
     @Published private(set) var isFinished = false
 
     let context: InterviewContext
+    /// Every new assistant message, e.g. for the push-to-talk voice to read aloud.
+    var onAssistantMessage: ((String) -> Void)?
     private let slots: [SlotQuestion]
     private let client: MetaModelClient?
     private let prompts: Prompts
@@ -378,6 +380,7 @@ final class ChatIntakeModel: ObservableObject {
 
     private func appendAssistant(_ text: String) {
         bubbles.append(ChatBubble(role: .assistant, text: text))
+        onAssistantMessage?(text)
     }
 
     private func appendResident(_ text: String) {

@@ -76,7 +76,7 @@ public enum WAVAudio {
     }
 
     /// 44-byte header for mono 16-bit PCM.
-    static func header(sampleRate: Int, dataSize: Int) -> Data {
+    public static func header(sampleRate: Int, dataSize: Int) -> Data {
         var data = Data()
         func append(_ text: String) { data.append(Data(text.utf8)) }
         func append32(_ value: Int) { withUnsafeBytes(of: UInt32(value).littleEndian) { data.append(contentsOf: $0) } }
