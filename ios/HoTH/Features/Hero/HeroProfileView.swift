@@ -80,7 +80,6 @@ struct HeroProfileView: View {
                     .shadow(color: Color.black.opacity(0.12), radius: 8, x: 0, y: 4)
                     .accessibilityHidden(true)
                 Spacer()
-                if me.isDemoSeed && services.demoMode { DemoBadge() }
             }
             Text(verbatim: levelTitle(points: me.points))
                 .font(.hothDisplay(34))

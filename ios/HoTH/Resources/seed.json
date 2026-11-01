@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "_comment": "Demo community for HoTH. Everything here is fictional demo data and must be labelled 'Demo community' in the UI. Place names are generic and do not refer to official facilities. Times are relative (hours before first launch) so the feed always looks fresh. photo values are placeholder asset names; the UI falls back to the category SF Symbol when missing.",
+  "_comment": "Demo community for HoTH. Everything here is fictional demo data. Place names are generic and do not refer to official facilities. Times are relative (hours before first launch) so the feed always looks fresh. photo values are placeholder asset names; the UI falls back to the category SF Symbol when missing.",
   "area": { "name": "Khalifa City", "nameAR": "مدينة خليفة", "latitude": 24.4200, "longitude": 54.5750 },
   "neighbours": [
     { "key": "you",    "displayName": "You",    "avatarSymbol": "person.crop.circle.fill", "hay": "Khalifa City", "points": 360, "trust": 6, "isCurrentUser": true },

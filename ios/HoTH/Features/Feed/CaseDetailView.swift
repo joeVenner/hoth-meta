@@ -95,7 +95,6 @@ struct CaseDetailView: View {
                 StatusPill(status: report.status)
                     .background(Capsule().fill(Color.hothSurface))
                 Spacer()
-                if report.isDemoSeed { DemoBadge().background(Capsule().fill(Color.hothSurface)) }
             }
             .padding(HoTHSpacing.m)
         }

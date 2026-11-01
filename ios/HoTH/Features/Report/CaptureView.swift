@@ -256,11 +256,7 @@ private struct DemoPhotoPicker: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: HoTHSpacing.m) {
-            HStack {
-                Text("Demo photo").font(.hothTitle).foregroundStyle(Color.hothInk)
-                Spacer()
-                DemoBadge()
-            }
+            Text("Demo photo").font(.hothTitle).foregroundStyle(Color.hothInk)
             Text("Sample photos for the demo only. Real reports use the live camera.")
                 .font(.hothBody)
                 .foregroundStyle(Color.hothInkSecondary)

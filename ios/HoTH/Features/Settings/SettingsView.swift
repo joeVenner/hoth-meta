@@ -141,7 +141,7 @@ struct SettingsView: View {
                     Toggle(isOn: $services.demoMode) {
                         VStack(alignment: .leading, spacing: 2) {
                             Text("Demo mode").font(.hothHeadline).foregroundStyle(Color.hothInk)
-                            Text("Shows a fictional demo community, clearly labelled.")
+                            Text("Shows a fictional demo community.")
                                 .font(.hothCaption)
                                 .foregroundStyle(Color.hothInkSecondary)
                         }
@@ -271,7 +271,7 @@ struct SettingsView: View {
                     privacyRow(symbol: "iphone", text: "Reports, comments and points live on this device. There is no HoTH server.")
                     privacyRow(symbol: "eye.slash", text: "Faces and number plates are blurred on your phone before anything is posted to the neighbourhood. To analyse the hazard, the photo is sent to Meta's Muse Spark model.")
                     privacyRow(symbol: "network", text: "Photos and voice go directly to the Meta Model API with your own key, only when you report.")
-                    privacyRow(symbol: "person.2", text: "The demo community is fictional and labelled as such.")
+                    privacyRow(symbol: "person.2", text: "The demo community is fictional.")
                     HStack {
                         Text(verbatim: "HoTH · Heroes of the Hay")
                         Spacer()
