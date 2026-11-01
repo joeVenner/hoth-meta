@@ -73,6 +73,8 @@ enum FaceAndPlateBlur {
     }
 
     /// Runs `work` off the caller and returns its value, or `fallback` if `timeout` passes first.
+    /// On timeout `work` still runs to completion (Vision can't be stopped mid-request), so repeated
+    /// retakes on a slow phone can briefly stack CPU work. Accepted: it fails closed and is rare.
     static func firstResult<Value: Sendable>(timeout: Duration, fallback: Value,
                                              work: @escaping @Sendable () -> Value) async -> Value {
         await withCheckedContinuation { continuation in

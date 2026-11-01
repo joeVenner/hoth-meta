@@ -566,10 +566,15 @@ final class ReportFlowModel: ObservableObject {
     /// Nil (no judge call, so a new report) when there is no public file or redaction fails.
     private func redactedPhoto(of report: Report) async -> Data? {
         guard let data = ReportPhotoFiles.loadJPEG(report.blurredPhotoFileName), let image = UIImage(data: data) else {
+            Self.logger.notice("Duplicate judge skipped: existing report has no public photo")
             return nil
         }
         // Same size cap as a new photo (seed assets can be larger).
-        return await redactor(ImageResizing.normalizedAndDownsized(image, maxEdge: ImageResizing.maxPixelEdge))?.jpegData
+        guard let upload = await redactor(ImageResizing.normalizedAndDownsized(image, maxEdge: ImageResizing.maxPixelEdge)) else {
+            Self.logger.notice("Duplicate judge skipped: existing photo could not be re-blurred")
+            return nil
+        }
+        return upload.jpegData
     }
 
     /// Demo samples decide by flag, never by distance or judge: only the duplicate demo merges.

@@ -169,10 +169,10 @@ final class CaptureService: NSObject, ObservableObject {
                                           source: .liveCamera, demoSampleID: nil)
     }
 
-    /// Normalizes orientation, downsizes and encodes a photo.
     /// JPEG quality for report photos (the local original and the redacted upload alike).
     nonisolated static let jpegQuality: CGFloat = 0.82
 
+    /// Normalizes orientation, downsizes and encodes a photo.
     nonisolated static func makeCapturedPhoto(
         from image: UIImage,
         capturedAt: Date,
