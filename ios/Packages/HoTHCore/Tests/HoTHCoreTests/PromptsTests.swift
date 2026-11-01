@@ -61,4 +61,18 @@ final class PromptsTests: XCTestCase {
             guard case .decoding? = error as? PromptsError else { return XCTFail("wrong error \(error)") }
         }
     }
+    func testIntakeAgentToolsDecodeWithoutRangeKeywords() throws {
+        let agent = try XCTUnwrap(try Fixtures.prompts().intakeAgent)
+        XCTAssertEqual(agent.tools.map(\.name), ["find_nearby_reports", "segment_hazard", "get_place_context"])
+        XCTAssertEqual(agent.maxToolRounds, 4)
+        XCTAssertTrue(agent.instructions.contains("confirm_report_id"))
+        for tool in agent.tools {
+            XCTAssertNotNil(tool.name.range(of: "^[a-zA-Z0-9_-]+$", options: .regularExpression), "name rule")
+            XCTAssertEqual(tool.parameters["type"], .string("object"))
+            let encoded = String(decoding: try JSONEncoder().encode(tool.parameters), as: UTF8.self)
+            for keyword in ["minimum", "maximum", "maxItems", "minLength", "maxLength"] {
+                XCTAssertFalse(encoded.contains(keyword), "\(tool.name) uses \(keyword)")
+            }
+        }
+    }
 }

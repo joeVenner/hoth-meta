@@ -21,6 +21,20 @@ public struct PromptSpec: Codable, Equatable, Sendable {
 }
 
 /// Voice/chat interview question for one category.
+/// The intake agent's extra instructions and its function tools (prompts.json `intake_agent`).
+public struct IntakeAgentSpec: Codable, Equatable, Sendable {
+    /// Appended to the chat system prompt when tools are on.
+    public let instructions: String
+    /// Tool rounds allowed per resident turn before finishing without tools.
+    public let maxToolRounds: Int
+    public let tools: [FunctionTool]
+
+    enum CodingKeys: String, CodingKey {
+        case instructions, tools
+        case maxToolRounds = "max_tool_rounds"
+    }
+}
+
 public struct SlotQuestion: Codable, Equatable, Sendable {
     public let id: String
     public let en: String
@@ -66,6 +80,8 @@ public struct Prompts: Codable, Sendable {
     public let moderation: PromptSpec
     /// SAM 3.1 noun phrase per category raw value (`segment_concepts`); absent in older files.
     public let segmentConcepts: [String: String]?
+    /// Tool-calling intake agent (`intake_agent`); absent in older files, which keeps single-turn chat.
+    public let intakeAgent: IntakeAgentSpec?
 
     enum CodingKeys: String, CodingKey {
         case version, models, categories
@@ -78,6 +94,7 @@ public struct Prompts: Codable, Sendable {
         case chatIntake = "chat_intake"
         case moderation
         case segmentConcepts = "segment_concepts"
+        case intakeAgent = "intake_agent"
     }
 
     public init(data: Data) throws {

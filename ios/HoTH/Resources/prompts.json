@@ -216,6 +216,57 @@
     "user_template": "{{user_message}}"
   },
 
+  "intake_agent": {
+    "instructions": "TOOLS. You can call these functions before you reply; the app runs them on the phone and returns JSON.\n- find_nearby_reports: on your FIRST turn, call it once (radius_m 100). If it returns an open report of the same category within about 50 m, tell the resident a neighbour already reported it (title, distance, how many neighbours confirmed it) and ask whether to confirm that report instead of filing a new one. If they clearly say yes, set confirm_report_id to that report's id exactly as the tool returned it (never invent one) and set done=true. Otherwise leave confirm_report_id empty and continue the interview.\n- get_place_context: call it when a nearby school, playground or park would change your safety advice or your questions (for example equipment children use).\n- segment_hazard: call it only when the resident says there is another or a different hazard in the photo; pass one short English noun phrase (1-4 words). Mention what was outlined in one short sentence.\nNever call the same tool twice with the same arguments; results from earlier turns are listed under 'Tool results so far'. Tools never change priority: the app's safety rules decide it, so do not promise a priority level. Leave confirm_report_id empty unless the resident confirmed a report a tool returned.",
+    "max_tool_rounds": 4,
+    "tools": [
+      {
+        "name": "find_nearby_reports",
+        "description": "List open or in-progress hazard reports already filed near the resident's photo, nearest first (at most 5). Use it to avoid duplicate reports.",
+        "parameters": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "radius_m"
+          ],
+          "properties": {
+            "radius_m": {
+              "type": "integer",
+              "description": "Search radius in metres, 10 to 500. Use 100 unless you have a reason."
+            }
+          }
+        }
+      },
+      {
+        "name": "segment_hazard",
+        "description": "Outline something in the resident's photo with SAM 3.1 and return how many matches were found and where (normalized 0-1 boxes, best first).",
+        "parameters": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "concept"
+          ],
+          "properties": {
+            "concept": {
+              "type": "string",
+              "description": "One short English noun phrase, 1-4 words, e.g. 'broken swing chain'."
+            }
+          }
+        }
+      },
+      {
+        "name": "get_place_context",
+        "description": "Child-relevant places near the photo (playground, school, park) from the phone's on-device map lookup, plus the scene the vision model saw.",
+        "parameters": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [],
+          "properties": {}
+        }
+      }
+    ]
+  },
+
   "moderation": {
     "system": "You moderate neighbour comments on public HoTH hazard reports. Decide allow or block.\n\nBlock if the comment: names or accuses a specific identifiable person (defamation risk), contains personal data (phone numbers, emails, plate numbers, home addresses of individuals, ID numbers), insults or harasses, contains hate speech, sexual content, threats or incitement, is spam or advertising, or is clearly unrelated to the report.\nAllow: confirmations ('I saw this too'), extra factual details, safety tips, polite frustration, criticism of the situation or of an organisation in general terms.\n\nJudge only the text given. Never invent laws or legal codes. Comments may be in Arabic (any dialect), English or mixed. reason: one short English sentence.",
     "user_template": "Report: {{report_title}}\nComment: {{comment}}",
