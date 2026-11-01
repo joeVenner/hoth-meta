@@ -13,6 +13,7 @@ The format follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/
 - Push-to-talk voice (`PushToTalkModel`): hold or tap the mic, record 24 kHz mono 16-bit WAV with `AVAudioRecorder` (temp file deleted after upload), transcribe with Muse Voice Transcribe, and read each reply aloud with `AVSpeechSynthesizer` in the reply's language (ar-SA / en-US). Mic denial and recording or transcription errors fall back to typing.
 
 ### Changed
+- The interview offers push-to-talk inside the chat when a Meta key is set: the orb shows listening, transcribing, thinking and speaking, "Type instead" and a mic button switch modes without losing the conversation, and "Start interview with voice" picks the starting mode (UI tests stay on the local typed chat). The Talk/Type picker is gone, and the Settings caption and en + ar strings describe the new voice.
 - AI client is now `MetaModelClient` on the Meta Model API (`https://api.meta.ai/v1`): 60 s timeout, configurable reasoning effort (default low), no image `detail`, provider-neutral `ModelAPIError`, and error bodies scrubbed of `LLM_…` keys.
 - prompts.json targets Meta models (`muse-spark-1.3` for vision and text, `muse-voice-transcribe-1.0`, `sam-3.1`). Schemas drop `minimum`/`maximum`/`maxItems` (clamped in Swift) and boxes use Muse Spark's 0-1000 grid, normalized once in `NormalizedBox`.
 - App wiring and copy name Meta: the key is stored under Keychain service `HoTH.MetaKey` (DEBUG simulator falls back to `META_API_KEY`), Settings says "Meta Model API key" and Muse Spark with a new text model override for chat and moderation, and privacy copy (en + ar) says photos go to Meta's Muse Spark model. UI tests read `TEST_RUNNER_META_API_KEY`.
@@ -20,5 +21,6 @@ The format follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/
 
 ### Removed
 - `realtime_tools` and `voice_persona` from prompts.json.
-- The previous provider's realtime (WebRTC) voice interview; the interview runs as text until the Meta push-to-talk voice lands.
+- The previous provider's realtime (WebRTC) voice interview, replaced by Meta push-to-talk.
+- Localized strings left over from the realtime voice screens.
 - The unused WebRTC Swift package from `ios/project.yml`.

@@ -102,9 +102,9 @@ final class ReportFlowDemoTests: XCTestCase {
     // MARK: Interview routing
 
     func testInterviewStartsWithVoiceByDefault() {
-        XCTAssertEqual(InterviewStepView.initialMode(prefersVoice: true, isUITestRun: false), .talk)
-        XCTAssertEqual(InterviewStepView.initialMode(prefersVoice: false, isUITestRun: false), .type)
-        XCTAssertEqual(InterviewStepView.initialMode(prefersVoice: true, isUITestRun: true), .type)
+        XCTAssertTrue(InterviewStepView.startsWithVoice(prefersVoice: true, isUITestRun: false))
+        XCTAssertFalse(InterviewStepView.startsWithVoice(prefersVoice: false, isUITestRun: false))
+        XCTAssertFalse(InterviewStepView.startsWithVoice(prefersVoice: true, isUITestRun: true))
     }
 
     func testSafetySheetResumesIntoInterview() async throws {

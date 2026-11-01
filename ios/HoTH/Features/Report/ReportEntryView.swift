@@ -104,11 +104,8 @@ struct ReportEntryView: View {
                     client: services.hasAPIKey() && !AppServices.isUITestRun ? services.modelClient : nil,
                     prompts: services.prompts,
                     textModel: services.textModel,
-                    // No voice builder yet: Talk is hidden and the interview runs as text until the
-                    // push-to-talk interview (Muse Voice Transcribe + on-device speech) lands.
-                    voiceBuilder: nil,
-                    initialMode: InterviewStepView.initialMode(prefersVoice: services.voiceFirstInterview,
-                                                               isUITestRun: AppServices.isUITestRun),
+                    startsWithVoice: InterviewStepView.startsWithVoice(prefersVoice: services.voiceFirstInterview,
+                                                                       isUITestRun: AppServices.isUITestRun),
                     onComplete: { flow.interviewCompleted($0, context: modelContext) },
                     onUrgent: { flow.interviewFlaggedUrgent($0) })
             }

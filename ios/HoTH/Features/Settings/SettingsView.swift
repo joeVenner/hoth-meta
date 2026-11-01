@@ -131,7 +131,7 @@ struct SettingsView: View {
                     Toggle(isOn: $services.voiceFirstInterview) {
                         VStack(alignment: .leading, spacing: 2) {
                             Text("Start interview with voice").font(.hothHeadline).foregroundStyle(Color.hothInk)
-                            Text("The assistant talks first. You can always switch to typing.")
+                            Text("Replies are read aloud and you hold the mic to answer. You can always switch to typing.")
                                 .font(.hothCaption)
                                 .foregroundStyle(Color.hothInkSecondary)
                         }
