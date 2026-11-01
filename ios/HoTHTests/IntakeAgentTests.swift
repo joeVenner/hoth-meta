@@ -311,7 +311,8 @@ final class IntakeAgentTests: XCTestCase {
         chat.start()
         await waitUntilSettled(chat, requests: 1)
         XCTAssertNil(try AgentStubURLProtocol.body(0)["tools"])
-        XCTAssertNil(try AgentStubURLProtocol.body(0)["store"], "single-turn path is unchanged")
+        XCTAssertNil(try AgentStubURLProtocol.body(0)["include"], "single-turn path, no encrypted reasoning replay")
+        XCTAssertEqual(try AgentStubURLProtocol.body(0)["store"], .bool(false))
     }
 
     func testOnlyRequestShapeErrorsRetrySingleTurn() {

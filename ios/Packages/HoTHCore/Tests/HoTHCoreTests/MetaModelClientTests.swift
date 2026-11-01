@@ -66,6 +66,7 @@ final class MetaModelClientTests: XCTestCase {
         XCTAssertTrue(image["image_url"]?.stringValue?.hasPrefix("data:image/jpeg;base64,") ?? false)
         XCTAssertNil(image["detail"], "Meta documents no image detail parameter")
         XCTAssertEqual(body["reasoning"]?["effort"], .string("low"))
+        XCTAssertEqual(body["store"], .bool(false), "Photos must not be kept server-side")
         guard case .array(let systemContent)? = input.first?["content"] else { return XCTFail("no system") }
         let systemText = systemContent.first?["text"]?.stringValue ?? ""
         XCTAssertFalse(systemText.contains("{{user_language}}"))
