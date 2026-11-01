@@ -105,6 +105,15 @@ final class IntakeAgentTests: XCTestCase {
         XCTAssertEqual(radii, [500, 10, 100])
     }
 
+    func testHugeOrInvalidRadiusClampsWithoutTrapping() {
+        XCTAssertEqual(IntakeToolbox.clampedRadius(.number(1e30)), IntakeToolbox.radiusRange.upperBound)
+        XCTAssertEqual(IntakeToolbox.clampedRadius(.number(-1e30)), IntakeToolbox.radiusRange.lowerBound)
+        XCTAssertEqual(IntakeToolbox.clampedRadius(.number(.nan)), IntakeToolbox.defaultRadius)
+        XCTAssertEqual(IntakeToolbox.clampedRadius(.number(.infinity)), IntakeToolbox.defaultRadius)
+        XCTAssertEqual(IntakeToolbox.clampedRadius(.string("1e30")), IntakeToolbox.defaultRadius)
+        XCTAssertEqual(IntakeToolbox.clampedRadius(.number(149.6)), 150)
+    }
+
     func testUnknownToolsAndBadArgumentsStillAnswerWithAnError() async throws {
         let toolbox = try makeToolbox()
         let unknown = await toolbox.run(FunctionCall(callID: "c", name: "delete_report", arguments: "{}"))

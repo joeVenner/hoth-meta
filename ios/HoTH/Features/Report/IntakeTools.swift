@@ -158,7 +158,10 @@ final class IntakeToolbox {
     static func clampedRadius(_ value: JSONValue?) -> Int {
         let requested: Int
         switch value {
-        case .number(let number) where number.isFinite: requested = Int(number.rounded())
+        case .number(let number) where number.isFinite:
+            // Clamp before converting: `Int(_:)` traps on a finite Double outside Int's range (e.g. 1e30).
+            let clamped = min(max(number, Double(radiusRange.lowerBound)), Double(radiusRange.upperBound))
+            requested = Int(clamped.rounded())
         case .string(let text): requested = Int(text) ?? defaultRadius
         default: requested = defaultRadius
         }
