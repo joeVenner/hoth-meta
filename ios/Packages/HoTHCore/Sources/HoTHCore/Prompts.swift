@@ -34,11 +34,16 @@ public struct SlotQuestion: Codable, Equatable, Sendable {
     }
 }
 
+/// Meta model ids (`models` in prompts.json).
 public struct ModelIDs: Codable, Equatable, Sendable {
+    /// Muse Spark: photo analysis, duplicate judge, fix check.
     public let vision: String
-    public let realtime: String
-    public let image: String
+    /// Muse Spark: chat intake and comment moderation.
     public let text: String
+    /// Muse Voice Transcribe: speech to text.
+    public let transcribe: String
+    /// SAM 3.1: concept segmentation.
+    public let segment: String
 }
 
 public enum PromptsError: Error, Equatable {
@@ -56,9 +61,7 @@ public struct Prompts: Codable, Sendable {
     public let visionAnalyze: PromptSpec
     public let fixVerify: PromptSpec
     public let sameIssue: PromptSpec
-    public let voicePersona: String
     public let slots: [String: [SlotQuestion]]
-    public let realtimeTools: [JSONValue]
     public let chatIntake: PromptSpec
     public let moderation: PromptSpec
 
@@ -69,9 +72,7 @@ public struct Prompts: Codable, Sendable {
         case visionAnalyze = "vision_analyze"
         case fixVerify = "fix_verify"
         case sameIssue = "same_issue"
-        case voicePersona = "voice_persona"
         case slots
-        case realtimeTools = "realtime_tools"
         case chatIntake = "chat_intake"
         case moderation
     }
@@ -98,8 +99,17 @@ public struct Prompts: Codable, Sendable {
 
     /// The vision model to call: a non-blank override (Settings) wins, else `models.vision`.
     public static func resolveVisionModel(override: String?, prompts: Prompts) -> String {
+        resolve(override: override, default: prompts.models.vision)
+    }
+
+    /// The text model to call: a non-blank override (Settings) wins, else `models.text`.
+    public static func resolveTextModel(override: String?, prompts: Prompts) -> String {
+        resolve(override: override, default: prompts.models.text)
+    }
+
+    private static func resolve(override: String?, default fallback: String) -> String {
         let trimmed = override?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        return trimmed.isEmpty ? prompts.models.vision : trimmed
+        return trimmed.isEmpty ? fallback : trimmed
     }
 
     /// Replaces every `{{name}}` placeholder; unknown placeholders are left untouched.

@@ -1,7 +1,7 @@
 import Foundation
 
-/// Lossless JSON value, used to forward the strict schemas and Realtime tools from prompts.json
-/// to the API exactly as written (no re-modelling, so no drift).
+/// Lossless JSON value, used to forward the strict schemas from prompts.json to the API exactly as
+/// written (no re-modelling, so no drift).
 public enum JSONValue: Codable, Equatable, Sendable {
     case string(String)
     case number(Double)
