@@ -186,8 +186,6 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: HoTHSpacing.m) {
                     modelField(title: "Vision model", text: $services.visionModelOverride,
                                placeholder: services.prompts.models.vision)
-                    modelField(title: "Voice (Realtime) model", text: $services.realtimeModelOverride,
-                               placeholder: services.prompts.models.realtime)
                     Text("Leave empty to use the defaults.")
                         .font(.hothCaption)
                         .foregroundStyle(Color.hothInkSecondary)

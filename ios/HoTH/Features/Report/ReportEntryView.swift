@@ -103,7 +103,9 @@ struct ReportEntryView: View {
                     // UI tests use the local chat so the golden path costs one live call (vision).
                     client: services.hasAPIKey() && !AppServices.isUITestRun ? services.openAI : nil,
                     prompts: services.prompts,
-                    voiceBuilder: voiceBuilder,
+                    // No voice builder yet: Talk is hidden and the interview runs as text until the
+                    // push-to-talk interview (Muse Voice Transcribe + on-device speech) lands.
+                    voiceBuilder: nil,
                     initialMode: InterviewStepView.initialMode(prefersVoice: services.voiceFirstInterview,
                                                                isUITestRun: AppServices.isUITestRun),
                     onComplete: { flow.interviewCompleted($0, context: modelContext) },
@@ -122,16 +124,6 @@ struct ReportEntryView: View {
         }
     }
 
-    /// The realtime voice interview (HoTH/Voice). Kept behind a builder so the flow compiles on its own.
-    /// Voice urgency goes to `voiceFlaggedUrgent`, which keeps the call alive under the safety sheet.
-    private var voiceBuilder: VoiceInterviewBuilder? {
-        let flow = flow
-        return { context, onComplete, _, onSwitchToText in
-            AnyView(VoiceInterviewView(context: context, onComplete: onComplete,
-                                       onUrgent: { flow.voiceFlaggedUrgent($0) },
-                                       onSwitchToText: onSwitchToText, keyProvider: AppServices.shared.keyProvider))
-        }
-    }
 }
 
 // MARK: - Analyzing

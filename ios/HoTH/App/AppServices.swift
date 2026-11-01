@@ -140,7 +140,6 @@ final class AppServices: ObservableObject {
         static let demoMode = "hoth.settings.demoMode"
         static let role = "hoth.settings.role"
         static let visionModel = "hoth.settings.visionModel"
-        static let realtimeModel = "hoth.settings.realtimeModel"
         static let language = "hoth.settings.language"
         static let voiceFirstInterview = "hoth.settings.voiceFirstInterview"
     }
@@ -169,11 +168,6 @@ final class AppServices: ObservableObject {
         set { objectWillChange.send(); defaults.set(newValue, forKey: SettingsKey.visionModel) }
     }
 
-    var realtimeModelOverride: String {
-        get { defaults.string(forKey: SettingsKey.realtimeModel) ?? "" }
-        set { objectWillChange.send(); defaults.set(newValue, forKey: SettingsKey.realtimeModel) }
-    }
-
     /// "system", "en" or "ar".
     var preferredLanguage: String {
         get { defaults.string(forKey: SettingsKey.language) ?? Language.system.rawValue }
@@ -198,12 +192,6 @@ final class AppServices: ObservableObject {
     /// Vision model: the user override when set, else the prompts.json default.
     var visionModel: String {
         Prompts.resolveVisionModel(override: visionModelOverride, prompts: prompts)
-    }
-
-    /// Realtime model: the user override when set, else the prompts.json default.
-    var realtimeModel: String {
-        let trimmed = realtimeModelOverride.trimmingCharacters(in: .whitespaces)
-        return trimmed.isEmpty ? prompts.models.realtime : trimmed
     }
 
     var isCrew: Bool { role == Role.crew.rawValue }

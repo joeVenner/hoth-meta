@@ -1,8 +1,18 @@
 import SwiftUI
 
+/// What the voice interview is doing, as far as the orb cares.
+enum VoiceOrbState: Equatable {
+    case idle
+    case connecting
+    case listening
+    case assistantSpeaking
+    case done
+    case failed
+}
+
 /// Living voice orb: slow breathing when idle, swells with the audio level, hue follows who is talking.
 struct VoiceOrbView: View {
-    let state: RealtimeSessionState
+    let state: VoiceOrbState
     /// 0...1, assistant output level when it speaks, resident mic level otherwise.
     let level: Float
 
@@ -18,7 +28,7 @@ struct VoiceOrbView: View {
         }
     }
 
-    /// Perceptual boost: WebRTC levels are small, so lift quiet speech into visible motion.
+    /// Perceptual boost: mic and speech levels are small, so lift quiet speech into visible motion.
     private var amplitude: CGFloat {
         let clamped = max(0, min(1, CGFloat(level)))
         return min(1, sqrt(clamped) * 1.4)
