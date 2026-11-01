@@ -102,8 +102,8 @@ enum DemoSamples {
             descriptionEN: "The seat of a playground spring rider has snapped off, leaving sharp metal sticking out at child height.",
             descriptionAR: "انكسر مقعد لعبة النابض في الملعب وبقي حديد حاد بارز على مستوى الأطفال.",
             hazards: [
-                Hazard(label: "Sharp exposed metal", kind: .sharpEdge, box: NormalizedBox(x: 0.38, y: 0.30, w: 0.24, h: 0.22)),
-                Hazard(label: "Missing seat", kind: .fall, box: NormalizedBox(x: 0.30, y: 0.50, w: 0.36, h: 0.26)),
+                Hazard(label: "Sharp exposed metal", labelAR: "معدن حاد مكشوف", kind: .sharpEdge, box: NormalizedBox(x: 0.38, y: 0.30, w: 0.24, h: 0.22)),
+                Hazard(label: "Missing seat", labelAR: "مقعد مفقود", kind: .fall, box: NormalizedBox(x: 0.30, y: 0.50, w: 0.36, h: 0.26)),
             ],
             childUseEquipment: true,
             childPresent: false,
@@ -133,7 +133,7 @@ enum DemoSamples {
             descriptionEN: "A deep pothole with broken asphalt edges in a residential street lane.",
             descriptionAR: "حفرة عميقة بحواف إسفلت مكسورة في مسار شارع سكني.",
             hazards: [
-                Hazard(label: "Pothole", kind: .trip, box: NormalizedBox(x: 0.28, y: 0.52, w: 0.42, h: 0.28)),
+                Hazard(label: "Pothole", labelAR: "حفرة", kind: .trip, box: NormalizedBox(x: 0.28, y: 0.52, w: 0.42, h: 0.28)),
             ],
             sceneType: .street,
             severityProposal: .medium,
@@ -162,7 +162,7 @@ enum DemoSamples {
             descriptionEN: "A street-side electrical cabinet on the footpath to a school is hanging open, bare wires within a child's reach.",
             descriptionAR: "خزانة كهرباء على ممر المشاة المؤدي إلى مدرسة مفتوحة، وأسلاكها العارية في متناول الأطفال.",
             hazards: [
-                Hazard(label: "Bare wires", kind: .electrical, box: NormalizedBox(x: 0.22, y: 0.25, w: 0.30, h: 0.30)),
+                Hazard(label: "Bare wires", labelAR: "أسلاك عارية", kind: .electrical, box: NormalizedBox(x: 0.22, y: 0.25, w: 0.30, h: 0.30)),
             ],
             childPresent: false,
             // School route: a child zone, so the offline read is CRITICAL and shows the safety sheet.
@@ -192,7 +192,7 @@ enum DemoSamples {
             descriptionEN: "A manhole on the street edge has no cover, leaving a deep open shaft where people walk.",
             descriptionAR: "فتحة صرف على طرف الشارع بدون غطاء، وتركت فتحة عميقة في ممر المشاة.",
             hazards: [
-                Hazard(label: "Open shaft", kind: .fall, box: NormalizedBox(x: 0.32, y: 0.45, w: 0.36, h: 0.30)),
+                Hazard(label: "Open shaft", labelAR: "فتحة مكشوفة", kind: .fall, box: NormalizedBox(x: 0.32, y: 0.45, w: 0.36, h: 0.30)),
             ],
             sceneType: .street,
             severityProposal: .critical,
@@ -220,7 +220,7 @@ enum DemoSamples {
             descriptionEN: "A public litter bin is full and bags of rubbish are piled on the pavement next to it.",
             descriptionAR: "حاوية نفايات عامة ممتلئة وأكياس القمامة مكدسة على الرصيف بجانبها.",
             hazards: [
-                Hazard(label: "Piled rubbish", kind: .sanitation, box: NormalizedBox(x: 0.25, y: 0.40, w: 0.50, h: 0.45)),
+                Hazard(label: "Piled rubbish", labelAR: "نفايات متراكمة", kind: .sanitation, box: NormalizedBox(x: 0.25, y: 0.40, w: 0.50, h: 0.45)),
             ],
             sceneType: .sidewalk,
             severityProposal: .medium,
@@ -248,7 +248,7 @@ enum DemoSamples {
             descriptionEN: "Water is bubbling up through the road surface and running along the street.",
             descriptionAR: "الماء يطلع من سطح الشارع ويجري على طول الطريق.",
             hazards: [
-                Hazard(label: "Running water", kind: .trip, box: NormalizedBox(x: 0.20, y: 0.50, w: 0.60, h: 0.35)),
+                Hazard(label: "Running water", labelAR: "مياه جارية", kind: .trip, box: NormalizedBox(x: 0.20, y: 0.50, w: 0.60, h: 0.35)),
             ],
             sceneType: .street,
             severityProposal: .high,
@@ -276,7 +276,7 @@ enum DemoSamples {
             descriptionEN: "A car is parked on the footpath, leaving no room for a wheelchair or pram to pass.",
             descriptionAR: "سيارة واقفة على ممر المشاة وما تخلي مجال للكرسي المتحرك أو عربة الأطفال.",
             hazards: [
-                Hazard(label: "Blocked path", kind: .traffic, box: NormalizedBox(x: 0.25, y: 0.40, w: 0.30, h: 0.30)),
+                Hazard(label: "Blocked path", labelAR: "ممر مسدود", kind: .traffic, box: NormalizedBox(x: 0.25, y: 0.40, w: 0.30, h: 0.30)),
             ],
             sceneType: .sidewalk,
             severityProposal: .medium,
@@ -304,7 +304,7 @@ enum DemoSamples {
             descriptionEN: "One footplate of an outdoor fitness walker has snapped off and lies on the ground.",
             descriptionAR: "انكسرت إحدى دواسات جهاز المشي الخارجي وطاحت على الأرض.",
             hazards: [
-                Hazard(label: "Broken footplate", kind: .sharpEdge, box: NormalizedBox(x: 0.55, y: 0.70, w: 0.30, h: 0.20)),
+                Hazard(label: "Broken footplate", labelAR: "دواسة مكسورة", kind: .sharpEdge, box: NormalizedBox(x: 0.55, y: 0.70, w: 0.30, h: 0.20)),
             ],
             sceneType: .park,
             severityProposal: .medium,

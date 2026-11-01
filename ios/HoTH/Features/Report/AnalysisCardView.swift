@@ -20,12 +20,12 @@ struct AnalysisCardView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: HoTHSpacing.m) {
-                HazardPhotoView(image: image, hazards: analysis.hazards, samBoxes: outline?.boxes ?? [])
+                HazardPhotoView(image: image, hazards: analysis.hazards, isArabic: isArabic, samBoxes: outline?.boxes ?? [])
                     .clipShape(RoundedRectangle(cornerRadius: HoTHRadius.card, style: .continuous))
                     .shadow(color: .black.opacity(0.12), radius: 18, x: 0, y: 10)
 
                 if !analysis.hazards.isEmpty {
-                    HazardLegend(hazards: analysis.hazards)
+                    HazardLegend(hazards: analysis.hazards, isArabic: isArabic)
                 }
 
                 trustChips
@@ -96,7 +96,7 @@ struct AnalysisCardView: View {
                 trustChip(symbol: "checkmark.seal.fill", text: "Checks passed")
             }
             if let outline, !outline.boxes.isEmpty {
-                SAMOutlineChip(concept: outline.concept)
+                SAMOutlineChip(concept: AppServices.shared.prompts.segmentConceptDisplayName(outline.concept, arabic: isArabic))
                     .transition(.opacity.combined(with: .scale))
             }
         }
@@ -310,6 +310,7 @@ func hazardTint(for kind: HazardKind) -> Color {
 struct HazardPhotoView: View {
     let image: UIImage
     let hazards: [Hazard]
+    let isArabic: Bool
     /// SAM 3.1 boxes, drawn under Spark's numbered tags in their own style.
     var samBoxes: [NormalizedBox] = []
 
@@ -347,7 +348,7 @@ struct HazardPhotoView: View {
                 withAnimation(.easeOut(duration: 1.0).delay(0.3)) { progress = 1 }
             }
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(Text(hazards.map(\.label).joined(separator: ", ")))
+            .accessibilityLabel(Text(hazards.map { $0.label(arabic: isArabic) }.joined(separator: ", ")))
     }
 
     private func layoutItems(in size: CGSize) -> [HazardLabelLayout.Item] {
@@ -359,7 +360,8 @@ struct HazardPhotoView: View {
                           height: max(min(clamp(box.h), 1 - y) * size.height, 8))
         }
         let widths = hazards.map { hazard -> CGFloat in
-            let text = (hazard.label as NSString).size(withAttributes: [.font: Self.labelFont]).width
+            // Measure the string the tag shows, or Arabic tags are sized for the English text.
+            let text = (hazard.label(arabic: isArabic) as NSString).size(withAttributes: [.font: Self.labelFont]).width
             // badge (18) + spacing (5) + text + horizontal padding (4 + 10)
             return ceil(text) + 18 + 5 + 14 + 2
         }
@@ -384,7 +386,7 @@ struct HazardPhotoView: View {
             if let frame = item.labelFrame {
                 HStack(spacing: 5) {
                     NumberBadge(number: item.number, tint: tint, inverted: true, size: 18)
-                    Text(hazard.label)
+                    Text(hazard.label(arabic: isArabic))
                         .font(Font(Self.labelFont))
                         .foregroundStyle(.white)
                         .lineLimit(1)
@@ -432,6 +434,7 @@ struct NumberBadge: View {
 /// Numbered list of every hazard under the photo, so long labels are always readable in full.
 struct HazardLegend: View {
     let hazards: [Hazard]
+    let isArabic: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: HoTHSpacing.xs) {
@@ -440,7 +443,7 @@ struct HazardLegend: View {
                 HStack(alignment: .firstTextBaseline, spacing: HoTHSpacing.s) {
                     NumberBadge(number: index + 1, tint: tint, size: 20)
                         .alignmentGuide(.firstTextBaseline) { $0[VerticalAlignment.center] + 4 }
-                    Text(hazard.label)
+                    Text(hazard.label(arabic: isArabic))
                         .font(.hothCaption.weight(.semibold))
                         .foregroundStyle(Color.hothInk)
                         .fixedSize(horizontal: false, vertical: true)
