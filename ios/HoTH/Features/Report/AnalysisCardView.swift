@@ -125,7 +125,7 @@ struct PriorityReasonCard: View {
         HoTHCard {
             VStack(alignment: .leading, spacing: HoTHSpacing.s) {
                 SectionHeader(title: "Why this priority")
-                if let floor = priority.floorApplied {
+                if let floor = isArabic ? priority.floorAppliedAR : priority.floorAppliedEN {
                     Text(floor)
                         .font(.hothHeadline)
                         .foregroundStyle(priority.level == .critical ? Color.hothCritical : Color.hothHigh)
