@@ -18,4 +18,4 @@ The format follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/
 
 ### Removed
 - `realtime_tools` and `voice_persona` from prompts.json.
-- OpenAI Realtime (WebRTC) voice interview; the interview runs as text until the Meta push-to-talk voice lands.
+- The previous provider's realtime (WebRTC) voice interview; the interview runs as text until the Meta push-to-talk voice lands.

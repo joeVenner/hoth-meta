@@ -45,7 +45,7 @@ public struct ImageInput: Sendable {
 
 /// Thin async client for the Meta Model API (`https://api.meta.ai/v1`).
 ///
-/// - `structured(...)`: Muse Spark over the OpenAI-compatible Responses API with a `text.format` json_schema.
+/// - `structured(...)`: Muse Spark over the Responses API (`POST /v1/responses`) with a `text.format` json_schema.
 /// - `transcribe(...)`: Muse Voice Transcribe file mode (`MetaModelClient+Transcribe.swift`).
 /// - `segment(...)`: SAM 3.1 concept segmentation (`MetaModelClient+Segment.swift`).
 public final class MetaModelClient: Sendable {
