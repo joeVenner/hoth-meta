@@ -27,6 +27,9 @@ final class DemoCaptureUITests: XCTestCase {
     private static let holdToTalkValues = ["Hold to talk", "اضغط مطوّل وتكلّم"]
     /// Clips the agent may need: two scripted answers plus two spares (capture plan §3).
     private static let maxClips = 4
+    /// The app's capture log in `HOTH_CAPTURE_LOG_DIR` (`CaptureLog.fileName` in the app target).
+    private static let appLogFileName = "hoth_app_log.jsonl"
+    private var appLogDirectory: String?
 
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -35,6 +38,9 @@ final class DemoCaptureUITests: XCTestCase {
                           "Live demo capture: set TEST_RUNNER_DEMO_CAPTURE=1 (makes real Meta calls)")
         if let path = environment["CAPTURE_LOG"], !path.isEmpty {
             logURL = URL(fileURLWithPath: path)
+            // The app appends its own log next to this one; two writers on one file would interleave.
+            XCTAssertNotEqual(logURL?.lastPathComponent, Self.appLogFileName,
+                              "CAPTURE_LOG must not be named \(Self.appLogFileName) (the app's own log)")
         }
 
         app = XCUIApplication()
@@ -55,9 +61,12 @@ final class DemoCaptureUITests: XCTestCase {
             app.launchEnvironment["HOTH_PTT_WAV_DIR"] = directory
         }
         if let directory = environment["HOTH_CAPTURE_LOG_DIR"], !directory.isEmpty {
-            app.launchEnvironment["HOTH_CAPTURE_LOG_DIR"] = directory
+            appLogDirectory = directory
         } else if let logURL {
-            app.launchEnvironment["HOTH_CAPTURE_LOG_DIR"] = logURL.deletingLastPathComponent().path
+            appLogDirectory = logURL.deletingLastPathComponent().path
+        }
+        if let appLogDirectory {
+            app.launchEnvironment["HOTH_CAPTURE_LOG_DIR"] = appLogDirectory
         }
 
         // Backstop for the notification prompt (C0 should have answered it already). The monitor only
@@ -80,8 +89,9 @@ final class DemoCaptureUITests: XCTestCase {
         let wordmark = app.staticTexts["hothWordmark"]
         XCTAssertTrue(wordmark.waitForExistence(timeout: 20), "Feed wordmark did not appear")
         mark("feed_shown")
-        wordmark.press(forDuration: 1.0)
+        // Same order as C2: the mark is the press start; the banner follows ~0.6 s later.
         mark("alert_fired", element: wordmark)
+        wordmark.press(forDuration: 1.0)
         allowSystemAlert(timeout: 10)
         beat(1)
         mark("warm_up_done")
@@ -97,7 +107,9 @@ final class DemoCaptureUITests: XCTestCase {
         let clips = try clipDurations(in: clipDirectory)
         XCTAssertFalse(clips.isEmpty, "No .wav clips in the playlist")
 
+        let launchedAt = Date().timeIntervalSince1970
         launch(scene: "C1", language: "ar", role: "resident", extraEnvironment: [:], startMark: "splash_start")
+        try assertAppLoadedPlaylist(clipNames: clipNames(in: clipDirectory), since: launchedAt)
 
         let reportTab = app.buttons["reportTabButton"]
         XCTAssertTrue(reportTab.waitForExistence(timeout: 30), "Feed did not appear")
@@ -265,15 +277,18 @@ final class DemoCaptureUITests: XCTestCase {
         let handle = app.descendants(matching: .any)["beforeAfterHandle"]
         if handle.waitForExistence(timeout: 5) {
             mark("slider", element: handle)
-            let centre = handle.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+            // Drag targets are window-relative. The handle's own coordinate resolves when it is used,
+            // so it is right for each drag's start, but as a target it would be "where the handle is now".
+            let start = handle.frame
             let window = app.windows.firstMatch
-            let left = window.coordinate(withNormalizedOffset: CGVector(dx: 0.1, dy: 0)).withOffset(CGVector(dx: 0, dy: handle.frame.midY))
-            let right = window.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0)).withOffset(CGVector(dx: 0, dy: handle.frame.midY))
-            centre.press(forDuration: 0.1, thenDragTo: left, withVelocity: .slow, thenHoldForDuration: 0.2)
-            let atLeft = handle.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
-            atLeft.press(forDuration: 0.1, thenDragTo: right, withVelocity: .slow, thenHoldForDuration: 0.2)
-            let atRight = handle.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
-            atRight.press(forDuration: 0.1, thenDragTo: centre, withVelocity: .slow, thenHoldForDuration: 0.2)
+            let origin = window.coordinate(withNormalizedOffset: .zero)
+            let left = window.coordinate(withNormalizedOffset: CGVector(dx: 0.1, dy: 0)).withOffset(CGVector(dx: 0, dy: start.midY))
+            let right = window.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0)).withOffset(CGVector(dx: 0, dy: start.midY))
+            let home = origin.withOffset(CGVector(dx: start.midX, dy: start.midY))
+            for target in [left, right, home] {
+                let grip = handle.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+                grip.press(forDuration: 0.1, thenDragTo: target, withVelocity: .slow, thenHoldForDuration: 0.2)
+            }
             beat(1)
         } else {
             mark("slider_missing")
@@ -297,18 +312,21 @@ final class DemoCaptureUITests: XCTestCase {
         let ticket = app.buttons["ticketSubmitButton"]
         let safety = app.buttons["safetyContinueButton"]
 
-        if safety.waitForExistence(timeout: 3) {
-            mark("safety_sheet", element: safety)
-            beat(3)
-            safety.tap()
-        }
+        if safety.waitForExistence(timeout: 3), !dismissSafety(safety) { return }
         XCTAssertTrue(talk.waitForExistence(timeout: 30) || ticket.exists, "Voice interview did not open")
         mark("interview_open")
 
         var assistantCount = 0
         var residentCount = 0
         var played = 0
+        var passes = 0
         while !ticket.exists {
+            // Every pass plays a clip or dismisses the safety sheet; more than this is a loop, not a take.
+            passes += 1
+            guard passes <= Self.maxClips + 3 else {
+                XCTFail("Interview did not reach the ticket after \(passes - 1) turns")
+                return
+            }
             // Wait for the agent's reply to be read out and the orb to return to "Hold to talk".
             mark("assistant_wait_start")
             let state = waitForInterviewTurn(talk: talk, ticket: ticket, safety: safety,
@@ -318,9 +336,7 @@ final class DemoCaptureUITests: XCTestCase {
             case .ticket:
                 continue
             case .safety:
-                mark("safety_sheet", element: safety)
-                beat(3)
-                safety.tap()
+                guard dismissSafety(safety) else { return }
                 continue
             case .timedOut:
                 XCTFail("Interview stalled (no idle orb, ticket or safety sheet within 90 s)")
@@ -355,6 +371,49 @@ final class DemoCaptureUITests: XCTestCase {
     }
 
     private enum InterviewState { case idle, ticket, safety, timedOut }
+
+    /// Holds on the urgent safety sheet for 3 s, then taps through. False (after failing the test)
+    /// if it stays up, so the interview stops instead of spinning on it.
+    @MainActor
+    private func dismissSafety(_ safety: XCUIElement) -> Bool {
+        mark("safety_sheet", element: safety)
+        beat(3)
+        safety.tap()
+        guard safety.waitForNonExistence(timeout: 10) else {
+            XCTFail("Safety sheet did not dismiss")
+            return false
+        }
+        return true
+    }
+
+    /// The app's `capture_launch` record for this launch must list exactly the playlist the test will
+    /// play; a `ptt_error` (or no record) would otherwise surface only as "No transcript for clip 01".
+    private func assertAppLoadedPlaylist(clipNames: [String], since launchedAt: TimeInterval) throws {
+        let directory = try XCTUnwrap(appLogDirectory,
+                                      "Set TEST_RUNNER_CAPTURE_LOG or TEST_RUNNER_HOTH_CAPTURE_LOG_DIR for C1")
+        let file = URL(fileURLWithPath: directory, isDirectory: true).appendingPathComponent(Self.appLogFileName)
+        var record: [String: Any]?
+        _ = waitUntil(timeout: 10) {
+            record = Self.records(in: file).last { entry in
+                entry["event"] as? String == "capture_launch" && entry["scene"] as? String == self.scene
+                    && (entry["t"] as? Double ?? 0) >= launchedAt - 1
+            }
+            return record != nil
+        }
+        let launch = try XCTUnwrap(record, "No capture_launch record for \(scene) in \(file.path)")
+        if let error = launch["ptt_error"] as? String {
+            XCTFail("App rejected the WAV playlist: \(error)")
+        }
+        XCTAssertEqual(launch["ptt_clips"] as? [String], clipNames, "App and test disagree on the playlist")
+        mark("playlist_loaded", extra: ["clips": clipNames.count])
+    }
+
+    private static func records(in file: URL) -> [[String: Any]] {
+        guard let text = try? String(contentsOf: file, encoding: .utf8) else { return [] }
+        return text.split(separator: "\n").compactMap { line in
+            (try? JSONSerialization.jsonObject(with: Data(line.utf8))) as? [String: Any]
+        }
+    }
 
     /// Idle means: a new assistant bubble arrived, the chat is not thinking (no typing line), and the
     /// orb reads "Hold to talk" again (the reply was read aloud). Agent tool captions seen on the typing
@@ -522,13 +581,17 @@ final class DemoCaptureUITests: XCTestCase {
     /// Each playlist clip's length in seconds, in playlist (name) order, read from the WAV header.
     private func clipDurations(in directory: String) throws -> [TimeInterval] {
         let url = URL(fileURLWithPath: directory, isDirectory: true)
-        let names = try FileManager.default.contentsOfDirectory(atPath: url.path)
-            .filter { $0.lowercased().hasSuffix(".wav") && !$0.hasPrefix(".") }
-            .sorted()
-        return try names.map { name in
+        return try clipNames(in: directory).map { name in
             let data = try Data(contentsOf: url.appendingPathComponent(name))
             return try XCTUnwrap(Self.wavDuration(data), "Not a PCM WAV: \(name)")
         }
+    }
+
+    /// Playlist file names in play order (same rule as the app: visible `.wav` files, by name).
+    private func clipNames(in directory: String) throws -> [String] {
+        try FileManager.default.contentsOfDirectory(atPath: directory)
+            .filter { $0.lowercased().hasSuffix(".wav") && !$0.hasPrefix(".") }
+            .sorted()
     }
 
     /// Duration of a PCM WAV: `data` chunk size / byte rate (from the `fmt ` chunk).
