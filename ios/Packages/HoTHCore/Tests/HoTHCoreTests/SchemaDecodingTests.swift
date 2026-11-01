@@ -20,6 +20,26 @@ final class SchemaDecodingTests: XCTestCase {
         XCTAssertEqual(vision.confidence, .high)
     }
 
+    func testHazardArabicLabelDecodesAndFallsBackToEnglish() throws {
+        let vision = try JSONDecoder().decode(VisionAnalysis.self, from: Fixtures.data("vision_analysis"))
+        XCTAssertEqual(vision.hazards[0].labelAR, "عمود معدني حاد مكشوف")
+        XCTAssertEqual(vision.hazards[0].label(arabic: true), "عمود معدني حاد مكشوف")
+        XCTAssertEqual(vision.hazards[0].label(arabic: false), "exposed sharp metal post")
+        // Older responses have no label_ar: Arabic UI falls back to the English label.
+        XCTAssertNil(vision.hazards[1].labelAR)
+        XCTAssertEqual(vision.hazards[1].label(arabic: true), "unstable spring base")
+    }
+
+    func testHazardBlankArabicLabelFallsBackAndRoundTrips() throws {
+        let blank = Hazard(label: "Pothole", labelAR: "  ", kind: .trip, box: NormalizedBox(x: 0.1, y: 0.1, w: 0.2, h: 0.2))
+        XCTAssertEqual(blank.label(arabic: true), "Pothole")
+        let hazard = Hazard(label: "Pothole", labelAR: "حفرة", kind: .trip, box: NormalizedBox(x: 0.1, y: 0.1, w: 0.2, h: 0.2))
+        let encoded = try JSONEncoder().encode(hazard)
+        let object = try XCTUnwrap(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+        XCTAssertEqual(object["label_ar"] as? String, "حفرة")
+        XCTAssertEqual(try JSONDecoder().decode(Hazard.self, from: encoded), hazard)
+    }
+
     func testVisionAnalysisRoundTripsWithSnakeCaseKeys() throws {
         let original = try JSONDecoder().decode(VisionAnalysis.self, from: Fixtures.data("vision_analysis"))
         let encoded = try JSONEncoder().encode(original)

@@ -5,7 +5,7 @@
   "description_en": "The seat of a spring rider has snapped off, leaving a jagged metal post exposed.",
   "description_ar": "انكسر مقعد اللعبة النابضية وظهر عمود معدني بحواف حادة.",
   "hazards": [
-    { "label": "exposed sharp metal post", "kind": "sharp_edge", "box": { "x_min": 410, "y_min": 520, "x_max": 530, "y_max": 620 } },
+    { "label": "exposed sharp metal post", "label_ar": "عمود معدني حاد مكشوف", "kind": "sharp_edge", "box": { "x_min": 410, "y_min": 520, "x_max": 530, "y_max": 620 } },
     { "label": "unstable spring base", "kind": "fall", "box": { "x_min": 350, "y_min": 600, "x_max": 600, "y_max": 1001 } }
   ],
   "child_use_equipment": true,
