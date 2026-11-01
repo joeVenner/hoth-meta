@@ -201,6 +201,8 @@ public enum ToolLoop {
                 records.append(ToolCallRecord(name: call.name, arguments: call.arguments, output: output))
                 input.append(MetaModelClient.functionCallOutput(callID: call.callID, output: output))
             }
+            // Tools do not throw; stop here instead of paying for another round nobody will read.
+            try Task.checkCancellation()
         }
         return .roundLimit(calls: records)
     }

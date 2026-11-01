@@ -53,6 +53,8 @@ final class StubURLProtocol: URLProtocol {
 
     nonisolated(unsafe) static var handler: ((URLRequest) -> (Int, Data))?
     nonisolated(unsafe) static var captured: [Captured] = []
+    /// When set, the request fails with this error instead of calling `handler` (reset it after use).
+    nonisolated(unsafe) static var failure: URLError?
 
     override class func canInit(with request: URLRequest) -> Bool { true }
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
@@ -60,6 +62,10 @@ final class StubURLProtocol: URLProtocol {
     override func startLoading() {
         let body = Self.readBody(request)
         Self.captured.append(Captured(request: request, body: body))
+        if let failure = Self.failure {
+            client?.urlProtocol(self, didFailWithError: failure)
+            return
+        }
         let (status, data) = Self.handler?(request) ?? (500, Data())
         let response = HTTPURLResponse(url: request.url!, statusCode: status, httpVersion: "HTTP/1.1",
                                        headerFields: ["Content-Type": "application/json"])!

@@ -185,7 +185,7 @@ public final class MetaModelClient: Sendable {
         do {
             (data, response) = try await session.data(for: request)
         } catch {
-            throw ModelAPIError.network((error as? URLError)?.code.rawValue.description ?? "request failed")
+            throw Self.transportError(error, isTaskCancelled: Task.isCancelled)
         }
         guard let http = response as? HTTPURLResponse else {
             throw ModelAPIError.network("no HTTP response")
@@ -200,6 +200,15 @@ public final class MetaModelClient: Sendable {
         default:
             throw ModelAPIError.http(http.statusCode, Self.sanitizedErrorMessage(data, key: key))
         }
+    }
+
+    /// Cancellation stays `CancellationError` so callers can drop abandoned work silently; anything else
+    /// (timeouts included) is a real `.network` failure.
+    static func transportError(_ error: Error, isTaskCancelled: Bool) -> Error {
+        if isTaskCancelled || error is CancellationError || (error as? URLError)?.code == .cancelled {
+            return CancellationError()
+        }
+        return ModelAPIError.network((error as? URLError)?.code.rawValue.description ?? "request failed")
     }
 
     /// Short, key-free error message. Error bodies can echo the request, so drop the literal key and
