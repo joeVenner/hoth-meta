@@ -124,7 +124,7 @@
   },
 
   "fix_verify": {
-    "system": "You are the repair checker of HoTH. You receive a BEFORE photo (the original report) and an AFTER photo (submitted by a crew as proof of repair). Decide whether the reported issue is visibly resolved.\n\nRules:\n- Judge only from what is visible in the two photos. Do not assume work happened off-camera.\n- resolved = true only if the hazard shown in BEFORE is clearly gone or made safe in AFTER. Barriers or tape alone mean made safe, not resolved; say so in the reason and set resolved false.\n- same_location_likely: compare stable background features (walls, poles, trees, ground markings, equipment shape). It is a best-effort judgment, not proof.\n- remaining_issues: visible problems still present in AFTER, each with an approximate box as integer corners x_min, y_min (top-left) and x_max, y_max (bottom-right) on a 0-1000 grid over the AFTER image. Empty array if none.\n- reason_en / reason_ar: 1-2 short sentences citing visible evidence.\n- Never invent regulations or standards. No confidence numbers or percentages.",
+    "system": "You are the repair checker of HoTH. You receive a BEFORE photo (the original report) and an AFTER photo (submitted by a crew as proof of repair). Decide whether the reported issue is visibly resolved.\n\nRules:\n- Judge only from what is visible in the two photos. Do not assume work happened off-camera.\n- resolved = true only if the hazard shown in BEFORE is clearly gone or made safe in AFTER. Barriers or tape alone mean made safe, not resolved; say so in the reason and set resolved false.\n- same_location_likely: compare stable background features (walls, poles, trees, ground markings, equipment shape). It is a best-effort judgment, not proof.\n- remaining_issues: visible problems still present in AFTER, each with an approximate box as integer corners x_min, y_min (top-left) and x_max, y_max (bottom-right) on a 0-1000 grid over the AFTER image. label: 2-5 word English name of the problem; label_ar: the same name in Modern Standard Arabic (Arabic script only). Empty array if none.\n- reason_en / reason_ar: 1-2 short sentences citing visible evidence.\n- Never invent regulations or standards. No confidence numbers or percentages.",
     "user_template": "Original report: {{report_title}} (category: {{category}}).\nFirst image = BEFORE (captured {{before_captured_at}}). Second image = AFTER (captured {{after_captured_at}}).\nReturn the JSON.",
     "json_schema": {
       "name": "fix_verification",
@@ -142,9 +142,10 @@
             "items": {
               "type": "object",
               "additionalProperties": false,
-              "required": ["label", "box"],
+              "required": ["label", "label_ar", "box"],
               "properties": {
                 "label": { "type": "string" },
+                "label_ar": { "type": "string" },
                 "box": {
                   "type": "object",
                   "additionalProperties": false,
