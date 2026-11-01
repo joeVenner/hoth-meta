@@ -59,6 +59,18 @@ public struct NormalizedBox: Codable, Equatable, Sendable {
     public init(x: Double, y: Double, w: Double, h: Double) {
         self.x = x; self.y = y; self.w = w; self.h = h
     }
+
+    /// Builds a box from corner coordinates on a `width` x `height` grid (source pixels for SAM, 1000 x 1000
+    /// for Muse Spark grounding). Corners are reordered and clamped, so slightly out-of-range values
+    /// (models emit e.g. 1001 at an edge) still land inside 0...1.
+    public static func fromCorners(x1: Double, y1: Double, x2: Double, y2: Double,
+                                   width: Double, height: Double) -> NormalizedBox {
+        guard width > 0, height > 0 else { return NormalizedBox(x: 0, y: 0, w: 0, h: 0) }
+        func unit(_ value: Double, _ size: Double) -> Double { min(max(value / size, 0), 1) }
+        let left = unit(min(x1, x2), width), right = unit(max(x1, x2), width)
+        let top = unit(min(y1, y2), height), bottom = unit(max(y1, y2), height)
+        return NormalizedBox(x: left, y: top, w: right - left, h: bottom - top)
+    }
 }
 
 public struct Hazard: Codable, Equatable, Sendable {
