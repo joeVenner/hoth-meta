@@ -144,7 +144,7 @@ struct CaptureView: View {
                 .background(Capsule().fill(.ultraThinMaterial.opacity(0.9)))
                 .environment(\.colorScheme, .dark)
             // Disclosure: the blurred photo and an approximate location leave the phone for analysis.
-            Text("Faces and plates are blurred on your phone first; then the photo and approximate location go to Meta's Muse Spark model to analyse the hazard.")
+            Text("Faces and plates your phone detects are blurred first; then the photo and approximate location go to Meta's Muse Spark model to analyse the hazard.")
                 .font(.system(size: 11, weight: .medium))
                 .foregroundStyle(.white.opacity(0.85))
                 .multilineTextAlignment(.center)
