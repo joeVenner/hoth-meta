@@ -83,7 +83,7 @@ final class ReportFlowModel: ObservableObject {
     private var hasShownSafety = false
     /// Identifies the current submit run; regenerated on every reset so results from an abandoned run
     /// (retake / close while a model call is in flight) are dropped instead of overwriting the new one.
-    private var runID = UUID()
+    private(set) var runID = UUID()
     /// Re-entrancy guard for `post`: `step` only changes after the blur await, so a double tap needs this.
     private var isPosting = false
     private static let logger = Logger(subsystem: "io.fomy.hoth", category: "ReportFlow")
@@ -232,7 +232,9 @@ final class ReportFlowModel: ObservableObject {
         step = .interview
     }
 
-    func interviewCompleted(_ args: SubmitReportArgs, context: ModelContext? = nil) {
+    /// - Parameter run: the `runID` the interview started in; a reply from an abandoned run is dropped.
+    func interviewCompleted(_ args: SubmitReportArgs, context: ModelContext? = nil, run: UUID? = nil) {
+        guard isCurrentInterview(run) else { return }
         if let target = voiceNoteTarget {
             voiceNoteTarget = nil
             if let context { attachVoiceNote(args, to: target.reportID, context: context) }
@@ -257,8 +259,8 @@ final class ReportFlowModel: ObservableObject {
     /// the resident's own "same issue" decision, so it merges like "I saw it too" in every mode (the
     /// automatic `mergePolicy` is for merges nobody confirmed). Only open reports still in range merge;
     /// anything else files a new ticket from `args` through `interviewCompleted` (priority floors, safety).
-    func interviewConfirmedExisting(_ reportID: UUID, args: SubmitReportArgs, context: ModelContext) {
-        guard step == .interview, voiceNoteTarget == nil, let photo else { return }
+    func interviewConfirmedExisting(_ reportID: UUID, args: SubmitReportArgs, context: ModelContext, run: UUID? = nil) {
+        guard isCurrentInterview(run), step == .interview, voiceNoteTarget == nil, let photo else { return }
         var descriptor = FetchDescriptor<Report>(predicate: #Predicate { $0.id == reportID })
         descriptor.fetchLimit = 1
         let match: Report?
@@ -285,8 +287,8 @@ final class ReportFlowModel: ObservableObject {
     }
 
     /// Interview urgency (the chat, typed or spoken, has already finished): keep what was said, show safety, ticket behind it.
-    func interviewFlaggedUrgent(_ reason: String) {
-        guard voiceNoteTarget == nil else { return }  // a note on a merged report never files a new ticket
+    func interviewFlaggedUrgent(_ reason: String, run: UUID? = nil) {
+        guard isCurrentInterview(run), voiceNoteTarget == nil else { return }  // a note on a merged report never files a new ticket
         presentSafety(reason: reason, answers: Self.answers(fromUrgentReason: reason))
     }
 
@@ -622,6 +624,13 @@ final class ReportFlowModel: ObservableObject {
     }
 
     // MARK: Helpers
+
+    /// Nil means the caller did not tag the interview (tests, older call sites).
+    private func isCurrentInterview(_ run: UUID?) -> Bool {
+        guard let run, run != runID else { return true }
+        Self.logger.error("Dropping an interview result from an abandoned report")
+        return false
+    }
 
     private func reset(keepingStep: Bool) {
         cancelOutline()

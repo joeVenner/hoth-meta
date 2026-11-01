@@ -58,6 +58,8 @@ final class ChatIntakeModel: ObservableObject {
     private let onConfirmExisting: ((UUID, SubmitReportArgs) -> Void)?
     /// Tool results from earlier turns, resent as text so the agent does not call them again.
     private var toolNotes: [String] = []
+    /// The model turn in flight; `cancel()` stops it (exposed so tests can await it).
+    private(set) var turnTask: Task<Void, Never>?
 
     private var answers: [String: String] = [:]
     private var phase: LocalPhase = .asking(0)
@@ -93,7 +95,7 @@ final class ChatIntakeModel: ObservableObject {
         guard bubbles.isEmpty else { return }
         switch mode {
         case .model:
-            Task { await sendToModel(userMessage: arabic ? "(ابدأ المحادثة)" : "(start the conversation)", echo: false) }
+            turnTask = Task { await sendToModel(userMessage: arabic ? "(ابدأ المحادثة)" : "(start the conversation)", echo: false) }
         case .local:
             startLocal()
         }
@@ -104,11 +106,17 @@ final class ChatIntakeModel: ObservableObject {
         guard !text.isEmpty, !isThinking, !isFinished else { return }
         switch mode {
         case .model:
-            Task { await sendToModel(userMessage: text, echo: true) }
+            turnTask = Task { await sendToModel(userMessage: text, echo: true) }
         case .local:
             appendResident(text)
             handleLocal(text)
         }
+    }
+
+    /// The interview screen went away: a late reply must not add bubbles or finish a reset report.
+    func cancel() {
+        turnTask?.cancel()
+        turnTask = nil
     }
 
     // MARK: Local deterministic flow
@@ -364,8 +372,11 @@ final class ChatIntakeModel: ObservableObject {
                 turn = try await client.structured(model: model, system: systemPrompt(), user: user,
                                                    schema: schema, as: ModelTurn.self)
             }
+            guard !Task.isCancelled else { return }
             apply(turn)
         } catch {
+            // Cancelled on purpose (screen dismissed): not a reason to switch to the local flow.
+            guard !Task.isCancelled, !(error is CancellationError) else { return }
             Self.logger.error("Chat model unavailable, using local flow: \(String(describing: error))")
             switchToLocal(pending: echo ? userMessage : nil, alreadyEchoed: echo)
         }

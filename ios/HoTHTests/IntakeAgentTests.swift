@@ -262,6 +262,21 @@ final class IntakeAgentTests: XCTestCase {
         XCTAssertEqual(AgentStubURLProtocol.requestCount, 1, "no doomed single-turn retry")
     }
 
+    func testCancelledTurnAddsNothingAndStaysOnTheModel() async throws {
+        AgentStubURLProtocol.replies = [.final(turn(reply: "Done", done: true))]
+        var completions = 0
+        let chat = try makeChat(toolbox: try makeToolbox(), completed: { _ in completions += 1 })
+        chat.start()
+        let inFlight = chat.turnTask
+        chat.cancel()
+        await inFlight?.value
+
+        XCTAssertTrue(chat.bubbles.isEmpty, "no reply and no local-flow bubbles")
+        XCTAssertEqual(chat.mode, .model, "cancelling is not a model failure")
+        XCTAssertFalse(chat.isThinking)
+        XCTAssertEqual(completions, 0)
+    }
+
     func testRoundLimitFinishesTheTurnSingleTurnWithToolResults() async throws {
         let rounds = try XCTUnwrap(try prompts().intakeAgent).maxToolRounds
         AgentStubURLProtocol.replies = Array(repeating: .calls([("call_x", "get_place_context", "{}")]), count: rounds + 1)
@@ -380,6 +395,20 @@ final class IntakeConfirmFlowTests: XCTestCase {
             XCTAssertEqual(flow.priority?.level, expected.level, "\(status): priority refined by PriorityAgent")
             XCTAssertTrue(flow.step == .ticket || flow.safetyAlert != nil, "\(status): ticket or safety sheet")
         }
+    }
+
+    func testInterviewResultFromAnAbandonedRunIsDropped() async throws {
+        let flow = try await flowInInterview()
+        let stale = UUID()
+        flow.interviewFlaggedUrgent("child_use_now: yes", run: stale)
+        flow.interviewConfirmedExisting(insertReport(metresNorth: 10).id, args: args(), context: context, run: stale)
+        flow.interviewCompleted(args(), context: context, run: stale)
+        XCTAssertEqual(flow.step, .interview)
+        XCTAssertNil(flow.submitArgs)
+        XCTAssertNil(flow.safetyAlert)
+
+        flow.interviewCompleted(args(), context: context, run: flow.runID)
+        XCTAssertNotNil(flow.submitArgs, "the current run still completes")
     }
 
     private func args(answers: [String: String] = [:]) -> SubmitReportArgs {

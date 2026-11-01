@@ -107,7 +107,10 @@ struct ChatIntakeView: View {
             voice.onTranscript = { [weak model] text in model?.send(text) }
             model.start()
         }
-        .onDisappear { voice.shutDown() }
+        .onDisappear {
+            model.cancel()
+            voice.shutDown()
+        }
         .onChange(of: model.isThinking) { _, isThinking in
             if !isThinking { voice.chatSettled() }
         }
