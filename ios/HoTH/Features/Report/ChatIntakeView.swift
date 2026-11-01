@@ -67,9 +67,16 @@ struct ChatIntakeView: View {
         _model = StateObject(wrappedValue: ChatIntakeModel(
             context: context, slots: slots, client: client, prompts: prompts, model: textModel, toolbox: toolbox,
             onComplete: onComplete, onUrgent: onUrgent, onConfirmExisting: onConfirmExisting))
-        _voice = StateObject(wrappedValue: PushToTalkModel(
-            transcriber: transcriber, recorder: WAVVoiceRecorder(), speaker: SystemSpeechSpeaker(),
-            startsInVoice: startsWithVoice))
+        _voice = StateObject(wrappedValue: Self.makeVoiceModel(transcriber: transcriber,
+                                                               startsWithVoice: startsWithVoice))
+    }
+
+    /// Built inside the `StateObject` autoclosure, so the recorder (and a capture playlist) is made once.
+    private static func makeVoiceModel(transcriber: SpeechTranscribing?, startsWithVoice: Bool) -> PushToTalkModel {
+        let recorder = VoiceRecorderFactory.make()
+        return PushToTalkModel(
+            transcriber: transcriber, recorder: recorder, speaker: SystemSpeechSpeaker(),
+            startsInVoice: startsWithVoice, micStatus: VoiceRecorderFactory.micStatus(for: recorder))
     }
 
     var body: some View {
