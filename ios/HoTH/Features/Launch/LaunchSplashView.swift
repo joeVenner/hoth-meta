@@ -67,7 +67,7 @@ struct LaunchSplashView: View {
             .offset(y: reduceMotion || isWordmarkIn ? 0 : 10)
 
             Text("The social network for your Hay")
-                .font(.system(size: 17, weight: .regular, design: .serif).italic())
+                .font(.system(size: 17, weight: .regular))
                 .foregroundStyle(Color.hothInk.opacity(0.75))
                 .padding(.top, HoTHSpacing.m)
                 .opacity(isTaglineIn ? 1 : 0)

@@ -2,8 +2,8 @@ import SwiftUI
 import UIKit
 
 // MARK: - HoTH Design System
-// Warm editorial palette, serif display vs rounded UI text, generous spacing,
-// soft layered cards, subtle spring motion. RTL-safe: only leading/trailing.
+// Social-network palette: one blue accent on cool neutrals, system sans throughout,
+// flat white cards with hairlines, subtle spring motion. RTL-safe: only leading/trailing.
 
 // MARK: Colors
 
@@ -25,20 +25,20 @@ private extension UIColor {
 }
 
 extension Color {
-    /// Warm paper background.
-    static let hothBackground = Color(uiColor: .hothDynamic(light: 0xF7F3EC, dark: 0x13110F))
-    /// Raised card surface.
-    static let hothSurface = Color(uiColor: .hothDynamic(light: 0xFFFDF9, dark: 0x1E1B18))
-    /// Primary text (warm near-black, never pure black).
-    static let hothInk = Color(uiColor: .hothDynamic(light: 0x1F1B17, dark: 0xF4EFE7))
+    /// Cool grey page background.
+    static let hothBackground = Color(uiColor: .hothDynamic(light: 0xF0F2F5, dark: 0x18191A))
+    /// Card surface (white in light mode).
+    static let hothSurface = Color(uiColor: .hothDynamic(light: 0xFFFFFF, dark: 0x242526))
+    /// Primary text (near-black, never pure black).
+    static let hothInk = Color(uiColor: .hothDynamic(light: 0x1C1E21, dark: 0xE4E6EB))
     /// Secondary text.
-    static let hothInkSecondary = Color(uiColor: .hothDynamic(light: 0x6E655B, dark: 0xA79D90))
-    /// Warm coral accent (primary action).
-    static let hothAccent = Color(uiColor: .hothDynamic(light: 0xE0613F, dark: 0xF07A58))
-    /// Deep teal (civic / trust).
-    static let hothTeal = Color(uiColor: .hothDynamic(light: 0x1F6F6B, dark: 0x4FB3AC))
-    /// Sand (soft fills, chips).
-    static let hothSand = Color(uiColor: .hothDynamic(light: 0xEDE3D3, dark: 0x2C2722))
+    static let hothInkSecondary = Color(uiColor: .hothDynamic(light: 0x65676B, dark: 0xB0B3B8))
+    /// Blue accent (primary action, links, selection).
+    static let hothAccent = Color(uiColor: .hothDynamic(light: 0x0866FF, dark: 0x2D88FF))
+    /// Deep civic blue (trust, info, demo labels). Name kept from the earlier teal palette.
+    static let hothTeal = Color(uiColor: .hothDynamic(light: 0x0A5DC2, dark: 0x5AA7FF))
+    /// Neutral grey fill (chips, secondary buttons). Name kept from the earlier sand palette.
+    static let hothSand = Color(uiColor: .hothDynamic(light: 0xE4E6EB, dark: 0x3A3B3C))
     static let hothCritical = Color(uiColor: .hothDynamic(light: 0xC62E2E, dark: 0xF0605A))
     static let hothHigh = Color(uiColor: .hothDynamic(light: 0xD9711C, dark: 0xF39A4A))
     static let hothMedium = Color(uiColor: .hothDynamic(light: 0xB8901A, dark: 0xE2C04F))
@@ -49,14 +49,14 @@ extension Color {
 // MARK: Typography
 
 extension Font {
-    /// Editorial serif display for hero numbers and wordmarks.
+    /// Bold system sans for hero numbers and wordmarks.
     static func hothDisplay(_ size: CGFloat) -> Font {
-        .system(size: size, weight: .bold, design: .serif)
+        .system(size: size, weight: .bold)
     }
-    static let hothTitle = Font.system(size: 26, weight: .semibold, design: .serif)
-    static let hothHeadline = Font.system(size: 17, weight: .semibold, design: .rounded)
-    static let hothBody = Font.system(size: 16, weight: .regular, design: .rounded)
-    static let hothCaption = Font.system(size: 13, weight: .medium, design: .rounded)
+    static let hothTitle = Font.system(size: 24, weight: .bold)
+    static let hothHeadline = Font.system(size: 17, weight: .semibold)
+    static let hothBody = Font.system(size: 16, weight: .regular)
+    static let hothCaption = Font.system(size: 13, weight: .medium)
 }
 
 // MARK: Spacing & Radius
@@ -70,9 +70,9 @@ enum HoTHSpacing {
 }
 
 enum HoTHRadius {
-    static let card: CGFloat = 24
+    static let card: CGFloat = 14
     static let chip: CGFloat = 999
-    static let inner: CGFloat = 16
+    static let inner: CGFloat = 10
 }
 
 enum HoTHMotion {
@@ -81,7 +81,7 @@ enum HoTHMotion {
 
 // MARK: Card
 
-/// Soft layered card: surface fill, hairline border, two-layer diffused shadow.
+/// Flat card: surface fill, hairline border, one faint shadow.
 struct HoTHCard<Content: View>: View {
     private let padding: CGFloat
     private let content: Content
@@ -101,10 +101,9 @@ struct HoTHCard<Content: View>: View {
             )
             .overlay(
                 RoundedRectangle(cornerRadius: HoTHRadius.card, style: .continuous)
-                    .strokeBorder(Color.hothInk.opacity(0.06), lineWidth: 1)
+                    .strokeBorder(Color.hothInk.opacity(0.06), lineWidth: 0.5)
             )
-            .shadow(color: Color.black.opacity(0.04), radius: 2, x: 0, y: 1)
-            .shadow(color: Color.black.opacity(0.06), radius: 18, x: 0, y: 10)
+            .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
     }
 }
 
@@ -217,9 +216,10 @@ struct PrimaryButtonStyle: ButtonStyle {
             .padding(.horizontal, HoTHSpacing.l)
             .padding(.vertical, 15)
             .frame(maxWidth: .infinity)
-            .background(Capsule().fill(Color.hothAccent.opacity(isEnabled ? 1 : 0.4)))
-            .shadow(color: Color.hothAccent.opacity(configuration.isPressed ? 0.15 : 0.32),
-                    radius: configuration.isPressed ? 4 : 14, x: 0, y: configuration.isPressed ? 2 : 8)
+            .background(
+                RoundedRectangle(cornerRadius: HoTHRadius.inner, style: .continuous)
+                    .fill(Color.hothAccent.opacity(isEnabled ? (configuration.isPressed ? 0.85 : 1) : 0.4))
+            )
             .scaleEffect(configuration.isPressed ? 0.97 : 1)
             .animation(HoTHMotion.spring, value: configuration.isPressed)
     }
@@ -233,8 +233,10 @@ struct SecondaryButtonStyle: ButtonStyle {
             .padding(.horizontal, HoTHSpacing.l)
             .padding(.vertical, 14)
             .frame(maxWidth: .infinity)
-            .background(Capsule().fill(Color.hothSand))
-            .overlay(Capsule().strokeBorder(Color.hothInk.opacity(0.08), lineWidth: 1))
+            .background(
+                RoundedRectangle(cornerRadius: HoTHRadius.inner, style: .continuous)
+                    .fill(Color.hothSand.opacity(configuration.isPressed ? 0.7 : 1))
+            )
             .scaleEffect(configuration.isPressed ? 0.97 : 1)
             .animation(HoTHMotion.spring, value: configuration.isPressed)
     }
