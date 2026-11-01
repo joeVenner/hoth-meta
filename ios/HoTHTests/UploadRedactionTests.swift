@@ -145,6 +145,63 @@ final class UploadRedactionTests: XCTestCase {
         XCTAssertEqual(report.status, .inProgress)
     }
 
+    func testCannedFixCheckSkipsUploadBlurButSavesABlurredFix() async throws {
+        let redactor = RecordingRedactor()
+        let model = FixCheckModel(verifierFactory: { CannedFixVerifier(photo: $0 ?? .good) }, outlinerFactory: { nil },
+                                  redactor: redactor.redact)
+        let report = makeCrewReport()
+        await model.check(report: report, after: Self.solidImage(.gray, size: CGSize(width: 64, height: 64)),
+                          demo: .good, context: context)
+        XCTAssertEqual(model.phase, .verdict)
+        XCTAssertEqual(redactor.inputCount, 1, "canned verdicts send nothing: only the saved fix photo is blurred")
+        savedFiles.append(try XCTUnwrap(report.fixPhotoFileName))
+
+        // A failed blur never breaks the canned demo; it only means no public fix photo is saved.
+        let failing = FixCheckModel(verifierFactory: { CannedFixVerifier(photo: $0 ?? .good) }, outlinerFactory: { nil },
+                                    redactor: { _ in nil })
+        let other = makeCrewReport()
+        await failing.check(report: other, after: Self.solidImage(.gray, size: CGSize(width: 64, height: 64)),
+                            demo: .good, context: context)
+        XCTAssertEqual(failing.phase, .verdict)
+        XCTAssertNil(other.fixPhotoFileName)
+    }
+
+    func testFixCheckBeforePhotoIsDownsizedBeforeBlur() async throws {
+        let redactor = RecordingRedactor()
+        let verifier = RecordingVerifier(verdict: FixVerdict(resolved: false, reasonEN: "", reasonAR: "", remaining: [],
+                                                             isCanned: true))
+        let model = FixCheckModel(verifierFactory: { _ in verifier }, outlinerFactory: { nil }, redactor: redactor.redact)
+        let report = makeCrewReport()
+        report.isDemoSeed = false
+        let big = try XCTUnwrap(Self.solidImage(.gray, size: CGSize(width: 3000, height: 2000)).jpegData(compressionQuality: 0.5))
+        let name = try XCTUnwrap(ReportPhotoFiles.save(big, named: "test_\(UUID().uuidString).jpg"))
+        savedFiles.append(name)
+        report.photoFileName = name
+        await model.check(report: report, after: Self.solidImage(.gray, size: CGSize(width: 64, height: 64)),
+                          demo: nil, context: context)
+        XCTAssertEqual(model.phase, .verdict)
+        XCTAssertLessThanOrEqual(redactor.maxInputEdge, ImageResizing.maxPixelEdge)
+    }
+
+    func testResetDuringFixCheckBlurSendsNothingAndAppliesNothing() async throws {
+        let verifier = RecordingVerifier(verdict: FixVerdict(resolved: true, reasonEN: "", reasonAR: "", remaining: [],
+                                                             isCanned: false))
+        let holder = ModelHolder()
+        let recording = RecordingRedactor()
+        let model = FixCheckModel(verifierFactory: { _ in verifier }, outlinerFactory: { nil }, redactor: { image in
+            await MainActor.run { holder.model?.reset() }
+            return await recording.redact(image)
+        })
+        holder.model = model
+        let report = makeCrewReport()
+        await model.check(report: report, after: Self.solidImage(.gray, size: CGSize(width: 64, height: 64)),
+                          demo: nil, context: context)
+        XCTAssertEqual(verifier.callCount, 0, "a stale check must not upload")
+        XCTAssertEqual(model.phase, .idle)
+        XCTAssertNil(model.verdict)
+        XCTAssertEqual(report.status, .inProgress)
+    }
+
     // MARK: Real on-device blur
 
     func testRealRedactionHidesAPlateBeforeUpload() async throws {
@@ -287,6 +344,9 @@ final class RecordingRedactor: @unchecked Sendable {
     var outputs: [Data] { lock.withLock { produced.map(\.jpegData) } }
     var inputCount: Int { lock.withLock { inputs } }
     var firstOutputImage: UIImage? { lock.withLock { produced.first?.result.image } }
+    /// Largest pixel edge of any image handed to the redactor.
+    var maxInputEdge: CGFloat { lock.withLock { largestEdge } }
+    private var largestEdge: CGFloat = 0
 
     static func marker(for pixelSize: CGSize) -> UIImage {
         UploadRedactionTests.solidImage(.magenta, size: pixelSize)
@@ -301,6 +361,7 @@ final class RecordingRedactor: @unchecked Sendable {
                                                  result: FaceAndPlateBlur.Result(image: output, faceCount: 1, plateCount: 0))
             lock.withLock {
                 inputs += 1
+                largestEdge = max(largestEdge, pixels.width, pixels.height)
                 produced.append(upload)
             }
             return upload
@@ -351,4 +412,10 @@ final class RecordingVerifier: FixVerifying, @unchecked Sendable {
         }
         return verdict
     }
+}
+
+/// Lets a fake redactor reach the model it was injected into (to simulate a mid-check reset).
+@MainActor
+final class ModelHolder {
+    weak var model: FixCheckModel?
 }

@@ -119,35 +119,58 @@ final class FixCheckModel: ObservableObject {
         }
 
         phase = .checking
-        // Privacy: both photos are blurred on the phone before either leaves it. If either cannot be
-        // redacted (or times out), nothing is sent.
-        async let redactedBefore = redactor(before)
-        async let redactedAfter = redactor(after)
-        guard let beforeUpload = await redactedBefore, let afterUpload = await redactedAfter else {
-            phase = .failed(String(localized: "crew.error.redaction",
-                                   defaultValue: "Couldn't blur faces and number plates on these photos, so nothing was sent. Please try again."))
-            return
+        let check = checkID
+        // Same size cap as the after photo: seed or asset befores can be large, and the blur has a time limit.
+        let beforeSized = ImageResizing.normalizedAndDownsized(before, maxEdge: ImageResizing.maxPixelEdge)
+        var afterUpload: FaceAndPlateBlur.Upload?
+        let beforeData: Data
+        let afterData: Data
+        if verifier.sendsPhotos {
+            // Privacy: both photos are blurred on the phone before either leaves it. If either cannot be
+            // redacted (or times out), nothing is sent.
+            async let redactedBefore = redactor(beforeSized)
+            async let redactedAfter = redactor(after)
+            let uploads = (await redactedBefore, await redactedAfter)
+            guard check == checkID, !Task.isCancelled else { return }
+            guard let beforeUpload = uploads.0, let redactedAfterUpload = uploads.1 else {
+                phase = .failed(String(localized: "crew.error.redaction",
+                                       defaultValue: "Couldn't blur faces and number plates on these photos, so nothing was sent. Please try again."))
+                return
+            }
+            afterUpload = redactedAfterUpload
+            beforeData = beforeUpload.jpegData
+            afterData = redactedAfterUpload.jpegData
+        } else {
+            // Canned demo verdict: nothing leaves the phone, so don't wait on blurs it never reads.
+            beforeData = Data()
+            afterData = Data()
         }
-        let beforeData = beforeUpload.jpegData
-        let afterData = afterUpload.jpegData
         let result: FixVerdict
         do {
             result = try await verifier.verify(before: beforeData, after: afterData, reportTitle: report.titleEN,
                                                categoryRaw: report.categoryRaw, beforeCapturedAt: report.createdAt)
         } catch {
+            guard check == checkID else { return }
             Self.logger.error("Fix check failed: \(String(describing: error), privacy: .public)")
             phase = .failed(String(localized: "crew.error.verify", defaultValue: "Couldn't check the repair. Please try again."))
             return
         }
+        // A reset or a new check during the call makes this result stale: don't apply it.
+        guard check == checkID, !Task.isCancelled else { return }
+        // The public fix photo is always a blurred one; the canned path blurs it only now, for saving.
+        if result.resolved, afterUpload == nil {
+            afterUpload = await redactor(after)
+            guard check == checkID, !Task.isCancelled else { return }
+        }
         verdict = result
-        if !result.resolved, !result.isCanned, let category = ReportCategory(rawValue: report.categoryRaw) {
+        if !result.resolved, !result.isCanned, afterUpload != nil, let category = ReportCategory(rawValue: report.categoryRaw) {
             startOutline(afterData: afterData, category: category)
         }
 
         do {
             // Public fix photo is always the redacted one; nothing is saved if blurring fails.
             var fixFileName: String?
-            if result.resolved {
+            if result.resolved, let afterUpload {
                 fixFileName = Self.saveBlurred(afterUpload.result, reportID: report.id)
             }
             let outcome = try CrewWorkflow.apply(result, to: report, fixPhotoFileName: fixFileName, context: context)
@@ -233,6 +256,7 @@ final class FixCheckModel: ObservableObject {
 /// Offline verdict for a bundled demo repair photo (no network).
 struct CannedFixVerifier: FixVerifying {
     let photo: DemoFixPhoto
+    var sendsPhotos: Bool { false }
 
     func verify(before: Data, after: Data, reportTitle: String, categoryRaw: String,
                 beforeCapturedAt: Date) async throws -> FixVerdict {
