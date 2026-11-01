@@ -568,6 +568,22 @@
         }
       }
     },
+    "Anonymous neighbour" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جار مجهول"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anonymous neighbour"
+          }
+        }
+      }
+    },
     "Answer by voice" : {
       "localizations" : {
         "ar" : {
@@ -861,6 +877,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Close"
+          }
+        }
+      }
+    },
+    "Comment" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعليق"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment"
           }
         }
       }
@@ -3345,6 +3377,22 @@
         }
       }
     },
+    "Share" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مشاركة"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share"
+          }
+        }
+      }
+    },
     "Shows a fictional demo community, clearly labelled." : {
       "localizations" : {
         "ar" : {
@@ -4319,6 +4367,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Why this priority"
+          }
+        }
+      }
+    },
+    "You" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أنت"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You"
           }
         }
       }
