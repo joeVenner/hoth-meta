@@ -1,4 +1,5 @@
 #if DEBUG
+import CoreLocation
 import HoTHCore
 import XCTest
 @testable import HoTH
@@ -60,6 +61,24 @@ final class DemoCaptureLaunchTests: XCTestCase {
 
     func testTestProcessIsNotACaptureRun() {
         XCTAssertFalse(AppServices.isDemoCaptureRun)
+    }
+
+    /// Outside capture mode (always, in Release) push-to-talk records the microphone.
+    func testRecorderFactoryUsesTheMicrophoneOutsideCapture() {
+        let recorder = VoiceRecorderFactory.make()
+        XCTAssertTrue(recorder is WAVVoiceRecorder)
+        XCTAssertFalse(recorder is FileVoiceRecorder)
+        XCTAssertEqual(VoiceRecorderFactory.micStatus(for: recorder)(), VoiceMicPermission.status,
+                       "The real permission check, not the playlist's forced grant")
+    }
+
+    /// Capture C1 posts the spring rider as CRITICAL; the plan relies on it raising no neighbour alert
+    /// over the feed and map shots. It sits about 1,079 m from home against a 1,000 m radius.
+    func testSpringRiderSampleIsOutsideTheNeighbourAlertRadius() {
+        let sample = DemoSamples.springRider.coordinate
+        let distance = CLLocation(latitude: sample.latitude, longitude: sample.longitude).distance(from: FeedGeography.home)
+        XCTAssertGreaterThan(distance, NeighbourAlertPolicy.radius)
+        XCTAssertFalse(NeighbourAlertPolicy.shouldAlert(priority: .critical, distance: distance, lastAlertAt: nil))
     }
 }
 #endif
