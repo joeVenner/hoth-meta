@@ -71,6 +71,9 @@ final class FixCheckModel: ObservableObject {
             phase = .failed(String(localized: "crew.error.notActionable", defaultValue: "This case is already closed."))
             return
         }
+        // Upright and <= 1024 px, like report photos: a camera shot is often `.right` with raw sensor
+        // pixels, and boxes from the model must land on the image that is shown.
+        let after = ImageResizing.normalizedAndDownsized(after, maxEdge: ImageResizing.maxPixelEdge)
         afterImage = after
         isDemoPhoto = demo != nil
         verdict = nil

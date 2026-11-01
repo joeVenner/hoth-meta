@@ -1,4 +1,5 @@
 import CoreGraphics
+import HoTHCore
 import SwiftData
 import UIKit
 import XCTest
@@ -169,6 +170,27 @@ final class CrewTests: XCTestCase {
         XCTAssertTrue(ar.contains("حفرة") && ar.contains("+10"))
     }
 
+    func testAfterPhotoIsMadeUprightBeforeChecking() async throws {
+        let format = UIGraphicsImageRendererFormat.default()
+        format.scale = 1
+        let sensor = try XCTUnwrap(UIGraphicsImageRenderer(size: CGSize(width: 60, height: 30), format: format)
+            .image { context in
+                UIColor.gray.setFill()
+                context.fill(CGRect(x: 0, y: 0, width: 60, height: 30))
+            }.cgImage)
+        let portrait = UIImage(cgImage: sensor, scale: 1, orientation: .right)
+        let stub = StubVerifier(verdict: notResolved)
+        let model = FixCheckModel(verifierFactory: { _ in stub })
+        let mine = makeReport(reporter: me, status: .open)
+        mine.photoFileName = "demo_fix_before"
+        mine.isDemoSeed = true
+        await model.check(report: mine, after: portrait, demo: nil, context: context)
+        XCTAssertEqual(model.afterImage?.imageOrientation, .up)
+        XCTAssertEqual(model.afterImage?.cgImage?.width, 30)
+        XCTAssertEqual(model.afterImage?.cgImage?.height, 60)
+        XCTAssertEqual(JPEGSize.pixelSize(of: try XCTUnwrap(stub.lastAfter)), PixelSize(width: 30, height: 60))
+    }
+
     private static func sampleImage() -> UIImage {
         UIGraphicsImageRenderer(size: CGSize(width: 40, height: 40)).image { context in
             UIColor.gray.setFill()
@@ -180,12 +202,14 @@ final class CrewTests: XCTestCase {
 private final class StubVerifier: FixVerifying, @unchecked Sendable {
     let verdict: FixVerdict
     private(set) var callCount = 0
+    private(set) var lastAfter: Data?
 
     init(verdict: FixVerdict) { self.verdict = verdict }
 
     func verify(before: Data, after: Data, reportTitle: String, categoryRaw: String,
                 beforeCapturedAt: Date) async throws -> FixVerdict {
         callCount += 1
+        lastAfter = after
         return verdict
     }
 }

@@ -27,3 +27,6 @@ The format follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/
 - Localized strings left over from the realtime voice screens.
 - The unused WebRTC Swift package from `ios/project.yml`.
 - The realtime-only mid-call urgency path in `ReportFlowModel` (`voiceFlaggedUrgent`, `SafetyAlert.keepsInterview`, `urgentAnswers`); push-to-talk urgency goes through the chat like typing.
+
+### Fixed
+- The repair photo is made upright and downsized to 1024 px before the fix check, so boxes from the model land on the shown image (camera shots arrive `.right`-oriented at full resolution).
