@@ -40,6 +40,8 @@ final class FixCheckModel: ObservableObject {
     private static let logger = Logger(subsystem: "io.fomy.hoth", category: "FixCheck")
     private let verifierFactory: (DemoFixPhoto?) -> FixVerifying?
     private let outlinerFactory: () -> HazardOutlining?
+    /// On-device face/plate blur for both photos before the verifier or SAM sees them.
+    private let redactor: @Sendable (UIImage) async -> FaceAndPlateBlur.Upload?
     private var outlineTask: Task<Void, Never>?
     /// Identifies the current check so a late SAM answer for an earlier photo is dropped.
     private var checkID = UUID()
@@ -47,10 +49,18 @@ final class FixCheckModel: ObservableObject {
     /// - Parameters:
     ///   - verifierFactory: returns the verifier for a pick (nil → no verifier available).
     ///   - outlinerFactory: SAM for rejected verdicts (nil → Muse Spark's boxes only).
+    ///   - redactor: blurs faces and plates before any upload (tests inject a fake).
     init(verifierFactory: ((DemoFixPhoto?) -> FixVerifying?)? = nil,
-         outlinerFactory: (() -> HazardOutlining?)? = nil) {
+         outlinerFactory: (() -> HazardOutlining?)? = nil,
+         redactor: @escaping @Sendable (UIImage) async -> FaceAndPlateBlur.Upload? = { await FixCheckModel.redactForUpload($0) }) {
         self.verifierFactory = verifierFactory ?? FixCheckModel.defaultVerifier
         self.outlinerFactory = outlinerFactory ?? { AppServices.shared.hazardOutliner() }
+        self.redactor = redactor
+    }
+
+    /// Production redactor at the fix check's JPEG quality.
+    nonisolated static func redactForUpload(_ image: UIImage) async -> FaceAndPlateBlur.Upload? {
+        await FaceAndPlateBlur.redactForUpload(image, quality: 0.7)
     }
 
     /// The "what's left" boxes to draw: SAM's when it found something, else the verifier's own.
@@ -99,8 +109,7 @@ final class FixCheckModel: ObservableObject {
         afterImage = after
         isDemoPhoto = demo != nil
         verdict = nil
-        guard let before = Self.beforeImage(for: report), let beforeData = before.jpegData(compressionQuality: 0.7),
-              let afterData = after.jpegData(compressionQuality: 0.7) else {
+        guard let before = Self.beforeImage(for: report) else {
             phase = .failed(String(localized: "crew.error.noBefore", defaultValue: "The original photo is not available on this device."))
             return
         }
@@ -110,6 +119,17 @@ final class FixCheckModel: ObservableObject {
         }
 
         phase = .checking
+        // Privacy: both photos are blurred on the phone before either leaves it. If either cannot be
+        // redacted (or times out), nothing is sent.
+        async let redactedBefore = redactor(before)
+        async let redactedAfter = redactor(after)
+        guard let beforeUpload = await redactedBefore, let afterUpload = await redactedAfter else {
+            phase = .failed(String(localized: "crew.error.redaction",
+                                   defaultValue: "Couldn't blur faces and number plates on these photos, so nothing was sent. Please try again."))
+            return
+        }
+        let beforeData = beforeUpload.jpegData
+        let afterData = afterUpload.jpegData
         let result: FixVerdict
         do {
             result = try await verifier.verify(before: beforeData, after: afterData, reportTitle: report.titleEN,
@@ -128,7 +148,7 @@ final class FixCheckModel: ObservableObject {
             // Public fix photo is always the redacted one; nothing is saved if blurring fails.
             var fixFileName: String?
             if result.resolved {
-                fixFileName = await Self.saveBlurred(after, reportID: report.id)
+                fixFileName = Self.saveBlurred(afterUpload.result, reportID: report.id)
             }
             let outcome = try CrewWorkflow.apply(result, to: report, fixPhotoFileName: fixFileName, context: context)
             try context.save()
@@ -191,9 +211,9 @@ final class FixCheckModel: ObservableObject {
         await outlineTask?.value
     }
 
-    /// Blurs faces/plates and writes `fix_<id>.jpg` to Documents. Nil when blurring or writing fails.
-    private static func saveBlurred(_ image: UIImage, reportID: UUID) async -> String? {
-        let blurred = await FaceAndPlateBlur.blur(image)
+    /// Writes the already-blurred after photo (the one the verifier saw) as `fix_<id>.jpg` to Documents.
+    /// Nil when there is no redacted image or writing fails.
+    private static func saveBlurred(_ blurred: FaceAndPlateBlur.Result, reportID: UUID) -> String? {
         guard let redacted = blurred.image, let data = redacted.jpegData(compressionQuality: 0.8),
               let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
             logger.error("Fix photo not saved: blur produced no image")
