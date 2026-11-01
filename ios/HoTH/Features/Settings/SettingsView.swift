@@ -141,6 +141,19 @@ struct SettingsView: View {
 
                     Divider()
 
+                    Toggle(isOn: $services.agentIntake) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Interview agent tools").font(.hothHeadline).foregroundStyle(Color.hothInk)
+                            Text("Muse Spark can check reports and places nearby on your phone and outline the photo with SAM 3.1 while it interviews you.")
+                                .font(.hothCaption)
+                                .foregroundStyle(Color.hothInkSecondary)
+                        }
+                    }
+                    .tint(Color.hothTeal)
+                    .accessibilityIdentifier("agentIntakeToggle")
+
+                    Divider()
+
                     VStack(alignment: .leading, spacing: HoTHSpacing.s) {
                         Text("Role").font(.hothHeadline).foregroundStyle(Color.hothInk)
                         Picker(selection: $services.role) {

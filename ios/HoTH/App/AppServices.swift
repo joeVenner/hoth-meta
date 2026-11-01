@@ -143,6 +143,7 @@ final class AppServices: ObservableObject {
         static let textModel = "hoth.settings.textModel"
         static let language = "hoth.settings.language"
         static let voiceFirstInterview = "hoth.settings.voiceFirstInterview"
+        static let agentIntake = "hoth.settings.agentIntake"
     }
 
     private let defaults = UserDefaults.standard
@@ -150,6 +151,13 @@ final class AppServices: ObservableObject {
     var demoMode: Bool {
         get { defaults.object(forKey: SettingsKey.demoMode) as? Bool ?? true }
         set { objectWillChange.send(); defaults.set(newValue, forKey: SettingsKey.demoMode) }
+    }
+
+    /// "Interview agent tools" (default on): Muse Spark may call the intake tools (nearby reports, SAM,
+    /// nearby places). Off keeps the single-turn chat.
+    var agentIntake: Bool {
+        get { defaults.object(forKey: SettingsKey.agentIntake) as? Bool ?? true }
+        set { objectWillChange.send(); defaults.set(newValue, forKey: SettingsKey.agentIntake) }
     }
 
     /// "Start interview with voice": the interview opens on Talk (default on).

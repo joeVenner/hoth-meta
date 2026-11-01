@@ -9,22 +9,27 @@ struct InterviewStepView: View {
     let prompts: Prompts
     let textModel: String?
     let startsWithVoice: Bool
+    let toolbox: IntakeToolbox?
     let onComplete: (SubmitReportArgs) -> Void
     let onUrgent: (String) -> Void
+    let onConfirmExisting: ((UUID, SubmitReportArgs) -> Void)?
 
     /// - Parameter startsWithVoice: see `startsWithVoice(prefersVoice:isUITestRun:)`. Without a client
     ///   (no key, UI tests) there is no transcription, so the interview is text only either way.
     init(context: InterviewContext, slots: [SlotQuestion], client: MetaModelClient?, prompts: Prompts,
-         textModel: String? = nil, startsWithVoice: Bool = true,
-         onComplete: @escaping (SubmitReportArgs) -> Void, onUrgent: @escaping (String) -> Void) {
+         textModel: String? = nil, startsWithVoice: Bool = true, toolbox: IntakeToolbox? = nil,
+         onComplete: @escaping (SubmitReportArgs) -> Void, onUrgent: @escaping (String) -> Void,
+         onConfirmExisting: ((UUID, SubmitReportArgs) -> Void)? = nil) {
         self.context = context
         self.slots = slots
         self.client = client
         self.prompts = prompts
         self.textModel = textModel
         self.startsWithVoice = startsWithVoice
+        self.toolbox = toolbox
         self.onComplete = onComplete
         self.onUrgent = onUrgent
+        self.onConfirmExisting = onConfirmExisting
     }
 
     /// Voice unless the resident turned off "Start interview with voice". UI tests always start typing
@@ -39,8 +44,8 @@ struct InterviewStepView: View {
                            MetaSpeechTranscriber(client: $0, model: prompts.models.transcribe,
                                                  languageHint: context.language)
                        },
-                       startsWithVoice: startsWithVoice,
-                       onComplete: onComplete, onUrgent: onUrgent)
+                       startsWithVoice: startsWithVoice, toolbox: toolbox,
+                       onComplete: onComplete, onUrgent: onUrgent, onConfirmExisting: onConfirmExisting)
             .background(Color.hothBackground.ignoresSafeArea())
     }
 }
@@ -56,10 +61,12 @@ struct ChatIntakeView: View {
 
     init(context: InterviewContext, slots: [SlotQuestion], client: MetaModelClient?, prompts: Prompts,
          textModel: String? = nil, transcriber: SpeechTranscribing? = nil, startsWithVoice: Bool = false,
-         onComplete: @escaping (SubmitReportArgs) -> Void, onUrgent: @escaping (String) -> Void) {
+         toolbox: IntakeToolbox? = nil,
+         onComplete: @escaping (SubmitReportArgs) -> Void, onUrgent: @escaping (String) -> Void,
+         onConfirmExisting: ((UUID, SubmitReportArgs) -> Void)? = nil) {
         _model = StateObject(wrappedValue: ChatIntakeModel(
-            context: context, slots: slots, client: client, prompts: prompts, model: textModel,
-            onComplete: onComplete, onUrgent: onUrgent))
+            context: context, slots: slots, client: client, prompts: prompts, model: textModel, toolbox: toolbox,
+            onComplete: onComplete, onUrgent: onUrgent, onConfirmExisting: onConfirmExisting))
         _voice = StateObject(wrappedValue: PushToTalkModel(
             transcriber: transcriber, recorder: WAVVoiceRecorder(), speaker: SystemSpeechSpeaker(),
             startsInVoice: startsWithVoice))
@@ -144,10 +151,21 @@ struct ChatIntakeView: View {
     private var typingIndicator: some View {
         HStack {
             ProgressView().tint(Color.hothTeal)
-            Text("Thinking…").font(.hothCaption).foregroundStyle(Color.hothInkSecondary)
+            Text(activityText).font(.hothCaption).foregroundStyle(Color.hothInkSecondary)
+                .accessibilityIdentifier("chatActivity")
             Spacer()
         }
         .padding(.leading, 36)
+    }
+
+    /// What the agent is doing, so its tool calls are visible while it thinks.
+    private var activityText: LocalizedStringKey {
+        switch model.toolActivity {
+        case .nearbyReports: return "Checking reports nearby…"
+        case .segmenting: return "Outlining with SAM 3.1…"
+        case .placeContext: return "Checking places nearby…"
+        case nil: return "Thinking…"
+        }
     }
 
     private var inputArea: some View {

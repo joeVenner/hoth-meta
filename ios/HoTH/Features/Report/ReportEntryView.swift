@@ -107,8 +107,12 @@ struct ReportEntryView: View {
                     textModel: services.textModel,
                     startsWithVoice: InterviewStepView.startsWithVoice(prefersVoice: services.voiceFirstInterview,
                                                                        isUITestRun: AppServices.isUITestRun),
+                    // Same gate as the client above: no tools without the live model.
+                    toolbox: services.agentIntake && services.hasAPIKey() && !AppServices.isUITestRun
+                        ? flow.intakeToolbox(context: modelContext, outliner: services.hazardOutliner()) : nil,
                     onComplete: { flow.interviewCompleted($0, context: modelContext) },
-                    onUrgent: { flow.interviewFlaggedUrgent($0) })
+                    onUrgent: { flow.interviewFlaggedUrgent($0) },
+                    onConfirmExisting: { flow.interviewConfirmedExisting($0, args: $1, context: modelContext) })
             }
         case .ticket:
             if let analysis = flow.analysis, let priority = flow.priority, let team = flow.team {

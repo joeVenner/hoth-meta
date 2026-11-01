@@ -5,6 +5,13 @@ import SwiftUI
 protocol HazardOutlining: Sendable {
     /// - Returns: nil when the category has no SAM concept; throws on timeout or API errors.
     func outline(jpegData: Data, category: ReportCategory) async throws -> SegmentOutline?
+    /// A free-form concept (the intake agent's `segment_hazard`); nil when the concept is refused.
+    func outline(jpegData: Data, concept: String) async throws -> SegmentOutline?
+}
+
+extension HazardOutlining {
+    /// Fakes that only outline categories find nothing for free-form concepts.
+    func outline(jpegData: Data, concept: String) async throws -> SegmentOutline? { nil }
 }
 
 extension HazardSegmenter: HazardOutlining {}
