@@ -269,7 +269,7 @@ struct SettingsView: View {
             HoTHCard {
                 VStack(alignment: .leading, spacing: HoTHSpacing.m) {
                     privacyRow(symbol: "iphone", text: "Reports, comments and points live on this device. There is no HoTH server.")
-                    privacyRow(symbol: "eye.slash", text: "Faces and number plates are blurred on your phone before anything is posted to the neighbourhood. To analyse the hazard, the photo is sent to Meta's Muse Spark model.")
+                    privacyRow(symbol: "eye.slash", text: "Faces and number plates are blurred on your phone before the photo leaves it: Meta's models only ever see the blurred photo, and only the blurred photo is posted to the neighbourhood.")
                     privacyRow(symbol: "network", text: "Photos and voice go directly to the Meta Model API with your own key, only when you report.")
                     privacyRow(symbol: "person.2", text: "The demo community is fictional.")
                     HStack {
