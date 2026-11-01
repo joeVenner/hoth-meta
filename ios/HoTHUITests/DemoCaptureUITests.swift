@@ -25,6 +25,8 @@ final class DemoCaptureUITests: XCTestCase {
 
     /// Idle push-to-talk status ("Hold to talk"), the orb's accessibility value, per UI language.
     private static let holdToTalkValues = ["Hold to talk", "اضغط مطوّل وتكلّم"]
+    /// Push-to-talk status while the agent's reply is read aloud, per UI language.
+    private static let speakingValues = ["Speaking… hold to interrupt", "أتكلم… اضغط مطوّل للمقاطعة"]
     /// Clips the agent may need: two scripted answers plus two spares (capture plan §3).
     private static let maxClips = 4
     /// The app's capture log in `HOTH_CAPTURE_LOG_DIR` (`CaptureLog.fileName` in the app target).
@@ -133,10 +135,10 @@ final class DemoCaptureUITests: XCTestCase {
         mark("vision_done")
 
         mark("sam_wait_start")
-        let samChip = app.descendants(matching: .any)["samOutlineChip"]
+        let samChip = app.descendants(matching: .any)["samOutlineChip"].firstMatch
         mark(samChip.waitForExistence(timeout: 25) ? "sam_chip" : "sam_timeout", element: samChip.exists ? samChip : nil)
 
-        let critical = app.descendants(matching: .any)["priorityBadge_critical"]
+        let critical = app.descendants(matching: .any)["priorityBadge_critical"].firstMatch
         XCTAssertTrue(critical.waitForExistence(timeout: 5), "Expected the CRITICAL badge (spark_critical_floor)")
         mark("badge_critical", element: critical)
         beat(4)
@@ -151,7 +153,7 @@ final class DemoCaptureUITests: XCTestCase {
         // Ticket.
         let submit = app.buttons["ticketSubmitButton"]
         XCTAssertTrue(submit.exists, "Ticket missing")
-        let routed = app.descendants(matching: .any)["routedToTeam"]
+        let routed = app.descendants(matching: .any)["routedToTeam"].firstMatch
         mark("ticket_shown", element: routed.exists ? routed : nil, extra: ["routed_to": routed.exists ? routed.label : ""])
         beat(4)
         app.swipeUp(velocity: .slow)
@@ -195,7 +197,7 @@ final class DemoCaptureUITests: XCTestCase {
 
         mark("alert_fired", element: wordmark)
         wordmark.press(forDuration: 1.0)
-        let banner = app.descendants(matching: .any)["neighbourAlertBanner"]
+        let banner = app.descendants(matching: .any)["neighbourAlertBanner"].firstMatch
         XCTAssertTrue(banner.waitForExistence(timeout: 10), "Neighbour alert banner did not appear")
         mark("banner_shown", element: banner)
         beat(4)
@@ -225,7 +227,7 @@ final class DemoCaptureUITests: XCTestCase {
         let pending = app.descendants(matching: .any)["commentPending"].firstMatch
         mark("moderation_wait_start", extra: ["pending_seen": pending.waitForExistence(timeout: 5)])
         XCTAssertTrue(pending.waitForNonExistence(timeout: 60), "Moderation did not finish within 60 s")
-        let removed = app.descendants(matching: .any)["commentRemoved"].exists
+        let removed = app.descendants(matching: .any)["commentRemoved"].firstMatch.exists
         mark("moderation_done", extra: ["removed": removed])
         beat(3)
         mark("scene_end")
@@ -256,25 +258,25 @@ final class DemoCaptureUITests: XCTestCase {
 
         try uploadRepair("demoFix_bad", sheetMark: "repair_sheet", pickMark: "bad_uploaded")
         mark("fix_wait_start")
-        let rejected = app.descendants(matching: .any)["fixVerdictRejected"]
+        let rejected = app.descendants(matching: .any)["fixVerdictRejected"].firstMatch
         XCTAssertTrue(rejected.waitForExistence(timeout: 90), "Rejected verdict did not appear")
         mark("rejected", element: rejected)
         beat(5)
 
         try uploadRepair("demoFix_good", sheetMark: "repair_sheet_2", pickMark: "good_uploaded")
         mark("fix_wait_start_2")
-        let resolved = app.descendants(matching: .any)["fixVerdictResolved"]
+        let resolved = app.descendants(matching: .any)["fixVerdictResolved"].firstMatch
         XCTAssertTrue(resolved.waitForExistence(timeout: 90), "Resolved verdict did not appear")
         mark("resolved")
         beat(1)
 
-        let celebration = app.descendants(matching: .any)["celebrationMessage"]
+        let celebration = app.descendants(matching: .any)["celebrationMessage"].firstMatch
         XCTAssertTrue(celebration.waitForExistence(timeout: 30), "Fixed celebration did not appear")
         mark("celebration")
         allowSystemAlert(timeout: 1)
         beat(2)
 
-        let handle = app.descendants(matching: .any)["beforeAfterHandle"]
+        let handle = app.descendants(matching: .any)["beforeAfterHandle"].firstMatch
         if handle.waitForExistence(timeout: 5) {
             mark("slider", element: handle)
             // Drag targets are window-relative. The handle's own coordinate resolves when it is used,
@@ -294,7 +296,7 @@ final class DemoCaptureUITests: XCTestCase {
             mark("slider_missing")
         }
 
-        let levelUp = app.descendants(matching: .any)["celebrationLevelUp"]
+        let levelUp = app.descendants(matching: .any)["celebrationLevelUp"].firstMatch
         XCTAssertTrue(levelUp.waitForExistence(timeout: 15), "Level-up did not appear")
         scrollIntoView(levelUp)
         mark("level_up", element: levelUp)
@@ -308,7 +310,7 @@ final class DemoCaptureUITests: XCTestCase {
     /// which is tapped through after a 3 s hold). Waits never use fixed sleeps.
     @MainActor
     private func runInterview(clips: [TimeInterval]) throws {
-        let talk = app.descendants(matching: .any)["pushToTalkButton"]
+        let talk = app.descendants(matching: .any)["pushToTalkButton"].firstMatch
         let ticket = app.buttons["ticketSubmitButton"]
         let safety = app.buttons["safetyContinueButton"]
 
@@ -362,7 +364,7 @@ final class DemoCaptureUITests: XCTestCase {
             if gotTranscript && resident.count > residentCount {
                 residentCount = logNewBubbles(role: "resident", seen: residentCount, event: "transcript_\(label)")
             } else {
-                let notice = app.descendants(matching: .any)["voiceNotice"]
+                let notice = app.descendants(matching: .any)["voiceNotice"].firstMatch
                 mark("transcript_\(label)_failed", extra: ["notice": notice.exists ? notice.label : "timeout"])
                 XCTFail("No transcript for clip \(label) (voice_transcribe_ar)")
                 return
@@ -416,14 +418,16 @@ final class DemoCaptureUITests: XCTestCase {
     }
 
     /// Idle means: a new assistant bubble arrived, the chat is not thinking (no typing line), and the
-    /// orb reads "Hold to talk" again (the reply was read aloud). Agent tool captions seen on the typing
+    /// orb reads "Hold to talk" again (the reply was read aloud), or the read-out allowance has passed
+    /// while it still reads "Speaking…" (marked `tts_barge_in`). Agent tool captions seen on the typing
     /// line on the way are marked with their text (`agent_tool_caption`).
     @MainActor
     private func waitForInterviewTurn(talk: XCUIElement, ticket: XCUIElement, safety: XCUIElement,
                                       assistantsBefore: Int, timeout: TimeInterval) -> InterviewState {
-        let activity = app.descendants(matching: .any)["chatActivity"]
+        let activity = app.descendants(matching: .any)["chatActivity"].firstMatch
         let assistants = app.descendants(matching: .any).matching(identifier: "chatBubble_assistant")
         var result = InterviewState.timedOut
+        var speakingSince: Date?
         _ = waitUntil(timeout: timeout) {
             if ticket.exists { result = .ticket; return true }
             if safety.exists { result = .safety; return true }
@@ -435,16 +439,35 @@ final class DemoCaptureUITests: XCTestCase {
                 }
                 return false
             }
-            guard assistants.count > assistantsBefore, talk.exists,
-                  let value = talk.value as? String, Self.holdToTalkValues.contains(value) else { return false }
+            guard assistants.count > assistantsBefore, talk.exists, let value = talk.value as? String else { return false }
+            if Self.holdToTalkValues.contains(value) {
+                result = .idle
+                return true
+            }
+            // The simulator's speech synthesizer can stay in "Speaking…" without ever reporting the end
+            // of the read-out (seen in C1: still speaking after 90 s). Once a generous read-out time has
+            // passed, hand the turn over: the next hold uses the app's own barge-in ("hold to interrupt").
+            guard Self.speakingValues.contains(value) else { return false }
+            let started = speakingSince ?? Date()
+            speakingSince = started
+            let reply = assistants.element(boundBy: assistants.count - 1).label
+            let allowance = Self.readOutAllowance(characters: reply.count)
+            guard Date().timeIntervalSince(started) >= allowance else { return false }
+            self.mark("tts_barge_in", extra: ["speaking_s": Date().timeIntervalSince(started), "allowance_s": allowance])
             result = .idle
             return true
         }
         return result
     }
 
+    /// Seconds to let the agent's reply be read aloud before barging in: about 12 characters a second
+    /// plus 2 s, kept between 4 s and 25 s.
+    static func readOutAllowance(characters: Int) -> TimeInterval {
+        min(max(Double(characters) / 12 + 2, 4), 25)
+    }
+
     private func voiceNoticeShown() -> Bool {
-        app.descendants(matching: .any)["voiceNotice"].exists
+        app.descendants(matching: .any)["voiceNotice"].firstMatch.exists
     }
 
     /// Marks each bubble that appeared since `seen`, with its text (the transcript, or the agent's line).
@@ -490,7 +513,9 @@ final class DemoCaptureUITests: XCTestCase {
         record["scene"] = scene
         record["event"] = event
         record["t"] = Date().timeIntervalSince1970
-        if let element, element.exists, let app {
+        // `firstMatch`: an id can match several elements (the CRITICAL badge did), and `frame` on an
+        // ambiguous query fails the test instead of just logging the tap position.
+        if let element = element?.firstMatch, element.exists, let app {
             let window = app.windows.firstMatch.frame
             let frame = element.frame
             if window.width > 0, window.height > 0, !frame.isEmpty {
@@ -521,7 +546,7 @@ final class DemoCaptureUITests: XCTestCase {
 
     /// Holds the orb for `seconds` (clip length + 0.4 s); must exceed the 0.35 s tap threshold.
     private func holdToTalk(_ seconds: TimeInterval) {
-        app.descendants(matching: .any)["pushToTalkButton"].press(forDuration: max(seconds, 0.5))
+        app.descendants(matching: .any)["pushToTalkButton"].firstMatch.press(forDuration: max(seconds, 0.5))
     }
 
     /// Polls `condition` every 0.25 s; also answers a system permission alert if one is up.

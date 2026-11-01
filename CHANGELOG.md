@@ -46,6 +46,7 @@ The format follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/
 - The realtime-only mid-call urgency path in `ReportFlowModel` (`voiceFlaggedUrgent`, `SafetyAlert.keepsInterview`, `urgentAnswers`); push-to-talk urgency goes through the chat like typing.
 
 ### Fixed
+- `DemoCaptureUITests` (first live capture run): ids that match more than one element (the CRITICAL badge did) are resolved with `firstMatch`, so logging a tap position no longer fails the scene. The interview no longer stalls when the simulator's speech synthesizer stays on "Speaking…" without ever finishing: after a read-out allowance (about 12 characters a second plus 2 s, 4–25 s) the next hold uses the app's own barge-in, and the test logs `tts_barge_in`.
 - Distances are always metric ("233 m", "1.3 km") whatever the device region: the feed card, map card and merged-duplicate screen showed feet (e.g. "763 ft") on a US-region device or with the in-app English override. One `DistanceFormatting` helper in HoTHCore picks metres below 1 km and kilometres with one decimal from 1 km up, localized for en and ar.
 - Feed and Settings scroll content no longer runs under the status bar clock (page-colour backdrop behind the status bar).
 - A `find_nearby_reports` call with a huge `radius_m` (such as 1e30) no longer crashes the app: the radius is clamped to 10...500 m before it becomes an `Int`.
