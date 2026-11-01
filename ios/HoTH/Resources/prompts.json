@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "_comment": "Single source of prompts for the iOS app and tools/eval. Model ids from dev.meta.ai/docs/models on 2026-11-01; NOT yet confirmed against GET /v1/models (no key at migration time). Schemas avoid minimum/maximum/maxItems; the app clamps instead. Boxes use Muse Spark's 0-1000 grounding grid. Placeholders use {{name}}. segment_concepts: one short SAM 3.1 noun phrase per category (one concept per request); other and not_an_issue have none, so no SAM call.",
+  "_comment": "Single source of prompts for the iOS app and tools/eval. Model ids from dev.meta.ai/docs/models on 2026-11-01; NOT yet confirmed against GET /v1/models (no key at migration time). Schemas avoid minimum/maximum/maxItems; the app clamps instead. Boxes use Muse Spark's 0-1000 grounding grid. Placeholders use {{name}}. segment_concepts: one short SAM 3.1 noun phrase per category (one concept per request); other and not_an_issue have none, so no SAM call. segment_concepts_ar: Arabic display names for the same concepts (UI only; SAM always gets English).",
   "models": {
     "vision": "muse-spark-1.3",
     "text": "muse-spark-1.3",
@@ -16,6 +16,16 @@
     "waste_overflow_dumping": "garbage",
     "blocked_accessibility": "obstruction",
     "water_leak": "water"
+  },
+  "segment_concepts_ar": {
+    "playground_equipment": "ألعاب أطفال مكسورة",
+    "fitness_equipment": "معدات رياضية مكسورة",
+    "pothole_pavement": "حفرة",
+    "electrical_hazard": "كابل مكشوف",
+    "open_manhole": "فتحة صرف",
+    "waste_overflow_dumping": "نفايات",
+    "blocked_accessibility": "عائق",
+    "water_leak": "مياه"
   },
   "categories": [
     "playground_equipment",
