@@ -162,7 +162,9 @@ final class SystemSpeechSpeaker: NSObject, SpeechSpeaking, AVSpeechSynthesizerDe
     }
 
     func stop() {
-        if synthesizer.isSpeaking { synthesizer.stopSpeaking(at: .immediate) }
+        // Unconditional: right after `speak` the synthesizer may not report `isSpeaking` yet, and the
+        // queued utterance would then play into the resident's recording.
+        synthesizer.stopSpeaking(at: .immediate)
         resume(for: current)
     }
 

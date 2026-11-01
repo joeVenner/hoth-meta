@@ -260,6 +260,12 @@ final class PushToTalkModel: ObservableObject {
         guard !speakable.isEmpty else { return }
         speechQueue.append(speakable)
         guard speechTask == nil else { return }
+        // Before the first press the session is still `.soloAmbient`, which the silent switch mutes.
+        do {
+            try prepareAudio()
+        } catch {
+            Self.logger.error("Audio session setup failed, speaking anyway: \(String(describing: error))")
+        }
         if phase != .listening { phase = .speaking }
         speechTask = Task { await drainSpeech() }
     }

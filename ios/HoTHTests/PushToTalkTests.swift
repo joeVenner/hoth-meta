@@ -54,12 +54,14 @@ final class PushToTalkTests: XCTestCase {
     private var micStatus: VoiceMicPermission.Status = .granted
     private var recorder: StubRecorder!
     private var speaker: StubSpeaker!
+    private var prepareCount = 0
 
     override func setUp() async throws {
         clock = Date(timeIntervalSince1970: 0)
         micStatus = .granted
         recorder = StubRecorder()
         speaker = StubSpeaker()
+        prepareCount = 0
     }
 
     private func makeModel(transcript: Result<String, Error> = .success("The swing chain is broken"),
@@ -70,7 +72,7 @@ final class PushToTalkTests: XCTestCase {
             recorder: recorder, speaker: speaker, startsInVoice: startsInVoice,
             micStatus: { [unowned self] in self.micStatus },
             requestMic: { grantOnRequest },
-            prepareAudio: {},
+            prepareAudio: { [unowned self] in self.prepareCount += 1 },
             now: { [unowned self] in self.clock })
     }
 
@@ -257,11 +259,38 @@ final class PushToTalkTests: XCTestCase {
         model.assistantSaid("Hello")
         XCTAssertNil(model.speechTask)
         XCTAssertTrue(speaker.spoken.isEmpty)
+        XCTAssertEqual(prepareCount, 0, "Typing leaves the audio session alone")
 
         model.switchToVoice()
         model.assistantSaid("Hello")
         await model.speechTask?.value
         XCTAssertEqual(speaker.spoken.count, 1)
+    }
+
+    func testSpokenReplySetsUpTheAudioSessionBeforeAnyPress() async {
+        let model = makeModel()
+        model.assistantSaid("I'm HoTH's AI assistant.")
+        XCTAssertEqual(prepareCount, 1, "The opening reply must not play under the muted default category")
+        await model.speechTask?.value
+        XCTAssertEqual(speaker.spoken.count, 1)
+    }
+
+    func testAppleWAVWriterOutputPassesTheUploadCheck() throws {
+        let url = PushToTalkAudio.temporaryRecordingURL()
+        defer { PushToTalkModel.removeTemporaryFile(url) }
+        try {
+            // Scoped so the file is closed (header finalized) before it is read back.
+            let file = try AVAudioFile(forWriting: url, settings: PushToTalkAudio.recorderSettings,
+                                       commonFormat: .pcmFormatInt16, interleaved: true)
+            let frames = AVAudioFrameCount(PushToTalkAudio.sampleRate)
+            let buffer = try XCTUnwrap(AVAudioPCMBuffer(pcmFormat: file.processingFormat, frameCapacity: frames))
+            buffer.frameLength = frames
+            try file.write(from: buffer)
+        }()
+        let wav = try WAVAudio.canonicalPCM16(Data(contentsOf: url))
+        XCTAssertEqual(wav.sampleRate, 24_000)
+        XCTAssertEqual(wav.durationMs, 1000)
+        XCTAssertEqual(wav.data.count, 44 + 48_000)
     }
 
     func testSwitchingToTypingCancelsRecording() async {
