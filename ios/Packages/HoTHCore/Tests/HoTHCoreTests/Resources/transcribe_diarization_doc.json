@@ -1,0 +1,21 @@
+{
+  "sessionId": "9f1c...",
+  "transcript": "How is the weather? It is raining.",
+  "audioDurationMs": 8240,
+  "turns": [
+    {
+      "turnId": 1,
+      "startMs": 1520,
+      "endMs": 4640,
+      "transcript": "How is the weather?",
+      "speaker": "A"
+    },
+    {
+      "turnId": 2,
+      "startMs": 5900,
+      "endMs": 8240,
+      "transcript": "It is raining.",
+      "speaker": "B"
+    }
+  ]
+}
