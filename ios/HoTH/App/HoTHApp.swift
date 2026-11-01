@@ -12,6 +12,7 @@ struct HoTHApp: App {
         #if DEBUG
         if AppServices.isDemoCaptureRun {
             DemoCapture.prepareLaunch(defaults: .standard, environment: ProcessInfo.processInfo.environment)
+            CaptureLog.recordLaunch()
         }
         #endif
         do {

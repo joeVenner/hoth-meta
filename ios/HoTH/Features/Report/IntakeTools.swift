@@ -74,6 +74,20 @@ final class IntakeToolbox {
     }
 
     func run(_ call: FunctionCall) async -> String {
+        #if DEBUG
+        let clock = ContinuousClock()
+        let started = clock.now
+        let output = await dispatch(call)
+        let elapsed = started.duration(to: clock.now).components
+        let durationMs = Int(elapsed.seconds * 1000 + elapsed.attoseconds / 1_000_000_000_000_000)
+        CaptureLog.recordToolCall(call, output: output, durationMs: durationMs)
+        return output
+        #else
+        return await dispatch(call)
+        #endif
+    }
+
+    private func dispatch(_ call: FunctionCall) async -> String {
         guard tools.contains(where: { $0.name == call.name }) else {
             return Self.error("unknown tool \(call.name)")
         }
