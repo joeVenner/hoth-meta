@@ -270,7 +270,13 @@ final class DemoCaptureUITests: XCTestCase {
         mark("moderation_wait_start", extra: ["pending_seen": pending.waitForExistence(timeout: 5)])
         XCTAssertTrue(pending.waitForNonExistence(timeout: 60), "Moderation did not finish within 60 s")
         let removed = app.descendants(matching: .any)["commentRemoved"].firstMatch.exists
-        mark("moderation_done", extra: ["removed": removed])
+        // What was actually posted (autocorrect, smart punctuation or a softened rewrite can change it),
+        // so glosses translate the recorded text, not the typed script.
+        let posted = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", String(comment.prefix(6)))).firstMatch
+        let postedText = posted.exists ? posted.label : ""
+        mark("moderation_done", extra: ["removed": removed, "posted_text": postedText,
+                                        "posted_matches_typed": postedText == comment])
+        XCTAssertTrue(removed || posted.exists, "The comment was never posted (did the send tap land on the tab bar?)")
         beat(3)
         mark("scene_end")
     }
