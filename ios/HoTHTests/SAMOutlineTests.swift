@@ -14,6 +14,7 @@ final class SAMOutlineTests: XCTestCase {
     override func setUp() async throws {
         container = try HoTHStore.makeContainer(inMemory: true)
         VisionStubURLProtocol.payload = try JSONEncoder().encode(DemoSamples.springRider.cannedAnalysis)
+        VisionStubURLProtocol.resetRecording()
     }
 
     override func tearDown() async throws {
@@ -46,7 +47,8 @@ final class SAMOutlineTests: XCTestCase {
         await flow.waitForOutline()
         XCTAssertEqual(flow.outline, samFound)
         XCTAssertEqual(fake.calls.count, 1)
-        XCTAssertEqual(fake.calls.first?.jpeg, photo.jpegData, "SAM sees exactly the bytes vision saw")
+        let visionJPEG = try XCTUnwrap(VisionStubURLProtocol.sentJPEGs.first)
+        XCTAssertEqual(fake.calls.first?.jpeg, visionJPEG, "SAM sees exactly the bytes vision saw")
         XCTAssertEqual(fake.calls.first?.category, .playgroundEquipment)
     }
 
@@ -168,14 +170,45 @@ final class FakeOutliner: HazardOutlining, @unchecked Sendable {
     }
 }
 
-/// Answers every Responses call with `payload` as the model's JSON output.
+/// Answers every Responses call with `payload` as the model's JSON output, and records each request
+/// body so tests can check exactly which photo bytes would have left the phone.
 final class VisionStubURLProtocol: URLProtocol {
     nonisolated(unsafe) static var payload: Data?
+    private static let lock = NSLock()
+    nonisolated(unsafe) private static var recordedBodies: [Data] = []
+
+    /// Request bodies since the last `resetRecording()`.
+    static var bodies: [Data] { lock.withLock { recordedBodies } }
+    static func resetRecording() { lock.withLock { recordedBodies = [] } }
+
+    /// Every `data:image/jpeg;base64,` payload in the recorded bodies, decoded, in request order.
+    static var sentJPEGs: [Data] { bodies.flatMap(Self.jpegs(inBody:)) }
+
+    static func jpegs(inBody body: Data) -> [Data] {
+        guard let object = try? JSONSerialization.jsonObject(with: body) else { return [] }
+        return dataURLs(in: object).compactMap { url in
+            let prefix = "data:image/jpeg;base64,"
+            guard url.hasPrefix(prefix) else { return nil }
+            return Data(base64Encoded: String(url.dropFirst(prefix.count)))
+        }
+    }
+
+    private static func dataURLs(in object: Any) -> [String] {
+        switch object {
+        case let string as String: return string.hasPrefix("data:") ? [string] : []
+        case let array as [Any]: return array.flatMap(dataURLs(in:))
+        case let dictionary as [String: Any]: return dictionary.values.flatMap(dataURLs(in:))
+        default: return []
+        }
+    }
 
     override class func canInit(with request: URLRequest) -> Bool { true }
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
 
     override func startLoading() {
+        // URLSession moves the body into a stream before it reaches a URLProtocol.
+        let body = request.httpBody ?? request.httpBodyStream.map(Self.readAll) ?? Data()
+        Self.lock.withLock { Self.recordedBodies.append(body) }
         let text = String(decoding: Self.payload ?? Data(), as: UTF8.self)
         let envelope: [String: Any] = [
             "status": "completed",
@@ -191,6 +224,19 @@ final class VisionStubURLProtocol: URLProtocol {
     }
 
     override func stopLoading() {}
+
+    private static func readAll(_ stream: InputStream) -> Data {
+        stream.open()
+        defer { stream.close() }
+        var data = Data()
+        var buffer = [UInt8](repeating: 0, count: 64 * 1024)
+        while stream.hasBytesAvailable {
+            let count = stream.read(&buffer, maxLength: buffer.count)
+            guard count > 0 else { break }
+            data.append(buffer, count: count)
+        }
+        return data
+    }
 
     static func makeSession() -> URLSession {
         let config = URLSessionConfiguration.ephemeral
