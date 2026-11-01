@@ -85,11 +85,13 @@ struct HeroProfileView: View {
             Text(verbatim: levelTitle(points: me.points))
                 .font(.hothDisplay(34))
                 .foregroundStyle(Color.hothInk)
+                .accessibilityIdentifier("heroLevelTitle")
             HStack(alignment: .firstTextBaseline, spacing: HoTHSpacing.xs) {
                 Text(verbatim: "\(me.points)")
                     .font(.hothDisplay(56))
                     .foregroundStyle(Color.hothAccent)
                     .contentTransition(.numericText())
+                    .accessibilityIdentifier("heroPoints")
                 Text("points")
                     .font(.hothHeadline)
                     .foregroundStyle(Color.hothInkSecondary)

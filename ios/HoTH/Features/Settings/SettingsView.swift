@@ -41,6 +41,7 @@ struct SettingsView: View {
                 titleVisibility: .visible
             ) {
                 Button(role: .destructive, action: resetDemo) { Text("Reset everything") }
+                    .accessibilityIdentifier("resetConfirmButton")
                 Button(role: .cancel) {} label: { Text("Cancel") }
             } message: {
                 Text("This deletes all reports, comments and points on this device and reloads the demo community.")
@@ -192,6 +193,7 @@ struct SettingsView: View {
                         Label { Text("Reset demo community") } icon: { Image(systemName: "arrow.counterclockwise") }
                     }
                     .buttonStyle(SecondaryButtonStyle())
+                    .accessibilityIdentifier("resetDemoButton")
                     if let resetMessage {
                         Text(resetMessage).font(.hothCaption).foregroundStyle(Color.hothSuccess)
                     }

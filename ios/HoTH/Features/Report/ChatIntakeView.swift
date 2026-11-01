@@ -184,7 +184,7 @@ struct ChatIntakeView: View {
             if !model.quickReplies.isEmpty && !model.isFinished {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: HoTHSpacing.s) {
-                        ForEach(model.quickReplies, id: \.self) { reply in
+                        ForEach(Array(model.quickReplies.enumerated()), id: \.element) { index, reply in
                             Button(reply) {
                                 voice.stopSpeaking()
                                 model.send(reply)
@@ -195,6 +195,8 @@ struct ChatIntakeView: View {
                                 .padding(.vertical, 9)
                                 .background(Capsule().strokeBorder(Color.hothTeal, lineWidth: 1.5))
                                 .disabled(model.isThinking)
+                                // Labels are localized; the index is stable across en / ar runs.
+                                .accessibilityIdentifier("quickReply_\(index)")
                         }
                     }
                     .padding(.horizontal, HoTHSpacing.m)

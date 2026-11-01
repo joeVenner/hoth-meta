@@ -137,6 +137,7 @@ struct CaseDetailView: View {
             }
             .buttonStyle(PrimaryButtonStyle())
             .disabled(hasConfirmed || isOwnReport || report.status == .fixed)
+            .accessibilityIdentifier("caseConfirmButton")
 
             Button(action: toggleVote) {
                 HStack(spacing: HoTHSpacing.xs) {
@@ -148,6 +149,7 @@ struct CaseDetailView: View {
             .buttonStyle(SecondaryButtonStyle())
             .frame(width: 104)
             .accessibilityLabel(Text(hasVoted ? "Remove vote" : "Vote"))
+            .accessibilityIdentifier("caseVoteButton")
         }
     }
 
@@ -294,6 +296,7 @@ struct CaseDetailView: View {
             .font(.hothBody)
             .lineLimit(1...4)
             .focused($isComposerFocused)
+            .accessibilityIdentifier("commentField")
             .padding(.horizontal, HoTHSpacing.m)
             .padding(.vertical, 12)
             .background(RoundedRectangle(cornerRadius: 20, style: .continuous).fill(Color.hothSurface))
@@ -312,6 +315,7 @@ struct CaseDetailView: View {
             .buttonStyle(.plain)
             .disabled(draftComment.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isPostingComment)
             .accessibilityLabel(Text("Send comment"))
+            .accessibilityIdentifier("commentSendButton")
         }
     }
 
