@@ -80,7 +80,7 @@ final class FixCheckModel: ObservableObject {
             return
         }
         guard let verifier = verifierFactory(demo) else {
-            phase = .failed(String(localized: "crew.error.noKey", defaultValue: "Add an OpenAI key in Settings to check repairs."))
+            phase = .failed(String(localized: "crew.error.noKey", defaultValue: "Add a Meta Model API key in Settings to check repairs."))
             return
         }
 

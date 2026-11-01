@@ -1094,13 +1094,13 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "أضف مفتاح OpenAI في الإعدادات لفحص الإصلاحات."
+            "value" : "أضف مفتاح Meta Model API في الإعدادات لفحص الإصلاحات."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Add an OpenAI key in Settings to check repairs."
+            "value" : "Add a Meta Model API key in Settings to check repairs."
           }
         }
       }
@@ -1387,19 +1387,19 @@
         }
       }
     },
-    "Faces and number plates are blurred on your phone before anything is posted to the neighbourhood. To analyse the hazard, the photo is sent to OpenAI." : {
+    "Faces and number plates are blurred on your phone before anything is posted to the neighbourhood. To analyse the hazard, the photo is sent to Meta's Muse Spark model." : {
       "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تُموَّه الوجوه وأرقام اللوحات على هاتفك قبل نشر أي شيء في الحي. ولتحليل الخطر، تُرسل الصورة إلى OpenAI."
+            "value" : "تُموَّه الوجوه وأرقام اللوحات على هاتفك قبل نشر أي شيء في الحي. ولتحليل الخطر، تُرسل الصورة إلى نموذج Muse Spark من Meta."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Faces and number plates are blurred on your phone before anything is posted to the neighbourhood. To analyse the hazard, the photo is sent to OpenAI."
+            "value" : "Faces and number plates are blurred on your phone before anything is posted to the neighbourhood. To analyse the hazard, the photo is sent to Meta's Muse Spark model."
           }
         }
       }
@@ -2639,19 +2639,36 @@
         }
       }
     },
-    "OpenAI API key" : {
+    "Meta Model API key" : {
       "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "مفتاح OpenAI API"
+            "value" : "مفتاح Meta Model API"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "OpenAI API key"
+            "value" : "Meta Model API key"
+          }
+        }
+      }
+    },
+    "Powers Meta's Muse Spark: photo analysis, chat and repair checks." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يشغّل نموذج Muse Spark من Meta: تحليل الصور والمحادثة وفحص الإصلاحات."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Powers Meta's Muse Spark: photo analysis, chat and repair checks."
           }
         }
       }
@@ -2717,19 +2734,19 @@
         }
       }
     },
-    "Photos and voice go directly to OpenAI with your own key, only when you report." : {
+    "Photos and voice go directly to the Meta Model API with your own key, only when you report." : {
       "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تُرسل الصور والصوت مباشرة إلى OpenAI بمفتاحك الخاص، فقط عند الإبلاغ."
+            "value" : "تُرسل الصور والصوت مباشرة إلى Meta Model API بمفتاحك الخاص، فقط عند الإبلاغ."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Photos and voice go directly to OpenAI with your own key, only when you report."
+            "value" : "Photos and voice go directly to the Meta Model API with your own key, only when you report."
           }
         }
       }
@@ -3794,23 +3811,6 @@
         }
       }
     },
-    "The OpenAI key was rejected. Check it in Settings, or type instead." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تم رفض مفتاح OpenAI. تأكد منه في الإعدادات، أو اكتب بدلاً من ذلك."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The OpenAI key was rejected. Check it in Settings, or type instead."
-          }
-        }
-      }
-    },
     "The photo could not be taken. Please try again." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4282,19 +4282,19 @@
         }
       }
     },
-    "Voice (Realtime) model" : {
+    "Text model" : {
       "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "نموذج الصوت (الفوري)"
+            "value" : "نموذج النص"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Voice (Realtime) model"
+            "value" : "Text model"
           }
         }
       }
@@ -4312,23 +4312,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voice is unavailable"
-          }
-        }
-      }
-    },
-    "Voice needs an OpenAI key. Add one in Settings, or type instead." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الصوت يحتاج مفتاح OpenAI. أضفه من الإعدادات، أو اكتب بدلاً من ذلك."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Voice needs an OpenAI key. Add one in Settings, or type instead."
           }
         }
       }
@@ -4566,18 +4549,18 @@
         }
       }
     },
-    "Your photo and location are sent to OpenAI to analyse the hazard." : {
+    "Your photo and location are sent to Meta's Muse Spark model to analyse the hazard." : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تُرسل صورتك وموقعك إلى OpenAI لتحليل الخطر."
+            "value" : "تُرسل صورتك وموقعك إلى نموذج Muse Spark من Meta لتحليل الخطر."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your photo and location are sent to OpenAI to analyse the hazard."
+            "value" : "Your photo and location are sent to Meta's Muse Spark model to analyse the hazard."
           }
         }
       }

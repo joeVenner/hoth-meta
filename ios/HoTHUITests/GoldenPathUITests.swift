@@ -4,7 +4,7 @@ import XCTest
 /// ticket → posted → feed. Screenshots go to the test attachments and, when `SCREENSHOT_DIR` is set
 /// (pass `TEST_RUNNER_SCREENSHOT_DIR=<abs path>` to xcodebuild), to PNG files there.
 ///
-/// The OpenAI key is optional: pass `TEST_RUNNER_OPENAI_API_KEY` at invocation time for the real
+/// The Meta Model API key is optional: pass `TEST_RUNNER_META_API_KEY` at invocation time for the real
 /// vision call; without it the app uses the labelled offline demo analysis. Never commit a key.
 final class GoldenPathUITests: XCTestCase {
     private var app: XCUIApplication!
@@ -20,8 +20,8 @@ final class GoldenPathUITests: XCTestCase {
             "-AppleLanguages", "(en)",
         ]
         app.launchEnvironment["HOTH_UITEST"] = "1"
-        if let key = ProcessInfo.processInfo.environment["OPENAI_API_KEY"], !key.isEmpty {
-            app.launchEnvironment["OPENAI_API_KEY"] = key
+        if let key = ProcessInfo.processInfo.environment["META_API_KEY"], !key.isEmpty {
+            app.launchEnvironment["META_API_KEY"] = key
         }
     }
 

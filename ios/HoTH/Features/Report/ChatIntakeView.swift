@@ -15,6 +15,7 @@ struct InterviewStepView: View {
     let slots: [SlotQuestion]
     let client: MetaModelClient?
     let prompts: Prompts
+    let textModel: String?
     let voiceBuilder: VoiceInterviewBuilder?
     let onComplete: (SubmitReportArgs) -> Void
     let onUrgent: (String) -> Void
@@ -27,12 +28,13 @@ struct InterviewStepView: View {
     ///   Talk is used even without a key: the voice screen then explains why it can't start instead of
     ///   silently switching to Type.
     init(context: InterviewContext, slots: [SlotQuestion], client: MetaModelClient?, prompts: Prompts,
-         voiceBuilder: VoiceInterviewBuilder?, initialMode: Mode = .talk,
+         textModel: String? = nil, voiceBuilder: VoiceInterviewBuilder?, initialMode: Mode = .talk,
          onComplete: @escaping (SubmitReportArgs) -> Void, onUrgent: @escaping (String) -> Void) {
         self.context = context
         self.slots = slots
         self.client = client
         self.prompts = prompts
+        self.textModel = textModel
         self.voiceBuilder = voiceBuilder
         self.onComplete = onComplete
         self.onUrgent = onUrgent
@@ -40,7 +42,7 @@ struct InterviewStepView: View {
     }
 
     /// Talk unless the resident turned off "Start interview with voice". UI tests always start in Type
-    /// (no mic prompt, no Realtime call).
+    /// (no mic prompt, no live voice call).
     static func initialMode(prefersVoice: Bool, isUITestRun: Bool) -> Mode {
         prefersVoice && !isUITestRun ? .talk : .type
     }
@@ -62,7 +64,7 @@ struct InterviewStepView: View {
                     voiceBuilder(context, onComplete, onUrgent, { mode = .type })
                 } else {
                     ChatIntakeView(context: context, slots: slots, client: client, prompts: prompts,
-                                   onComplete: onComplete, onUrgent: onUrgent)
+                                   textModel: textModel, onComplete: onComplete, onUrgent: onUrgent)
                 }
             }
             .transition(.opacity)
@@ -79,9 +81,10 @@ struct ChatIntakeView: View {
     @FocusState private var isFocused: Bool
 
     init(context: InterviewContext, slots: [SlotQuestion], client: MetaModelClient?, prompts: Prompts,
+         textModel: String? = nil,
          onComplete: @escaping (SubmitReportArgs) -> Void, onUrgent: @escaping (String) -> Void) {
         _model = StateObject(wrappedValue: ChatIntakeModel(
-            context: context, slots: slots, client: client, prompts: prompts,
+            context: context, slots: slots, client: client, prompts: prompts, model: textModel,
             onComplete: onComplete, onUrgent: onUrgent))
     }
 

@@ -13,7 +13,7 @@ struct ChatBubble: Identifiable, Equatable {
 
 /// Text quick-chat intake (P0-15).
 ///
-/// Uses the `chat_intake` prompt through `MetaModelClient` when a key is available; on a missing key or
+/// Uses the `chat_intake` prompt on Muse Spark through `MetaModelClient` when a key is available; on a missing key or
 /// any API/network error it switches, mid-conversation if needed, to a deterministic local flow that
 /// asks the category's slot questions in order, reads back, and asks about posting.
 @MainActor
@@ -38,6 +38,7 @@ final class ChatIntakeModel: ObservableObject {
     private let slots: [SlotQuestion]
     private let client: MetaModelClient?
     private let prompts: Prompts
+    private let model: String
     private let onComplete: (SubmitReportArgs) -> Void
     private let onUrgent: (String) -> Void
 
@@ -45,12 +46,15 @@ final class ChatIntakeModel: ObservableObject {
     private var phase: LocalPhase = .asking(0)
     private static let logger = Logger(subsystem: "io.fomy.hoth", category: "ChatIntake")
 
+    /// - Parameter model: text model override (Settings); blank or nil uses `prompts.models.text`.
     init(context: InterviewContext, slots: [SlotQuestion], client: MetaModelClient?, prompts: Prompts,
+         model: String? = nil,
          onComplete: @escaping (SubmitReportArgs) -> Void, onUrgent: @escaping (String) -> Void) {
         self.context = context
         self.slots = Array(slots.prefix(2))
         self.client = client
         self.prompts = prompts
+        self.model = Prompts.resolveTextModel(override: model, prompts: prompts)
         self.onComplete = onComplete
         self.onUrgent = onUrgent
         self.mode = client == nil ? .local : .model
@@ -307,7 +311,7 @@ final class ChatIntakeModel: ObservableObject {
         defer { isThinking = false }
         do {
             let turn: ModelTurn = try await client.structured(
-                model: prompts.models.text,
+                model: model,
                 system: systemPrompt(),
                 user: Prompts.fill(prompts.chatIntake.userTemplate, ["user_message": userText]),
                 schema: schema,

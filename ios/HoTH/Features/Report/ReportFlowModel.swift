@@ -82,7 +82,7 @@ final class ReportFlowModel: ObservableObject {
     /// Answers recovered from a voice `flag_urgent` reason, merged into the final priority.
     private var urgentAnswers: [String: String] = [:]
     /// Identifies the current submit run; regenerated on every reset so results from an abandoned run
-    /// (retake / close while an OpenAI call is in flight) are dropped instead of overwriting the new one.
+    /// (retake / close while a model call is in flight) are dropped instead of overwriting the new one.
     private var runID = UUID()
     /// Re-entrancy guard for `post`: `step` only changes after the blur await, so a double tap needs this.
     private var isPosting = false

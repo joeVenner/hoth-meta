@@ -1,7 +1,7 @@
 import XCTest
 
 /// P2-03: Feed list → map toggle, tap a critical pin, compact card opens the case. Offline (demo mode,
-/// no OpenAI calls). Writes `11_feed_map.png` to `SCREENSHOT_DIR` when set (`TEST_RUNNER_SCREENSHOT_DIR`).
+/// no model API calls). Writes `11_feed_map.png` to `SCREENSHOT_DIR` when set (`TEST_RUNNER_SCREENSHOT_DIR`).
 final class FeedMapUITests: XCTestCase {
     private var app: XCUIApplication!
 

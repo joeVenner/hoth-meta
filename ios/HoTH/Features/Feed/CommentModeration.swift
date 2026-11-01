@@ -54,13 +54,15 @@ struct LocalCommentModerator: CommentModerator {
     }
 }
 
-// MARK: - OpenAI moderator
+// MARK: - Model moderator
 
 /// P1-06: local checks first (no call when they already block), then the `moderation` prompt.
 /// Missing key, offline or any API error falls back to the local verdict (allow).
 struct ModelCommentModerator: CommentModerator {
     let client: MetaModelClient
     let prompts: Prompts
+    /// Muse Spark text model id (Settings override or `prompts.models.text`).
+    let model: String
     let hasKey: @Sendable () -> Bool
 
     private static let logger = Logger(subsystem: "io.fomy.hoth", category: "Moderation")
@@ -73,7 +75,7 @@ struct ModelCommentModerator: CommentModerator {
         let values = ["report_title": reportTitle, "comment": text]
         do {
             let verdict = try await client.structured(
-                model: prompts.models.text,
+                model: model,
                 system: Prompts.fill(spec.system, values),
                 user: Prompts.fill(spec.userTemplate, values),
                 schema: schema,
@@ -89,13 +91,13 @@ struct ModelCommentModerator: CommentModerator {
 }
 
 extension ModelCommentModerator {
-    /// App moderator: local-only in UI-test runs (no live calls), else OpenAI-backed.
+    /// App moderator: local-only in UI-test runs (no live calls), else Muse Spark-backed.
     @MainActor
     static func live() -> CommentModerator {
         if AppServices.isUITestRun { return LocalCommentModerator() }
         let services = AppServices.shared
         let provider = services.keyProvider
         return ModelCommentModerator(client: services.modelClient, prompts: services.prompts,
-                                      hasKey: { provider.currentKey() != nil })
+                                     model: services.textModel, hasKey: { provider.currentKey() != nil })
     }
 }

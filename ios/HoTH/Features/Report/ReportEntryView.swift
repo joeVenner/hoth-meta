@@ -103,6 +103,7 @@ struct ReportEntryView: View {
                     // UI tests use the local chat so the golden path costs one live call (vision).
                     client: services.hasAPIKey() && !AppServices.isUITestRun ? services.modelClient : nil,
                     prompts: services.prompts,
+                    textModel: services.textModel,
                     // No voice builder yet: Talk is hidden and the interview runs as text until the
                     // push-to-talk interview (Muse Voice Transcribe + on-device speech) lands.
                     voiceBuilder: nil,

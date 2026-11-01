@@ -1,7 +1,7 @@
 import XCTest
 
 /// City Crew demo: queue → pothole case → partial repair rejected → full repair accepted → Fixed moment.
-/// With `TEST_RUNNER_OPENAI_API_KEY` this makes exactly two live fix-check calls; without a key it uses the
+/// With `TEST_RUNNER_META_API_KEY` this makes exactly two live fix-check calls; without a key it uses the
 /// labelled offline demo verdicts. Screenshots go to `SCREENSHOT_DIR` when set (`TEST_RUNNER_SCREENSHOT_DIR`).
 final class CrewUITests: XCTestCase {
     private var app: XCUIApplication!
@@ -17,8 +17,8 @@ final class CrewUITests: XCTestCase {
             "-AppleLanguages", "(en)",
         ]
         app.launchEnvironment["HOTH_UITEST"] = "1"
-        if let key = ProcessInfo.processInfo.environment["OPENAI_API_KEY"], !key.isEmpty {
-            app.launchEnvironment["OPENAI_API_KEY"] = key
+        if let key = ProcessInfo.processInfo.environment["META_API_KEY"], !key.isEmpty {
+            app.launchEnvironment["META_API_KEY"] = key
         }
     }
 
