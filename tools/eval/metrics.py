@@ -7,11 +7,11 @@ from typing import Mapping, Sequence
 
 from priority import PriorityInput, decide, rank
 
-# USD per 1M tokens, gpt-6.1-sol standard tier, short context
-# (developers.openai.com/api/docs/pricing, fetched 2026-10-07).
-PRICE_INPUT = 2.00
-PRICE_CACHED_INPUT = 0.10
-PRICE_OUTPUT = 10.00
+# USD per 1M tokens, muse-spark-1.3 Standard mode
+# (dev.meta.ai/docs/pricing-rate-limits, fetched 2026-11-01).
+PRICE_INPUT = 1.25
+PRICE_CACHED_INPUT = 0.15
+PRICE_OUTPUT = 4.25
 
 
 @dataclass(frozen=True)

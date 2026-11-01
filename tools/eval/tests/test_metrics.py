@@ -78,4 +78,7 @@ def test_empty_rate_and_percentile():
 
 
 def test_cost():
-    assert round(m.cost_usd(1_000_000, 0, 100_000), 2) == 3.00
+    # Muse Spark 1.3 Standard: $1.25 in, $0.15 cached in, $4.25 out per 1M tokens.
+    assert round(m.cost_usd(1_000_000, 0, 100_000), 4) == 1.675
+    assert round(m.cost_usd(1_000_000, 1_000_000, 0), 4) == 0.15
+    assert round(m.cost_usd(2_000_000, 500_000, 1_000_000), 4) == 6.2
