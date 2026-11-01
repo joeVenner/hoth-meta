@@ -330,6 +330,8 @@ struct HazardPhotoView: View {
                     }
                     .frame(width: proxy.size.width, height: proxy.size.height, alignment: .topLeading)
                 }
+                // Boxes are image coordinates: never mirror them in RTL (matches the SAM layer underneath).
+                .environment(\.layoutDirection, .leftToRight)
             }
             .onAppear {
                 withAnimation(.easeOut(duration: 1.0).delay(0.3)) { progress = 1 }

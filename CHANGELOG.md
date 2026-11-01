@@ -30,4 +30,5 @@ The format follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/
 - The realtime-only mid-call urgency path in `ReportFlowModel` (`voiceFlaggedUrgent`, `SafetyAlert.keepsInterview`, `urgentAnswers`); push-to-talk urgency goes through the chat like typing.
 
 ### Fixed
+- Muse Spark's hazard boxes on the analysis photo are laid out left-to-right in Arabic too, like the SAM layer and the fix-check boxes, so the two never disagree under RTL.
 - The repair photo is made upright and downsized to 1024 px before the fix check, so boxes from the model land on the shown image (camera shots arrive `.right`-oriented at full resolution).
