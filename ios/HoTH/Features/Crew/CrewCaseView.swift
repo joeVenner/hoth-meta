@@ -206,13 +206,16 @@ struct CrewCaseView: View {
 
                 if let after = fixCheck.afterImage {
                     let remaining = FixCheckModel.remainingRegions(verdict: verdict, sam: fixCheck.samRemaining)
-                    RemainingIssuesImage(image: after, regions: remaining.regions)
+                    // SAM regions carry the English concept; show its Arabic name in the Arabic UI.
+                    RemainingIssuesImage(image: after, regions: remaining.regions.map {
+                        FixVerdict.Region(label: services.prompts.segmentConceptDisplayName($0.label, arabic: isArabic), box: $0.box)
+                    })
                         .overlay(alignment: .topLeading) {
                             if fixCheck.isDemoPhoto { DemoPhotoTag().padding(8) }
                         }
                         .animation(.easeOut(duration: 0.35), value: remaining.isFromSAM)
                     if remaining.isFromSAM, let concept = fixCheck.samRemaining?.concept {
-                        SAMOutlineChip(concept: concept)
+                        SAMOutlineChip(concept: services.prompts.segmentConceptDisplayName(concept, arabic: isArabic))
                     }
                 }
                 Text(verdict.reasonEN)

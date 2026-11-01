@@ -63,6 +63,7 @@ struct SAMOutlineOverlay: View {
 
 /// "Outlined by SAM 3.1 · pothole": says which boxes came from SAM and what it looked for.
 struct SAMOutlineChip: View {
+    /// Display name of the concept (already localized by the caller; SAM itself got English).
     let concept: String
 
     var body: some View {
