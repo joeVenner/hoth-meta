@@ -234,8 +234,15 @@ private struct DuplicateMergedView: View {
     let onDone: () -> Void
 
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.locale) private var locale
     @State private var appeared = false
     @State private var mergedReport: Report?
+
+    /// Metric whatever the device region ("18 m away" / "على بعد ١٨ مترًا").
+    private var mergedDistanceLabel: String {
+        let distance = DistanceFormatting.string(metres: Double(outcome.distanceMeters), locale: locale)
+        return isArabic ? "على بعد \(distance)" : "\(distance) away"
+    }
 
     var body: some View {
         VStack(spacing: HoTHSpacing.l) {
@@ -258,7 +265,7 @@ private struct DuplicateMergedView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(isArabic ? outcome.titleAR : outcome.titleEN).font(.hothHeadline)
                             .foregroundStyle(Color.hothInk)
-                        Text(verbatim: isArabic ? "على بعد \(outcome.distanceMeters) م" : "\(outcome.distanceMeters) m away")
+                        Text(verbatim: mergedDistanceLabel)
                             .font(.hothCaption).foregroundStyle(Color.hothInkSecondary)
                     }
                     Spacer()

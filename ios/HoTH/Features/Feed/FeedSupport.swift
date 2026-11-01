@@ -46,13 +46,9 @@ enum FeedGeography {
     static let nearMeRadius: CLLocationDistance = 1500
 
     /// - Parameter locale: pass the SwiftUI environment locale so the in-app language override applies.
+    /// Always metric ("233 m", "1.3 km"), whatever the device region: see `DistanceFormatting`.
     static func formattedDistance(_ metres: CLLocationDistance, locale: Locale = .autoupdatingCurrent) -> String {
-        let measurement = Measurement(value: metres, unit: UnitLength.meters)
-        let formatter = MeasurementFormatter()
-        formatter.locale = locale
-        formatter.unitOptions = .naturalScale
-        formatter.numberFormatter.maximumFractionDigits = metres < 1000 ? 0 : 1
-        return formatter.string(from: measurement)
+        DistanceFormatting.string(metres: metres, locale: locale)
     }
 }
 
