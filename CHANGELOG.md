@@ -41,6 +41,8 @@ The format follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/
 - App wiring and copy name Meta: the key is stored under Keychain service `HoTH.MetaKey` (DEBUG simulator falls back to `META_API_KEY`), Settings says "Meta Model API key" and Muse Spark with a new text model override for chat and moderation, and privacy copy (en + ar) says photos go to Meta's Muse Spark model. UI tests read `TEST_RUNNER_META_API_KEY`.
 - Eval harness calls the Meta Model API (`META_API_KEY`, 60 s app timeout, reasoning effort low, no image `detail`) and prices runs at Muse Spark 1.3 Standard rates ($1.25 in, $0.15 cached in, $4.25 out per 1M tokens).
 
+- Privacy copy (Settings, onboarding, capture disclosure, ticket; en + ar) now says faces and plates *your phone detects* are blurred, and no longer says Meta's models "only ever see" the blurred photo, since on-device detection can miss some.
+
 ### Removed
 - `realtime_tools` and `voice_persona` from prompts.json.
 - The previous provider's realtime (WebRTC) voice interview, replaced by Meta push-to-talk.
@@ -65,6 +67,9 @@ The format follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/
 - Muse Spark's hazard boxes on the analysis photo are laid out left-to-right in Arabic too, like the SAM layer and the fix-check boxes, so the two never disagree under RTL.
 - The repair photo is made upright and downsized to 1024 px before the fix check, so boxes from the model land on the shown image (camera shots arrive `.right`-oriented at full resolution).
 - Arabic UI showed the fix check's "what's left" labels in English. The fix-check schema now asks for `label_ar` per remaining issue (decoded as `RemainingIssue.labelAR`, optional for older responses), `FixVerdict.Region` carries it, and the canned "Unfilled gravel" has an Arabic name («حصى غير مردوم»). SAM regions keep the Arabic concept name.
+
+- Fix check: a reset during the blur or the verifier call no longer uploads or applies a stale result; the before photo is downsized (<= 1024 px) before the blur like the after photo; canned demo verdicts skip the upload blur (nothing is sent) and blur only the saved fix photo, so a slow or failed blur cannot break the offline demo.
+- The duplicate judge logs a notice when it is skipped because the existing photo is missing or cannot be re-blurred.
 
 ### Security
 - Photos are blurred on the phone before they are sent to Meta, not only before posting. Vision, SAM 3.1, the duplicate judge (new photo and the existing report's public photo, blurred again on the phone), the intake agent's `segment_hazard` and the fix check (before and after) all receive the `FaceAndPlateBlur` output, and the same blur is reused for the posted photo and the saved fix photo. Fail-safe: if the blur fails or takes longer than 10 s (`FaceAndPlateBlur.uploadTimeout`), nothing is sent; the report shows "I couldn't blur faces and number plates on this photo, so it wasn't sent. Please take it again." and the fix check "Couldn't blur faces and number plates on these photos, so nothing was sent." (en + ar). Offline canned demo analyses send nothing, so they skip the gate. Privacy copy in Settings, onboarding, the capture disclosure and the ticket says so (en + ar). The eval harness still sends unblurred dataset images (Apple Vision is not available to the Python harness).
