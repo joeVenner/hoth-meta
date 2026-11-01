@@ -1,0 +1,3668 @@
+{
+  "subset": "full",
+  "model": "muse-spark-1.3",
+  "items": [
+    {
+      "file": "real/real_playground_equipment_1.jpg",
+      "label": {
+        "file": "real/real_playground_equipment_1.jpg",
+        "source": "commons",
+        "category": "playground_equipment",
+        "expected_severity_min": "medium",
+        "child_risk": true,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Wide shot of a park playground; the broken swing is small in frame. Low-salience hard case."
+      },
+      "pred": {
+        "category": "not_an_issue",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "تُظهر الصورة ملعب أطفال في حديقة خضراء فيه أراجيح وزلاقات وهياكل تسلق. لا يظهر أي تلف أو خطر واضح في المعدات أو الأرضية.",
+        "description_en": "The photo shows a green park playground with swing sets, yellow slides, and climbing structures. No damage, breakage, or hazard is visible on the equipment or ground.",
+        "hazards": [],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo looks like a direct daytime phone capture of a park.",
+          "shows_reported_issue": false
+        },
+        "scene_type": "playground",
+        "severity_proposal": "low",
+        "severity_reason_ar": "تبدو جميع معدات اللعب والأرضية سليمة دون أي كسر أو خطر مباشر ظاهر.",
+        "severity_reason_en": "All play equipment and surfacing appear intact with no visible breakage or immediate danger.",
+        "suggested_questions": [],
+        "title_ar": "ملعب أطفال يبدو سليما",
+        "title_en": "Intact playground with swings and slides"
+      },
+      "final_priority": "low",
+      "floor_applied": null,
+      "signals": [
+        "not_an_issue"
+      ],
+      "latency_ms": 10524.10050004255,
+      "usage": {
+        "input_tokens": 2472,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1452,
+        "output_tokens_details": {
+          "reasoning_tokens": 704
+        },
+        "total_tokens": 3924
+      },
+      "cached": false
+    },
+    {
+      "file": "real/real_playground_equipment_2.jpg",
+      "label": {
+        "file": "real/real_playground_equipment_2.jpg",
+        "source": "commons",
+        "category": "playground_equipment",
+        "expected_severity_min": "medium",
+        "child_risk": true,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Swing seat hangs from a single chain (one chain detached)."
+      },
+      "pred": {
+        "category": "playground_equipment",
+        "child_present": false,
+        "child_use_equipment": true,
+        "confidence": "high",
+        "description_ar": "تظهر الصورة أرجوحة في ملعب بها مقعد مكسور معلق بشكل عمودي وسلاسل أخرى تتدلى بدون مقعد. المنطقة مفتوحة ويبدو أن الأرجوحة الأخرى سليمة.",
+        "description_en": "A playground swing frame shows one swing seat hanging vertically and damaged, and another set of chains hanging with no seat. The area is open with one other swing seat appearing intact.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 505,
+              "x_min": 395,
+              "y_max": 665,
+              "y_min": 560
+            },
+            "kind": "fall",
+            "label": "Broken swing seat hanging vertically"
+          },
+          {
+            "box": {
+              "x_max": 700,
+              "x_min": 615,
+              "y_max": 540,
+              "y_min": 230
+            },
+            "kind": "fall",
+            "label": "Missing swing seat with hanging chains"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo looks like a direct outdoor capture of the playground.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "playground",
+        "severity_proposal": "high",
+        "severity_reason_ar": "معدات أطفال مكسورة قد تسقط أو تصدم مستخدمها بسهولة. الأرجوحة غير صالحة للاستخدام الآمن.",
+        "severity_reason_en": "Broken child swing equipment could fall or strike a user. The swings are not safe for normal use as shown.",
+        "suggested_questions": [
+          "Is the swing area fenced off or still open for use?",
+          "How long have the swings looked damaged like this?"
+        ],
+        "title_ar": "أرجوحة مكسورة في ملعب",
+        "title_en": "Broken playground swings"
+      },
+      "final_priority": "critical",
+      "floor_applied": "CRITICAL — child safety",
+      "signals": [
+        "child_equipment_hazard",
+        "location_playground"
+      ],
+      "latency_ms": 11614.080082974397,
+      "usage": {
+        "input_tokens": 1917,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 1622,
+        "output_tokens_details": {
+          "reasoning_tokens": 655
+        },
+        "total_tokens": 3539
+      },
+      "cached": false
+    },
+    {
+      "file": "real/real_playground_equipment_3.jpg",
+      "label": {
+        "file": "real/real_playground_equipment_3.jpg",
+        "source": "commons",
+        "category": "playground_equipment",
+        "expected_severity_min": "low",
+        "child_risk": true,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Close-up of play structure; damage is subtle (Commons description says broken). Hard case."
+      },
+      "pred": {
+        "category": "playground_equipment",
+        "child_present": false,
+        "child_use_equipment": true,
+        "confidence": "medium",
+        "description_ar": "مدخل نفق معدني في هيكل لعب يبدو محجوبا جزئيا بصندوق ثماني تظهر عليه علامات التآكل وتقشر الطلاء.",
+        "description_en": "A metal tunnel entrance on a playground structure is partly obstructed by a worn octagonal container with peeling paint, above a wooden platform.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 697,
+              "x_min": 318,
+              "y_max": 765,
+              "y_min": 336
+            },
+            "kind": "other",
+            "label": "Worn play component blocking tunnel entrance"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo looks like a direct live photo of playground equipment.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "playground",
+        "severity_proposal": "medium",
+        "severity_reason_ar": "المكون تالف ويعيق مدخل النفق المخصص للأطفال، لكن لا توجد حواف معدنية حادة واضحة.",
+        "severity_reason_en": "The component is worn and obstructs a child tunnel entrance, but no sharp breakage is clearly visible.",
+        "suggested_questions": [
+          "Is the tunnel completely blocked or can children still pass through?",
+          "Is the black container loose or firmly fixed in place?"
+        ],
+        "title_ar": "مكون تالف يسد نفق اللعب",
+        "title_en": "Worn playground component blocking tunnel"
+      },
+      "final_priority": "medium",
+      "floor_applied": null,
+      "signals": [],
+      "latency_ms": 10941.798874991946,
+      "usage": {
+        "input_tokens": 2112,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 1379,
+        "output_tokens_details": {
+          "reasoning_tokens": 579
+        },
+        "total_tokens": 3491
+      },
+      "cached": false
+    },
+    {
+      "file": "real/real_playground_equipment_4.jpg",
+      "label": {
+        "file": "real/real_playground_equipment_4.jpg",
+        "source": "commons",
+        "category": "playground_equipment",
+        "expected_severity_min": "high",
+        "child_risk": true,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Vandalized wooden play equipment, broken beams on the ground, splinter/collapse risk."
+      },
+      "pred": {
+        "category": "playground_equipment",
+        "child_present": false,
+        "child_use_equipment": true,
+        "confidence": "medium",
+        "description_ar": "معدات لعب خشبية متضررة ومنهارة في منطقة عشبية مع بقعة أرض محترقة وبقايا متفحمة ومبعثرة.",
+        "description_en": "Damaged wooden playground structures with collapsed logs on grass and a burnt patch of ground with charred debris scattered nearby.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 974,
+              "x_min": 594,
+              "y_max": 894,
+              "y_min": 408
+            },
+            "kind": "fall",
+            "label": "Collapsed wooden play structure"
+          },
+          {
+            "box": {
+              "x_max": 605,
+              "x_min": 213,
+              "y_max": 857,
+              "y_min": 647
+            },
+            "kind": "other",
+            "label": "Burnt ground with charred debris"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo looks like a direct outdoor capture with no screen artifacts.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "playground",
+        "severity_proposal": "high",
+        "severity_reason_ar": "معدات اللعب منهارة ومكسورة وبقايا محترقة ظاهرة على الأرض، مما قد يسبب إصابة للأطفال الذين يلعبون هنا.",
+        "severity_reason_en": "Play equipment is collapsed and broken with burnt debris visible on the ground, likely to cause injury to children playing here.",
+        "suggested_questions": [
+          "Is this play area still open for children to enter?",
+          "Have you seen any recent fire or further collapse here?"
+        ],
+        "title_ar": "ملعب خشبي متضرر ومحترق",
+        "title_en": "Damaged playground with burnt debris"
+      },
+      "final_priority": "critical",
+      "floor_applied": "CRITICAL — child safety",
+      "signals": [
+        "child_equipment_hazard",
+        "location_playground"
+      ],
+      "latency_ms": 6622.4461670499295,
+      "usage": {
+        "input_tokens": 1470,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 977,
+        "output_tokens_details": {
+          "reasoning_tokens": 574
+        },
+        "total_tokens": 2447
+      },
+      "cached": false
+    },
+    {
+      "file": "real/real_pothole_pavement_1.jpg",
+      "label": {
+        "file": "real/real_pothole_pavement_1.jpg",
+        "source": "commons",
+        "category": "pothole_pavement",
+        "expected_severity_min": "high",
+        "child_risk": false,
+        "urgent": true,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Large, deep pothole in the middle of a road."
+      },
+      "pred": {
+        "category": "pothole_pavement",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "يظهر في الصورة انهيار كبير في طبقة الأسفلت يكشف عن حفرة عميقة بحواف مكسورة ومياه موحلة في الداخل، وبجانبها حاجز أبيض.",
+        "description_en": "A large section of asphalt has collapsed into a deep hole with broken edges and muddy water visible inside, with a white barrier nearby.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 749,
+              "x_min": 85,
+              "y_max": 758,
+              "y_min": 193
+            },
+            "kind": "fall",
+            "label": "large deep sinkhole in road"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo looks like a direct live capture of the road defect.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "street",
+        "severity_proposal": "critical",
+        "severity_reason_ar": "الحفرة كبيرة وعميقة في وسط الأسفلت وخطر السقوط فيها أو سقوط مركبة واضح.",
+        "severity_reason_en": "The hole is large and deep in the asphalt surface with a clear fall-in risk for people and vehicles.",
+        "suggested_questions": [
+          "Is the road still open to vehicles or pedestrians?",
+          "Is water collecting or flowing inside the hole?"
+        ],
+        "title_ar": "حفرة انهيار كبيرة في الطريق",
+        "title_en": "Large sinkhole in asphalt road"
+      },
+      "final_priority": "critical",
+      "floor_applied": null,
+      "signals": [],
+      "latency_ms": 6339.503916911781,
+      "usage": {
+        "input_tokens": 1917,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 846,
+        "output_tokens_details": {
+          "reasoning_tokens": 488
+        },
+        "total_tokens": 2763
+      },
+      "cached": false
+    },
+    {
+      "file": "real/real_pothole_pavement_2.jpg",
+      "label": {
+        "file": "real/real_pothole_pavement_2.jpg",
+        "source": "commons",
+        "category": "pothole_pavement",
+        "expected_severity_min": "medium",
+        "child_risk": false,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Medium water-filled pothole on an urban street."
+      },
+      "pred": {
+        "category": "pothole_pavement",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "توجد حفرة كبيرة وعميقة في سطح الأسفلت مملوءة جزئيا بالماء الموحل قرب خط المشاة. وضعت قفاز بجانبها يظهر حجمها الكبير.",
+        "description_en": "A large deep pothole in the asphalt surface partly filled with muddy water near a pedestrian crossing line. A glove placed beside it shows its large size.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 815,
+              "x_min": 295,
+              "y_max": 830,
+              "y_min": 410
+            },
+            "kind": "traffic",
+            "label": "large water-filled pothole in road"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo shows a real road defect in daylight with no screen artifacts.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "street",
+        "severity_proposal": "high",
+        "severity_reason_ar": "الحفرة كبيرة وعميقة ومملوءة بالماء، مما يشكل خطرا واضحا على المركبات والمشاة قرب ممر العبور.",
+        "severity_reason_en": "The pothole is large, deep and water-filled, posing a clear risk to vehicles and pedestrians near a crossing.",
+        "suggested_questions": [
+          "Is this pothole on a busy road or pedestrian crossing area?",
+          "Is water still collecting in the hole after rain?"
+        ],
+        "title_ar": "حفرة كبيرة مملوءة بالماء في الطريق",
+        "title_en": "Large water-filled pothole on road"
+      },
+      "final_priority": "high",
+      "floor_applied": null,
+      "signals": [],
+      "latency_ms": 5729.58866704721,
+      "usage": {
+        "input_tokens": 2112,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 673,
+        "output_tokens_details": {
+          "reasoning_tokens": 295
+        },
+        "total_tokens": 2785
+      },
+      "cached": false
+    },
+    {
+      "file": "real/real_pothole_pavement_3.jpg",
+      "label": {
+        "file": "real/real_pothole_pavement_3.jpg",
+        "source": "commons",
+        "category": "pothole_pavement",
+        "expected_severity_min": "low",
+        "child_risk": false,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Shallow pothole partly filled with gravel near the kerb."
+      },
+      "pred": {
+        "category": "pothole_pavement",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "توجد حفرة مليئة بالحصى المفكك على حافة طريق اسفلتي بجانب الرصيف، مع حجارة خرسانية موضوعة على الرصيف.",
+        "description_en": "A pothole filled with loose gravel is visible on the edge of an asphalt road next to the sidewalk curb, with loose concrete stones sitting on the sidewalk.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 700,
+              "x_min": 270,
+              "y_max": 520,
+              "y_min": 370
+            },
+            "kind": "traffic",
+            "label": "pothole filled with loose gravel"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo looks like a direct live capture of the road defect.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "street",
+        "severity_proposal": "high",
+        "severity_reason_ar": "الحفرة والحصى المفكك على حافة الطريق ظاهران بوضوح وقد يتسببان في انزلاق الدراجات او تضرر المركبات.",
+        "severity_reason_en": "The pothole with loose gravel on the roadway edge is clearly visible and could cause bikes to slip or vehicles to be damaged.",
+        "suggested_questions": [
+          "How long has the pothole been like this?",
+          "Does water collect in this spot after rain?"
+        ],
+        "title_ar": "حفرة وحصى متناثر على الطريق",
+        "title_en": "Pothole with Loose Gravel on Road"
+      },
+      "final_priority": "high",
+      "floor_applied": null,
+      "signals": [],
+      "latency_ms": 7361.294750007801,
+      "usage": {
+        "input_tokens": 2112,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 1469,
+        "output_tokens_details": {
+          "reasoning_tokens": 1094
+        },
+        "total_tokens": 3581
+      },
+      "cached": false
+    },
+    {
+      "file": "real/real_electrical_hazard_1.jpg",
+      "label": {
+        "file": "real/real_electrical_hazard_1.jpg",
+        "source": "commons",
+        "category": "electrical_hazard",
+        "expected_severity_min": "high",
+        "child_risk": true,
+        "urgent": true,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Street-light pole with open access panel and exposed wiring at ground level next to grass."
+      },
+      "pred": {
+        "category": "electrical_hazard",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "عمود معدني بجانب طريق توجد في أسفله فتحة مكشوفة تظهر منها أسلاك كهربائية ملونة متدلية. الغطاء الواقي مفقود وحجرة الأسلاك مفتوحة على مستوى يسهل الوصول إليه.",
+        "description_en": "A metal pole beside a paved path has an open compartment at low height with multiple colored electrical wires exposed. The protective cover is missing and the wiring is accessible.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 625,
+              "x_min": 335,
+              "y_max": 910,
+              "y_min": 257
+            },
+            "kind": "electrical",
+            "label": "exposed electrical wires in open pole"
+          },
+          {
+            "box": {
+              "x_max": 535,
+              "x_min": 325,
+              "y_max": 915,
+              "y_min": 255
+            },
+            "kind": "sharp_edge",
+            "label": "torn open metal edge of pole"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo looks like a direct outdoor photo of the pole.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "street",
+        "severity_proposal": "critical",
+        "severity_reason_ar": "الأسلاك مكشوفة وفي متناول اليد بجانب ممر عام، مما يشكل خطر صعق كهربائي فوري.",
+        "severity_reason_en": "Wiring is exposed and reachable at low height beside a public path, creating an immediate shock risk.",
+        "suggested_questions": [
+          "Is the cover door missing or lying nearby?",
+          "Is the pole light still on at night?"
+        ],
+        "title_ar": "أسلاك مكشوفة في عمود إنارة",
+        "title_en": "Exposed Wiring in Light Pole"
+      },
+      "final_priority": "critical",
+      "floor_applied": null,
+      "signals": [
+        "electrical"
+      ],
+      "latency_ms": 5445.500292000361,
+      "usage": {
+        "input_tokens": 2112,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 898,
+        "output_tokens_details": {
+          "reasoning_tokens": 464
+        },
+        "total_tokens": 3010
+      },
+      "cached": false
+    },
+    {
+      "file": "real/real_electrical_hazard_2.jpg",
+      "label": {
+        "file": "real/real_electrical_hazard_2.jpg",
+        "source": "commons",
+        "category": "electrical_hazard",
+        "expected_severity_min": "high",
+        "child_risk": false,
+        "urgent": true,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Knocked-down street-light pole lying across the street corner."
+      },
+      "pred": {
+        "category": "electrical_hazard",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "عمود إنارة ساقط وممتد على الرصيف وزاوية الشارع في شارع سكني. يعترض طريق المشاة ويبرز جزئيا في طريق السيارات.",
+        "description_en": "A street light pole has fallen and is lying across the sidewalk and street corner in a residential rowhouse street. It blocks pedestrian passage and extends toward the roadway.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 825,
+              "x_min": 250,
+              "y_max": 795,
+              "y_min": 635
+            },
+            "kind": "electrical",
+            "label": "Fallen street light pole on sidewalk"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Direct daylight outdoor photo with no screen or watermark signs.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "residential",
+        "severity_proposal": "high",
+        "severity_reason_ar": "عمود معدني كبير ساقط يعترض الرصيف ويشكل خطر تعثر وإصابة وخطر كهربائي محتمل.",
+        "severity_reason_en": "A large metal pole lies across the sidewalk blocking passage, with trip and possible electrical risk visible.",
+        "suggested_questions": [
+          "Are any wires exposed or sparking from the fallen pole?",
+          "Is the sidewalk fully blocked for pedestrians and wheelchairs?"
+        ],
+        "title_ar": "عمود إنارة ساقط يعترض الرصيف",
+        "title_en": "Fallen street light blocking sidewalk"
+      },
+      "final_priority": "critical",
+      "floor_applied": null,
+      "signals": [
+        "electrical"
+      ],
+      "latency_ms": 10296.751582995057,
+      "usage": {
+        "input_tokens": 2112,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1702,
+        "output_tokens_details": {
+          "reasoning_tokens": 862
+        },
+        "total_tokens": 3814
+      },
+      "cached": false
+    },
+    {
+      "file": "real/real_electrical_hazard_3.jpg",
+      "label": {
+        "file": "real/real_electrical_hazard_3.jpg",
+        "source": "commons",
+        "category": "electrical_hazard",
+        "expected_severity_min": "high",
+        "child_risk": false,
+        "urgent": true,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Fallen street-light pole on a waterside path; wiring status not visible."
+      },
+      "pred": {
+        "category": "electrical_hazard",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "عمود إنارة معدني ساقط ومكسور من القاعدة وملقى على ممر ترابي قرب بحيرة. القاعدة مكسورة والعمود يعترض طريق المشاة في منطقة عامة.",
+        "description_en": "A metal street light pole is knocked down and lying across a dirt path near a lake. The base is broken and the pole blocks the ground in a public open area.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 685,
+              "x_min": 200,
+              "y_max": 760,
+              "y_min": 335
+            },
+            "kind": "electrical",
+            "label": "fallen street light pole with broken base"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo looks like a direct outdoor capture of the fallen pole.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "park",
+        "severity_proposal": "high",
+        "severity_reason_ar": "العمود الساقط بقاعدة مكسورة يشكل خطر التعثر والصدمة الكهربائية في ممر عام قرب البحيرة.",
+        "severity_reason_en": "The fallen pole with broken base lies across a public path by the lake, creating trip and possible electrical risk.",
+        "suggested_questions": [
+          "Is the lamp head still lit or making noise at night?",
+          "Can you see any exposed wires at the broken base?"
+        ],
+        "title_ar": "عمود إنارة ساقط قرب البحيرة",
+        "title_en": "Fallen street light pole by lake"
+      },
+      "final_priority": "critical",
+      "floor_applied": null,
+      "signals": [
+        "electrical"
+      ],
+      "latency_ms": 5955.510666011833,
+      "usage": {
+        "input_tokens": 2004,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 909,
+        "output_tokens_details": {
+          "reasoning_tokens": 538
+        },
+        "total_tokens": 2913
+      },
+      "cached": false
+    },
+    {
+      "file": "real/real_open_manhole_1.jpg",
+      "label": {
+        "file": "real/real_open_manhole_1.jpg",
+        "source": "commons",
+        "category": "open_manhole",
+        "expected_severity_min": "high",
+        "child_risk": true,
+        "urgent": true,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Open sewer manhole on a street, cover lying beside it, one cone only."
+      },
+      "pred": {
+        "category": "open_manhole",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "غطاء فتحة صرف صحي دائرية مزاح جانب فتحة مظلمة مفتوحة على الأسفلت، وبجانبها عمود تحذيري برتقالي، مع سيارات متوقفة بالقرب.",
+        "description_en": "A round sewer cover lies displaced beside an open dark shaft in the asphalt, with an orange warning post next to it and parked cars nearby.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 645,
+              "x_min": 400,
+              "y_max": 805,
+              "y_min": 540
+            },
+            "kind": "fall",
+            "label": "open sewer manhole shaft"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Image appears to be a direct photo of the open hole with no screen or stock signs.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "street",
+        "severity_proposal": "critical",
+        "severity_reason_ar": "الفتحة مكشوفة على مستوى الأرض بجانب سيارات متوقفة، مما يشكل خطر سقوط فوري.",
+        "severity_reason_en": "The shaft is fully uncovered at ground level next to parked cars, creating an immediate fall-in risk.",
+        "suggested_questions": [
+          "How long has the manhole been open like this?",
+          "Is this street busy with foot traffic after dark?"
+        ],
+        "title_ar": "غطاء صرف صحي مفتوح في الشارع",
+        "title_en": "Open Sewer Manhole on Street"
+      },
+      "final_priority": "critical",
+      "floor_applied": "CRITICAL — open manhole",
+      "signals": [
+        "open_manhole"
+      ],
+      "latency_ms": 7743.213582900353,
+      "usage": {
+        "input_tokens": 2112,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1203,
+        "output_tokens_details": {
+          "reasoning_tokens": 834
+        },
+        "total_tokens": 3315
+      },
+      "cached": false
+    },
+    {
+      "file": "real/real_open_manhole_2.jpg",
+      "label": {
+        "file": "real/real_open_manhole_2.jpg",
+        "source": "commons",
+        "category": "open_manhole",
+        "expected_severity_min": "critical",
+        "child_risk": true,
+        "urgent": true,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Uncovered manhole in a narrow pedestrian sidewalk, pedestrian's foot in frame."
+      },
+      "pred": {
+        "category": "open_manhole",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "يوجد منهول دائري بدون غطاء في ممر مرصوف بالبلاط يكشف عن حفرة عميقة ومظلمة. تظهر قدم شخص بالقرب من الحافة مما يوضح قرب المشاة من الخطر.",
+        "description_en": "A round manhole without its cover in a tiled paved walkway exposes a deep dark opening. A person's foot near the edge shows pedestrians are close to the hazard.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 795,
+              "x_min": 238,
+              "y_max": 500,
+              "y_min": 180
+            },
+            "kind": "fall",
+            "label": "Open manhole shaft"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo looks like a direct live capture of the walkway.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "sidewalk",
+        "severity_proposal": "critical",
+        "severity_reason_ar": "الحفرة عميقة ومفتوحة تماماً في ممر للمشاة دون أي غطاء أو حاجز، مما يشكل خطر سقوط فوري.",
+        "severity_reason_en": "A deep hole is fully open in the middle of a pedestrian walkway with no cover or barrier, creating an immediate fall risk.",
+        "suggested_questions": [
+          "Is this walkway busy with pedestrians, especially at night?",
+          "Is the missing cover visible nearby?"
+        ],
+        "title_ar": "فتحة منهول مفتوحة على ممر",
+        "title_en": "Open manhole on tiled walkway"
+      },
+      "final_priority": "critical",
+      "floor_applied": "CRITICAL — open manhole",
+      "signals": [
+        "open_manhole"
+      ],
+      "latency_ms": 12082.233333028853,
+      "usage": {
+        "input_tokens": 2112,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1598,
+        "output_tokens_details": {
+          "reasoning_tokens": 675
+        },
+        "total_tokens": 3710
+      },
+      "cached": false
+    },
+    {
+      "file": "real/real_open_manhole_3.jpg",
+      "label": {
+        "file": "real/real_open_manhole_3.jpg",
+        "source": "commons",
+        "category": "open_manhole",
+        "expected_severity_min": "medium",
+        "child_risk": true,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Open drainage excavation, but fenced off with temporary barriers."
+      },
+      "pred": {
+        "category": "open_manhole",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "حفرة مستطيلة مكشوفة في الرصيف ممتلئة بمياه راكدة وتظهر فيها أنابيب، وتحيط بها سياج شبكي مؤقت بجانب العشب.",
+        "description_en": "A rectangular open excavation in the pavement filled with murky standing water with exposed pipes, behind a temporary mesh fence beside grass.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 865,
+              "x_min": 110,
+              "y_max": 810,
+              "y_min": 195
+            },
+            "kind": "fall",
+            "label": "Open water-filled pit"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo looks like a direct live capture of the excavation.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "sidewalk",
+        "severity_proposal": "high",
+        "severity_reason_ar": "الحفرة عميقة وممتلئة بالمياه بجانب ممر المشاة ولا يفصلها سوى سياج مؤقت خفيف، مما يشكل خطر السقوط.",
+        "severity_reason_en": "A deep open pit with standing water sits beside a walkway with only a light temporary fence in front, creating a likely fall injury risk.",
+        "suggested_questions": [
+          "How long has the pit been open and filled with water?",
+          "Is the temporary fence damaged or easy to enter?"
+        ],
+        "title_ar": "حفرة مكشوفة ممتلئة بالمياه",
+        "title_en": "Open Water-Filled Excavation Pit"
+      },
+      "final_priority": "critical",
+      "floor_applied": "CRITICAL — open manhole",
+      "signals": [
+        "open_manhole"
+      ],
+      "latency_ms": 6588.952708989382,
+      "usage": {
+        "input_tokens": 2004,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1148,
+        "output_tokens_details": {
+          "reasoning_tokens": 770
+        },
+        "total_tokens": 3152
+      },
+      "cached": false
+    },
+    {
+      "file": "real/real_open_manhole_4.jpg",
+      "label": {
+        "file": "real/real_open_manhole_4.jpg",
+        "source": "commons",
+        "category": "open_manhole",
+        "expected_severity_min": "high",
+        "child_risk": true,
+        "urgent": true,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Manhole lid lifted off, open shaft exposed on asphalt."
+      },
+      "pred": {
+        "category": "open_manhole",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "فتحة منهول دائرية في الأسفلت مكشوفة تماما والغطاء المعدني مزاح إلى الجانب، وتظهر حفرة عميقة مظلمة بداخلها.",
+        "description_en": "A round manhole in asphalt is uncovered with its metal lid pushed aside, exposing a deep dark vertical shaft.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 975,
+              "x_min": 40,
+              "y_max": 852,
+              "y_min": 264
+            },
+            "kind": "fall",
+            "label": "open manhole shaft"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo appears to be a direct close-up capture of the open manhole.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "street",
+        "severity_proposal": "critical",
+        "severity_reason_ar": "الحفرة عميقة ومفتوحة تماما بدون غطاء، ويمكن أن يسقط فيها أي شخص أو طفل ويتعرض لإصابة خطيرة.",
+        "severity_reason_en": "The shaft is deep and fully open with the cover displaced, creating an immediate fall risk for anyone passing by.",
+        "suggested_questions": [
+          "Is there any barrier or warning sign around the opening?",
+          "How long has the cover been left open like this?"
+        ],
+        "title_ar": "فتحة منهول مفتوحة بدون غطاء",
+        "title_en": "Open manhole with displaced cover"
+      },
+      "final_priority": "critical",
+      "floor_applied": "CRITICAL — open manhole",
+      "signals": [
+        "open_manhole"
+      ],
+      "latency_ms": 9359.852666035295,
+      "usage": {
+        "input_tokens": 2112,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1396,
+        "output_tokens_details": {
+          "reasoning_tokens": 529
+        },
+        "total_tokens": 3508
+      },
+      "cached": false
+    },
+    {
+      "file": "real/real_waste_overflow_dumping_1.jpg",
+      "label": {
+        "file": "real/real_waste_overflow_dumping_1.jpg",
+        "source": "commons",
+        "category": "waste_overflow_dumping",
+        "expected_severity_min": "medium",
+        "child_risk": false,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Overflowing paper/recycling bins in an indoor bin room (not a street scene)."
+      },
+      "pred": {
+        "category": "waste_overflow_dumping",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "تظهر الصورة حاويات نفايات ممتلئة بالفوق بالأكياس الورقية والصناديق الكرتونية والأكياس البلاستيكية المكدسة فوقها وحولها. تتجاوز النفايات سعة الحاويات ومتراكمة على الأرض.",
+        "description_en": "Waste bins are overfilled with paper bags, cardboard boxes, and plastic bags piled high above and around them. Excess waste is stacked on the floor in front of the bins.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 960,
+              "x_min": 70,
+              "y_max": 550,
+              "y_min": 15
+            },
+            "kind": "sanitation",
+            "label": "Overflowing waste pile"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo looks like a direct live capture of an indoor waste room.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "residential",
+        "severity_proposal": "medium",
+        "severity_reason_ar": "الحاويات فائضة والنفايات متراكمة بشكل كبير، مما يشكل مشكلة نظافة واضحة وخطر محدود فوري.",
+        "severity_reason_en": "Bins are completely full with waste piled high above them, creating a clear sanitation problem with limited immediate danger.",
+        "suggested_questions": [
+          "How long has the waste been piled up like this?",
+          "Are collection pickups missed or is the bin capacity insufficient?"
+        ],
+        "title_ar": "حاويات نفايات فائضة في غرفة القمامة",
+        "title_en": "Overflowing waste bins in refuse room"
+      },
+      "final_priority": "medium",
+      "floor_applied": null,
+      "signals": [],
+      "latency_ms": 10399.548124987632,
+      "usage": {
+        "input_tokens": 2112,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1500,
+        "output_tokens_details": {
+          "reasoning_tokens": 422
+        },
+        "total_tokens": 3612
+      },
+      "cached": false
+    },
+    {
+      "file": "real/real_waste_overflow_dumping_2.jpg",
+      "label": {
+        "file": "real/real_waste_overflow_dumping_2.jpg",
+        "source": "commons",
+        "category": "waste_overflow_dumping",
+        "expected_severity_min": "medium",
+        "child_risk": false,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Rubbish bags and litter dumped around a street litter bin."
+      },
+      "pred": {
+        "category": "waste_overflow_dumping",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "صندوق قمامة ممتلئ تحيط به أكياس سوداء ونفايات متناثرة تغطي الرصيف.",
+        "description_en": "A full public litter bin surrounded by black garbage bags and loose trash scattered across the sidewalk.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 935,
+              "x_min": 190,
+              "y_max": 885,
+              "y_min": 420
+            },
+            "kind": "sanitation",
+            "label": "piled garbage bags and scattered litter on sidewalk"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo appears to be a direct outdoor capture of the scene.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "sidewalk",
+        "severity_proposal": "medium",
+        "severity_reason_ar": "توجد أكياس قمامة ونفايات متناثرة على الرصيف حول صندوق ممتلئ، وهي مشكلة حقيقية لكن دون خطر إصابة فوري.",
+        "severity_reason_en": "Garbage bags and loose litter are spread across the sidewalk around a full bin, a real sanitation problem with limited immediate danger.",
+        "suggested_questions": [
+          "How long has the waste been piled up here?",
+          "Is the bin usually this full or overflowing?"
+        ],
+        "title_ar": "قمامة متراكمة حول صندوق ممتلئ",
+        "title_en": "Overflowing litter bin with scattered waste"
+      },
+      "final_priority": "medium",
+      "floor_applied": null,
+      "signals": [],
+      "latency_ms": 5777.507542050444,
+      "usage": {
+        "input_tokens": 2004,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 850,
+        "output_tokens_details": {
+          "reasoning_tokens": 498
+        },
+        "total_tokens": 2854
+      },
+      "cached": false
+    },
+    {
+      "file": "real/real_waste_overflow_dumping_3.jpg",
+      "label": {
+        "file": "real/real_waste_overflow_dumping_3.jpg",
+        "source": "commons",
+        "category": "waste_overflow_dumping",
+        "expected_severity_min": "medium",
+        "child_risk": true,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Fly-tipped fridge, furniture and debris in woodland (discarded fridge is an entrapment risk)."
+      },
+      "pred": {
+        "category": "waste_overflow_dumping",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "كومة كبيرة من النفايات المنزلية والأجهزة القديمة مثل الثلاجات والأثاث ملقاة على الأرض في منطقة كثيفة بالأشجار. تنتشر المخلفات والألواح الخشبية والأكياس على ممر ترابي.",
+        "description_en": "A large pile of household waste and old appliances such as refrigerators and furniture dumped on the ground in a vegetated area. Trash, wooden boards, and bags are scattered across a dirt path.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 895,
+              "x_min": 285,
+              "y_max": 760,
+              "y_min": 100
+            },
+            "kind": "sanitation",
+            "label": "Piled dumped appliances and household waste"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo shows natural outdoor detail with no screen or watermark signs.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "other",
+        "severity_proposal": "medium",
+        "severity_reason_ar": "الصورة تظهر تراكما كبيرا من النفايات والأجهزة المهملة يسبب تلوثا وخطر إصابة، دون خطر فوري على الحياة.",
+        "severity_reason_en": "Visible evidence shows a large accumulation of dumped waste and bulky items causing sanitation and injury risk, with no immediate life-threatening hazard visible.",
+        "suggested_questions": [
+          "Is the dumped waste blocking a walking path or access?",
+          "Have you noticed any recent additions to the pile?"
+        ],
+        "title_ar": "تراكم كبير للنفايات في منطقة حرجية",
+        "title_en": "Large illegal dump in wooded area"
+      },
+      "final_priority": "medium",
+      "floor_applied": null,
+      "signals": [],
+      "latency_ms": 10982.806624961086,
+      "usage": {
+        "input_tokens": 2112,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1666,
+        "output_tokens_details": {
+          "reasoning_tokens": 565
+        },
+        "total_tokens": 3778
+      },
+      "cached": false
+    },
+    {
+      "file": "real/real_waste_overflow_dumping_4.jpg",
+      "label": {
+        "file": "real/real_waste_overflow_dumping_4.jpg",
+        "source": "commons",
+        "category": "waste_overflow_dumping",
+        "expected_severity_min": "low",
+        "child_risk": false,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Single street bin filled to the top, minor overflow."
+      },
+      "pred": {
+        "category": "waste_overflow_dumping",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "سلة مهملات عامة ممتلئة حتى الأعلى وتخرج منها أكواب وأكياس بلاستيكية وبقايا طعام. توجد بعض المخلفات متناثرة على الأرض المرصوفة حول السلة.",
+        "description_en": "A public litter bin is overflowing with fast-food cups, plastic bags and other trash sticking out of the top. Some litter is scattered on the paved ground around the bin.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 975,
+              "x_min": 50,
+              "y_max": 320,
+              "y_min": 110
+            },
+            "kind": "sanitation",
+            "label": "overflowing trash"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo looks like a direct outdoor shot of the bin.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "sidewalk",
+        "severity_proposal": "medium",
+        "severity_reason_ar": "السلة ممتلئة وتفيض منها النفايات مع تناثر القمامة على الأرض، مما قد يسبب اتساخ المكان.",
+        "severity_reason_en": "The bin is full and overflowing with visible litter on the surrounding pavement, creating a sanitation nuisance.",
+        "suggested_questions": [
+          "How long has the bin been overflowing?",
+          "Are other nearby bins also full?"
+        ],
+        "title_ar": "سلة مهملات عامة ممتلئة",
+        "title_en": "Overflowing Public Litter Bin"
+      },
+      "final_priority": "medium",
+      "floor_applied": null,
+      "signals": [],
+      "latency_ms": 4800.358708016574,
+      "usage": {
+        "input_tokens": 1917,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 863,
+        "output_tokens_details": {
+          "reasoning_tokens": 494
+        },
+        "total_tokens": 2780
+      },
+      "cached": false
+    },
+    {
+      "file": "real/real_blocked_accessibility_1.jpg",
+      "label": {
+        "file": "real/real_blocked_accessibility_1.jpg",
+        "source": "commons",
+        "category": "blocked_accessibility",
+        "expected_severity_min": "medium",
+        "child_risk": false,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Car parked across the sidewalk at a driveway."
+      },
+      "pred": {
+        "category": "blocked_accessibility",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "سيارة سيدان فضية متوقفة بالكامل على الرصيف أمام بوابة منزل، وتسد ممر المشاة تماماً. سيضطر المشاة إلى النزول إلى طريق السيارات للمرور.",
+        "description_en": "A silver sedan is parked fully on the sidewalk in front of a gate, blocking the pedestrian path. Walkers would have to step onto the road to get past.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 498,
+              "x_min": 246,
+              "y_max": 689,
+              "y_min": 472
+            },
+            "kind": "traffic",
+            "label": "Car blocking sidewalk forcing pedestrians toward road"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo appears to be a direct daylight outdoor capture with no screen artifacts.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "sidewalk",
+        "severity_proposal": "medium",
+        "severity_reason_ar": "السيارة تحتل الرصيف بالكامل، مما يجبر المشاة على السير بجوار حركة المرور.",
+        "severity_reason_en": "The car fully occupies the sidewalk, forcing pedestrians to walk near or into the traffic lane.",
+        "suggested_questions": [
+          "How long has the car been parked on the sidewalk?",
+          "Does this blocking happen frequently here?"
+        ],
+        "title_ar": "سيارة تسد الرصيف",
+        "title_en": "Car parked blocking sidewalk"
+      },
+      "final_priority": "medium",
+      "floor_applied": null,
+      "signals": [],
+      "latency_ms": 7191.762792062946,
+      "usage": {
+        "input_tokens": 2112,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1311,
+        "output_tokens_details": {
+          "reasoning_tokens": 445
+        },
+        "total_tokens": 3423
+      },
+      "cached": false
+    },
+    {
+      "file": "real/real_blocked_accessibility_2.jpg",
+      "label": {
+        "file": "real/real_blocked_accessibility_2.jpg",
+        "source": "commons",
+        "category": "blocked_accessibility",
+        "expected_severity_min": "medium",
+        "child_risk": false,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Car parked up on the sidewalk, blocking pedestrian path."
+      },
+      "pred": {
+        "category": "blocked_accessibility",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "سيارة دفع رباعي زرقاء متوقفة جزئيا على الرصيف وتحجب مسار المشاة مع فتح باب السائق، بجانب سيارات متوقفة في شارع ضيق.",
+        "description_en": "A blue SUV is parked half on the sidewalk blocking the pedestrian path with its door open, alongside other parked cars on a narrow street.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 620,
+              "x_min": 282,
+              "y_max": 735,
+              "y_min": 540
+            },
+            "kind": "traffic",
+            "label": "vehicle blocking sidewalk forcing pedestrians into road"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo looks like a direct outdoor capture with no screen artifacts.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "sidewalk",
+        "severity_proposal": "medium",
+        "severity_reason_ar": "السيارة تشغل معظم عرض الرصيف وتجبر المشاة على النزول إلى طريق السيارات.",
+        "severity_reason_en": "The vehicle occupies most of the sidewalk width, forcing pedestrians to step into the traffic lane.",
+        "suggested_questions": [
+          "Is the vehicle still parked there now?",
+          "Can pedestrians pass or is the sidewalk fully blocked?"
+        ],
+        "title_ar": "سيارة تحجب رصيف المشاة",
+        "title_en": "Car parked blocking sidewalk"
+      },
+      "final_priority": "medium",
+      "floor_applied": null,
+      "signals": [],
+      "latency_ms": 5948.229500092566,
+      "usage": {
+        "input_tokens": 1968,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 1105,
+        "output_tokens_details": {
+          "reasoning_tokens": 762
+        },
+        "total_tokens": 3073
+      },
+      "cached": false
+    },
+    {
+      "file": "real/real_blocked_accessibility_3.jpg",
+      "label": {
+        "file": "real/real_blocked_accessibility_3.jpg",
+        "source": "commons",
+        "category": "blocked_accessibility",
+        "expected_severity_min": "medium",
+        "child_risk": false,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Cars parked on sidewalk over tactile paving for visually impaired."
+      },
+      "pred": {
+        "category": "blocked_accessibility",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "سيارة فضية متوقفة جزئيا على الرصيف المبلط وفوق شريط التحذير اللمسي، وتصطف سيارات أخرى على طول الحافة.",
+        "description_en": "A silver sedan is parked partly on the brick sidewalk over the tactile strip, with other cars lined along the curb blocking pedestrian passage.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 918,
+              "x_min": 265,
+              "y_max": 735,
+              "y_min": 320
+            },
+            "kind": "traffic",
+            "label": "Car parked on sidewalk blocking pedestrian path"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo looks like a direct live street photo.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "sidewalk",
+        "severity_proposal": "medium",
+        "severity_reason_ar": "السيارة تسد الرصيف وشريط التحذير اللمسي وقد تجبر المشاة على النزول إلى الطريق، دون خطر فوري ظاهر.",
+        "severity_reason_en": "The car covers the sidewalk and tactile strip and may force pedestrians toward the road, with no immediate injury visible.",
+        "suggested_questions": [
+          "Does this sidewalk parking happen regularly here?",
+          "Do pedestrians have to step onto the road to pass?"
+        ],
+        "title_ar": "سيارة تسد الرصيف",
+        "title_en": "Car parked blocking sidewalk access"
+      },
+      "final_priority": "medium",
+      "floor_applied": null,
+      "signals": [],
+      "latency_ms": 9547.819375060499,
+      "usage": {
+        "input_tokens": 2112,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1331,
+        "output_tokens_details": {
+          "reasoning_tokens": 493
+        },
+        "total_tokens": 3443
+      },
+      "cached": false
+    },
+    {
+      "file": "real/real_blocked_accessibility_4.jpg",
+      "label": {
+        "file": "real/real_blocked_accessibility_4.jpg",
+        "source": "commons",
+        "category": "blocked_accessibility",
+        "expected_severity_min": "low",
+        "child_risk": false,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Utility pole and parked motorcycles narrow the sidewalk."
+      },
+      "pred": {
+        "category": "blocked_accessibility",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "medium",
+        "description_ar": "تُظهر الصورة رصيفًا ضيقًا تشغله دراجات نارية متوقفة من جهة ونباتات كثيفة من الجهة الأخرى مع عمود في الوسط. الممر المتبقي للمشاة ضيق ويقترب من حافة الطريق.",
+        "description_en": "The photo shows a narrow sidewalk with parked motorcycles on one side, dense bushes on the other, and a utility pole in the middle. The remaining passage for pedestrians is very narrow near the road edge.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 1000,
+              "x_min": 528,
+              "y_max": 993,
+              "y_min": 505
+            },
+            "kind": "traffic",
+            "label": "motorcycles parked on sidewalk narrowing walkway"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo looks like a direct live street photo with no screen artifacts.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "sidewalk",
+        "severity_proposal": "medium",
+        "severity_reason_ar": "الدراجات والنباتات تضيق الرصيف بشكل واضح وقد تدفع المشاة نحو الطريق، لكن لا يوجد خطر سقوط فوري ظاهر.",
+        "severity_reason_en": "Motorcycles and bushes visibly narrow the sidewalk and may force pedestrians toward the road, but no immediate fall or injury is shown.",
+        "suggested_questions": [
+          "Do pedestrians have to step into the road to get past here?",
+          "Are the motorcycles usually parked on the sidewalk at this spot?"
+        ],
+        "title_ar": "دراجات تسد ممر الرصيف",
+        "title_en": "Motorcycles blocking narrow sidewalk passage"
+      },
+      "final_priority": "medium",
+      "floor_applied": null,
+      "signals": [],
+      "latency_ms": 11596.240125014447,
+      "usage": {
+        "input_tokens": 2112,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1230,
+        "output_tokens_details": {
+          "reasoning_tokens": 829
+        },
+        "total_tokens": 3342
+      },
+      "cached": false
+    },
+    {
+      "file": "real/real_water_leak_1.jpg",
+      "label": {
+        "file": "real/real_water_leak_1.jpg",
+        "source": "commons",
+        "category": "water_leak",
+        "expected_severity_min": "low",
+        "child_risk": false,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Water-leak repair excavation already barricaded with crew on site; puddles visible."
+      },
+      "pred": {
+        "category": "water_leak",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "يظهر في الشارع حفر في الطريق مع كومتي تراب وتدفق للمياه وتجمعها على الأرض. المنطقة محاطة بحواجز بلاستيكية زرقاء وحمراء مع وجود سيارات ومحلات في الخلفية.",
+        "description_en": "An excavated section of street with piles of soil and water bubbling up and pooling across the road. The area is enclosed by blue and red plastic barriers with parked cars and shops visible.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 900,
+              "x_min": 238,
+              "y_max": 712,
+              "y_min": 393
+            },
+            "kind": "other",
+            "label": "flooded excavation with flowing water"
+          },
+          {
+            "box": {
+              "x_max": 450,
+              "x_min": 128,
+              "y_max": 625,
+              "y_min": 368
+            },
+            "kind": "trip",
+            "label": "mounds of excavated soil and uneven ground"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo looks like a direct street scene with no screen or stock signs.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "street",
+        "severity_proposal": "medium",
+        "severity_reason_ar": "يوجد تسرب ماء نشط وحفر مكشوف مع أرض موحلة، لكن الموقع مطوق بالحواجز. خطر حقيقي مع خطر فوري محدود على المارة.",
+        "severity_reason_en": "Active water flow and open dug-up ground with muddy flooding are visible, but the area is fenced off by barriers. Real problem with limited immediate danger.",
+        "suggested_questions": [
+          "Is water still bubbling up from the ground?",
+          "Is the sidewalk still passable around the barriers?"
+        ],
+        "title_ar": "تسرب مياه مع حفر في الشارع",
+        "title_en": "Street water leak with road excavation"
+      },
+      "final_priority": "medium",
+      "floor_applied": null,
+      "signals": [],
+      "latency_ms": 4936.380750034004,
+      "usage": {
+        "input_tokens": 2112,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 963,
+        "output_tokens_details": {
+          "reasoning_tokens": 503
+        },
+        "total_tokens": 3075
+      },
+      "cached": false
+    },
+    {
+      "file": "real/real_water_leak_2.jpg",
+      "label": {
+        "file": "real/real_water_leak_2.jpg",
+        "source": "commons",
+        "category": "water_leak",
+        "expected_severity_min": "medium",
+        "child_risk": false,
+        "urgent": true,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Water main break flooding a residential street."
+      },
+      "pred": {
+        "category": "water_leak",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "يغطي ماء عكر راكد شارعًا سكنيًا والرصيف ويحيط بالسيارات وحاويات القمامة. يبدو أن تصريف المياه مسدود ولا يمكن رؤية سطح الطريق.",
+        "description_en": "Muddy standing water floods a residential street, sidewalk, and surrounds parked cars and waste bins. The road surface is submerged and drainage is not clearing the water.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 880,
+              "x_min": 0,
+              "y_max": 997,
+              "y_min": 348
+            },
+            "kind": "traffic",
+            "label": "Flooded roadway"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo looks like a direct live capture of the flooded street.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "residential",
+        "severity_proposal": "high",
+        "severity_reason_ar": "الشارع مغمور بالمياه مما يعيق حركة السيارات والمشاة وقد يخفي مخاطر في الطريق.",
+        "severity_reason_en": "The street is submerged and impassable in places, blocking cars and pedestrians and possibly hiding road hazards.",
+        "suggested_questions": [
+          "How deep is the water at the deepest point?",
+          "Is the water level still rising or starting to drain?"
+        ],
+        "title_ar": "شارع سكني مغمور بالمياه",
+        "title_en": "Flooded residential street blocking road"
+      },
+      "final_priority": "high",
+      "floor_applied": null,
+      "signals": [],
+      "latency_ms": 6396.792500047013,
+      "usage": {
+        "input_tokens": 2004,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1107,
+        "output_tokens_details": {
+          "reasoning_tokens": 691
+        },
+        "total_tokens": 3111
+      },
+      "cached": false
+    },
+    {
+      "file": "real/real_water_leak_3.jpg",
+      "label": {
+        "file": "real/real_water_leak_3.jpg",
+        "source": "commons",
+        "category": "water_leak",
+        "expected_severity_min": "low",
+        "child_risk": false,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Water from a burst pipe running along an unpaved street; subtle."
+      },
+      "pred": {
+        "category": "not_an_issue",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "medium",
+        "description_ar": "شارع سكني مشمس تصطف على جانبيه منازل ملونة وطريق ترابي. لا يظهر تلف واضح أو انسداد أو خطر باستثناء بقعة أرض رطبة صغيرة.",
+        "description_en": "A sunlit residential street lined with colorful houses and an unpaved road. No clear damage, blockage, or hazard is visible apart from a small patch of damp ground.",
+        "hazards": [],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Daylight photo of a street with no obvious manipulation.",
+          "shows_reported_issue": false
+        },
+        "scene_type": "residential",
+        "severity_proposal": "low",
+        "severity_reason_ar": "لا توجد مشكلة واضحة أو خطر فوري ظاهر في الصورة.",
+        "severity_reason_en": "No clear problem or immediate danger is visible in the photo.",
+        "suggested_questions": [],
+        "title_ar": "شارع سكني هادئ بلا مشكلة",
+        "title_en": "Quiet residential street with no issue"
+      },
+      "final_priority": "low",
+      "floor_applied": null,
+      "signals": [
+        "not_an_issue"
+      ],
+      "latency_ms": 9594.19958293438,
+      "usage": {
+        "input_tokens": 2040,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1555,
+        "output_tokens_details": {
+          "reasoning_tokens": 859
+        },
+        "total_tokens": 3595
+      },
+      "cached": false
+    },
+    {
+      "file": "real/real_not_an_issue_1.jpg",
+      "label": {
+        "file": "real/real_not_an_issue_1.jpg",
+        "source": "commons",
+        "category": "not_an_issue",
+        "expected_severity_min": "low",
+        "child_risk": false,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Cup of coffee on a cafe table. Irrelevant object; should be rejected."
+      },
+      "pred": {
+        "category": "not_an_issue",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "فنجان أبيض من القهوة بالحليب موضوع على طبق مع ملعقة وقطعة بسكويت على طاولة خشبية. لا تظهر أي مشكلة عامة أو خطر في الصورة.",
+        "description_en": "A white cup of frothy coffee on a saucer with a spoon and small biscuit on a wooden table. No public issue or hazard is visible.",
+        "hazards": [],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo shows only a beverage close-up with no neighbourhood context.",
+          "shows_reported_issue": false
+        },
+        "scene_type": "other",
+        "severity_proposal": "low",
+        "severity_reason_ar": "لا يوجد أي خطر أو مشكلة عامة ظاهرة، فقط فنجان قهوة على طاولة.",
+        "severity_reason_en": "No hazard or public issue is visible, only a cup of coffee on a table.",
+        "suggested_questions": [],
+        "title_ar": "فنجان قهوة على طاولة",
+        "title_en": "Cup of coffee on table"
+      },
+      "final_priority": "low",
+      "floor_applied": null,
+      "signals": [
+        "not_an_issue"
+      ],
+      "latency_ms": 6684.840207919478,
+      "usage": {
+        "input_tokens": 2509,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1037,
+        "output_tokens_details": {
+          "reasoning_tokens": 312
+        },
+        "total_tokens": 3546
+      },
+      "cached": false
+    },
+    {
+      "file": "real/real_other_1.jpg",
+      "label": {
+        "file": "real/real_other_1.jpg",
+        "source": "commons",
+        "category": "other",
+        "expected_severity_min": "low",
+        "child_risk": false,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Park bench with seat slats missing (damaged street furniture)."
+      },
+      "pred": {
+        "category": "other",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "يظهر في الصورة هيكلان حديديان لمقعد في حديقة بجانب ممر مرصوف، بدون ألواح خشبية للمقعد أو الظهر، مما يجعل المقعد غير صالح للاستخدام.",
+        "description_en": "Two cast-iron bench frames stand on a paved path in a grassy area with all wooden seat and back slats missing, leaving the bench unusable.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 384,
+              "x_min": 158,
+              "y_max": 678,
+              "y_min": 128
+            },
+            "kind": "other",
+            "label": "Bench frame with missing seat and back slats"
+          },
+          {
+            "box": {
+              "x_max": 926,
+              "x_min": 670,
+              "y_max": 920,
+              "y_min": 285
+            },
+            "kind": "other",
+            "label": "Bench frame with missing seat and back slats"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Clear daylight outdoor photo showing the damaged benches directly.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "park",
+        "severity_proposal": "medium",
+        "severity_reason_ar": "المقعد مكسور وغير صالح للاستخدام، وقد يتعرض من يحاول الجلوس للسقوط أو الإصابة من الهيكل الحديدي.",
+        "severity_reason_en": "The benches have no seats and cannot be used, and the exposed metal frames could cause a fall or injury if someone tries to sit.",
+        "suggested_questions": [
+          "How long have the benches been in this condition?",
+          "Are there other damaged benches nearby?"
+        ],
+        "title_ar": "هياكل مقعد حديقة مكسورة",
+        "title_en": "Broken park bench frames"
+      },
+      "final_priority": "medium",
+      "floor_applied": null,
+      "signals": [],
+      "latency_ms": 5474.610334029421,
+      "usage": {
+        "input_tokens": 2004,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1144,
+        "output_tokens_details": {
+          "reasoning_tokens": 717
+        },
+        "total_tokens": 3148
+      },
+      "cached": false
+    },
+    {
+      "file": "real/real_not_an_issue_3.jpg",
+      "label": {
+        "file": "real/real_not_an_issue_3.jpg",
+        "source": "commons",
+        "category": "not_an_issue",
+        "expected_severity_min": "low",
+        "child_risk": false,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Intact outdoor fitness bars in a park. Hard negative for fitness category."
+      },
+      "pred": {
+        "category": "not_an_issue",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "أعمدة تمارين رياضية خضراء منصوبة على أرضية من نشارة الخشب بجانب ممر وتحيط بها الأشجار. لا يظهر أي تلف أو خطر في الصورة.",
+        "description_en": "Green metal pull-up and parallel bars stand on wood-chip surfacing beside a path with trees behind. No damage or hazard is visible.",
+        "hazards": [],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Live outdoor photo with no screen or stock signs.",
+          "shows_reported_issue": false
+        },
+        "scene_type": "park",
+        "severity_proposal": "low",
+        "severity_reason_ar": "المعدات تبدو ثابتة وسليمة ولا يوجد ضرر ظاهر. لا يوجد خطر يتطلب التدخل.",
+        "severity_reason_en": "Equipment looks upright and intact with no visible damage. No hazard requiring action is seen.",
+        "suggested_questions": [],
+        "title_ar": "أعمدة تمارين سليمة في حديقة",
+        "title_en": "Intact park exercise bars"
+      },
+      "final_priority": "low",
+      "floor_applied": null,
+      "signals": [
+        "not_an_issue"
+      ],
+      "latency_ms": 5814.214333076961,
+      "usage": {
+        "input_tokens": 1917,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 853,
+        "output_tokens_details": {
+          "reasoning_tokens": 608
+        },
+        "total_tokens": 2770
+      },
+      "cached": false
+    },
+    {
+      "file": "real/real_not_an_issue_2.jpg",
+      "label": {
+        "file": "real/real_not_an_issue_2.jpg",
+        "source": "commons",
+        "category": "not_an_issue",
+        "expected_severity_min": "low",
+        "child_risk": false,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Well-kept, intact playground. Hard negative for playground category."
+      },
+      "pred": {
+        "category": "not_an_issue",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "ملعب نظيف يضم زلاقات وهياكل للتسلق ومظلات وأرضية مطاطية، وكلها تبدو سليمة. لا يوجد تلف أو خطر ظاهر في الصورة.",
+        "description_en": "A clean playground with slides, climbing structures, shade sails and rubber surfacing, all appearing intact. People are in the background and no damage or hazard is visible.",
+        "hazards": [],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Live photo of a playground with no visible issue.",
+          "shows_reported_issue": false
+        },
+        "scene_type": "playground",
+        "severity_proposal": "low",
+        "severity_reason_ar": "المعدات والأرضية تبدو سليمة بدون تلف ظاهر أو خطر فوري.",
+        "severity_reason_en": "Equipment and surfacing look intact with no visible damage or immediate danger.",
+        "suggested_questions": [],
+        "title_ar": "ملعب سليم بدون أضرار",
+        "title_en": "Well-maintained playground with no damage"
+      },
+      "final_priority": "low",
+      "floor_applied": null,
+      "signals": [
+        "not_an_issue"
+      ],
+      "latency_ms": 9934.291542042047,
+      "usage": {
+        "input_tokens": 2112,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1315,
+        "output_tokens_details": {
+          "reasoning_tokens": 632
+        },
+        "total_tokens": 3427
+      },
+      "cached": false
+    },
+    {
+      "file": "generated/syn_playground_springrider.jpg",
+      "label": {
+        "file": "generated/syn_playground_springrider.jpg",
+        "source": "synthetic",
+        "category": "playground_equipment",
+        "expected_severity_min": "high",
+        "child_risk": true,
+        "urgent": true,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "HERO demo case. Spring rider with snapped seat exposing a sharp jagged metal edge at child sitting height."
+      },
+      "pred": {
+        "category": "playground_equipment",
+        "child_present": false,
+        "child_use_equipment": true,
+        "confidence": "high",
+        "description_ar": "حصان هزاز على نابض في ملعب خارجي وجسمه البلاستيكي مكسور من المنتصف. يظهر من داخل الكسر قطعة معدنية صدئة وحادة وحواف بلاستيكية متشققة.",
+        "description_en": "A spring-mounted horse rider in an outdoor playground with its plastic body broken open in the middle. A rusted metal support is exposed inside the break with jagged plastic edges.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 565,
+              "x_min": 270,
+              "y_max": 580,
+              "y_min": 395
+            },
+            "kind": "sharp_edge",
+            "label": "exposed rusted metal and broken plastic"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Live outdoor photo clearly showing damaged playground equipment.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "playground",
+        "severity_proposal": "critical",
+        "severity_reason_ar": "جسم اللعبة المكسور يكشف عن معدن صدئ حاد وحواف بلاستيكية مكسورة قد تسبب جروحا خطيرة للأطفال.",
+        "severity_reason_en": "Broken child rider exposes a rusted metal spike and jagged plastic that could cause serious cuts.",
+        "suggested_questions": [
+          "Is this rider still accessible to children or fenced off?",
+          "Are other nearby play structures also damaged?"
+        ],
+        "title_ar": "حصان هزاز مكسور بمعدن مكشوف",
+        "title_en": "Broken spring rider with exposed metal"
+      },
+      "final_priority": "critical",
+      "floor_applied": "CRITICAL — child safety",
+      "signals": [
+        "child_equipment_hazard",
+        "location_playground"
+      ],
+      "latency_ms": 6335.878667072393,
+      "usage": {
+        "input_tokens": 2004,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 938,
+        "output_tokens_details": {
+          "reasoning_tokens": 494
+        },
+        "total_tokens": 2942
+      },
+      "cached": false
+    },
+    {
+      "file": "generated/syn_fitness_equipment_1.jpg",
+      "label": {
+        "file": "generated/syn_fitness_equipment_1.jpg",
+        "source": "synthetic",
+        "category": "fitness_equipment",
+        "expected_severity_min": "medium",
+        "child_risk": true,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Air-walker with snapped footplate and exposed broken metal stub."
+      },
+      "pred": {
+        "category": "fitness_equipment",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "جهاز مشي للياقة الخارجية باللونين الأخضر والأصفر تالف حيث انفصلت إحدى دواساته وهي ملقاة على الأرض، ونهاية الذراع المعدنية مكسورة ومكشوفة.",
+        "description_en": "A green and yellow outdoor fitness walker with one foot pedal detached and lying on the sand, and the metal arm end broken and exposed.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 815,
+              "x_min": 610,
+              "y_max": 685,
+              "y_min": 190
+            },
+            "kind": "sharp_edge",
+            "label": "Broken metal arm with exposed end"
+          },
+          {
+            "box": {
+              "x_max": 920,
+              "x_min": 720,
+              "y_max": 950,
+              "y_min": 855
+            },
+            "kind": "trip",
+            "label": "Detached foot pedal on ground"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo looks like a direct outdoor capture with no screen or stock artifacts.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "park",
+        "severity_proposal": "high",
+        "severity_reason_ar": "الدواسة منفصلة على الأرض ونهاية الذراع المعدنية مكشوفة، مما قد يسبب السقوط أو الجرح عند الاستخدام.",
+        "severity_reason_en": "One pedal is detached on the ground and the metal arm end is exposed, creating a likely fall and cut risk if used.",
+        "suggested_questions": [
+          "Is the main frame loose or wobbly at the base?",
+          "How long has the pedal been detached?"
+        ],
+        "title_ar": "جهاز لياقة مكسور في الحديقة",
+        "title_en": "Broken Outdoor Fitness Walker in Park"
+      },
+      "final_priority": "high",
+      "floor_applied": null,
+      "signals": [],
+      "latency_ms": 12185.458208085038,
+      "usage": {
+        "input_tokens": 2509,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1904,
+        "output_tokens_details": {
+          "reasoning_tokens": 873
+        },
+        "total_tokens": 4413
+      },
+      "cached": false
+    },
+    {
+      "file": "generated/syn_open_manhole_1.jpg",
+      "label": {
+        "file": "generated/syn_open_manhole_1.jpg",
+        "source": "synthetic",
+        "category": "open_manhole",
+        "expected_severity_min": "critical",
+        "child_risk": true,
+        "urgent": true,
+        "plausible": true,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Missing manhole cover on a sidewalk, no barrier."
+      },
+      "pred": {
+        "category": "open_manhole",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "فتحة منهول دائرية مكشوفة بدون غطاء في وسط رصيف مرصوف بجانب شارع سكني.",
+        "description_en": "An uncovered circular manhole opening in the middle of a paved sidewalk along a residential street.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 615,
+              "x_min": 320,
+              "y_max": 795,
+              "y_min": 705
+            },
+            "kind": "fall",
+            "label": "Open manhole"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo looks like a direct live capture of the sidewalk.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "sidewalk",
+        "severity_proposal": "critical",
+        "severity_reason_ar": "الفتحة المكشوفة عميقة ومفتوحة تماما في ممر المشاة وقد يسقط فيها أي شخص.",
+        "severity_reason_en": "The deep hole is fully uncovered in the walking path where anyone could fall in.",
+        "suggested_questions": [
+          "Is the manhole cover missing nearby or completely gone?",
+          "Has anyone placed any warning or barrier around the hole?"
+        ],
+        "title_ar": "فتحة منهول مفتوحة على الرصيف",
+        "title_en": "Open Manhole on Sidewalk"
+      },
+      "final_priority": "critical",
+      "floor_applied": "CRITICAL — open manhole",
+      "signals": [
+        "open_manhole"
+      ],
+      "latency_ms": 6450.340290903114,
+      "usage": {
+        "input_tokens": 2509,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1149,
+        "output_tokens_details": {
+          "reasoning_tokens": 448
+        },
+        "total_tokens": 3658
+      },
+      "cached": false
+    },
+    {
+      "file": "generated/syn_fake_screen_pothole.jpg",
+      "label": {
+        "file": "generated/syn_fake_screen_pothole.jpg",
+        "source": "synthetic",
+        "category": "pothole_pavement",
+        "expected_severity_min": "low",
+        "child_risk": false,
+        "urgent": false,
+        "plausible": false,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Photo of a laptop screen showing a pothole (moire, bezel). Should be rejected as not a first-hand photo."
+      },
+      "pred": {
+        "category": "pothole_pavement",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "low",
+        "description_ar": "تُظهر الصورة جهاز لابتوب داخل مكان مغلق، وتعرض شاشته صورة لحفرة في سطح إسفلتي. لا يظهر الموقع الفعلي مباشرة في هذه الصورة.",
+        "description_en": "The photo shows a laptop indoors whose screen displays an image of a pothole in asphalt. The actual road location is not directly visible, only the screen reproduction.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 690,
+              "x_min": 310,
+              "y_max": 630,
+              "y_min": 310
+            },
+            "kind": "trip",
+            "label": "pothole in pavement shown on screen"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": true,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo is of a laptop screen showing a pothole, not a direct live view of the road.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "other",
+        "severity_proposal": "medium",
+        "severity_reason_ar": "الشاشة تعرض حفرة واضحة في الاسفلت قد تشكل خطر تعثر. التقييم محدود لأن الصورة غير مباشرة.",
+        "severity_reason_en": "Screen shows a distinct pothole in asphalt that could cause tripping or vehicle damage. Assessment is limited because it is a photo of a screen, not a direct view.",
+        "suggested_questions": [
+          "Can you upload the original photo taken at the pothole location?",
+          "What is the exact street or landmark where this pothole is?"
+        ],
+        "title_ar": "حفرة طريق ظاهرة على شاشة",
+        "title_en": "Road pothole shown on laptop screen"
+      },
+      "final_priority": "medium",
+      "floor_applied": null,
+      "signals": [],
+      "latency_ms": 11375.845124945045,
+      "usage": {
+        "input_tokens": 2509,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1783,
+        "output_tokens_details": {
+          "reasoning_tokens": 860
+        },
+        "total_tokens": 4292
+      },
+      "cached": false
+    },
+    {
+      "file": "generated/syn_fake_printed_photo.jpg",
+      "label": {
+        "file": "generated/syn_fake_printed_photo.jpg",
+        "source": "synthetic",
+        "category": "waste_overflow_dumping",
+        "expected_severity_min": "low",
+        "child_risk": false,
+        "urgent": false,
+        "plausible": false,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Hand holding a printed photo of an overflowing bin. Should be rejected."
+      },
+      "pred": {
+        "category": "waste_overflow_dumping",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "low",
+        "description_ar": "يد تمسك صورة مطبوعة على طاولة خشبية. تُظهر الصورة المطبوعة سلة مهملات فائضة بالأكواب والنفايات مع قمامة متناثرة حول قاعدتها.",
+        "description_en": "A hand holds a printed photo on a wooden table. The print shows a street litter bin overflowing with cups and packaging with trash scattered around its base.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 780,
+              "x_min": 290,
+              "y_max": 868,
+              "y_min": 285
+            },
+            "kind": "sanitation",
+            "label": "overflowing bin with scattered litter"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": true,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "The live photo shows a hand holding a small print with paper edges and glare, not a direct street scene.",
+          "shows_reported_issue": false
+        },
+        "scene_type": "other",
+        "severity_proposal": "low",
+        "severity_reason_ar": "المشهد المباشر هو داخل المنزل بلا خطر مباشر، والقمامة تظهر فقط داخل الصورة المطبوعة.",
+        "severity_reason_en": "The live view is indoors with no direct hazard, the overflow is only visible inside the held print.",
+        "suggested_questions": [
+          "Can you take a live photo of the bin at its street location?",
+          "Is the overflowing bin still there now?"
+        ],
+        "title_ar": "سلة فائضة في صورة مطبوعة",
+        "title_en": "Overflowing litter bin in printed photo"
+      },
+      "final_priority": "low",
+      "floor_applied": null,
+      "signals": [],
+      "latency_ms": 11055.137707968242,
+      "usage": {
+        "input_tokens": 2509,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 2022,
+        "output_tokens_details": {
+          "reasoning_tokens": 1110
+        },
+        "total_tokens": 4531
+      },
+      "cached": false
+    },
+    {
+      "file": "generated/syn_fake_stock_watermark.jpg",
+      "label": {
+        "file": "generated/syn_fake_stock_watermark.jpg",
+        "source": "synthetic",
+        "category": "playground_equipment",
+        "expected_severity_min": "low",
+        "child_risk": false,
+        "urgent": false,
+        "plausible": false,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Stock-photo look with SAMPLE PREVIEW watermark. Should be rejected."
+      },
+      "pred": {
+        "category": "playground_equipment",
+        "child_present": false,
+        "child_use_equipment": true,
+        "confidence": "high",
+        "description_ar": "يظهر مقعد أرجوحة ممزق في المنتصف بحواف مسننة، وقطعة منه ساقطة على الأرض في ملعب أطفال.",
+        "description_en": "A swing seat in a playground is torn in half with jagged edges, and a piece of it lies on the ground below.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 960,
+              "x_min": 108,
+              "y_max": 867,
+              "y_min": 371
+            },
+            "kind": "fall",
+            "label": "broken swing seat with jagged edges"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": true,
+          "notes": "Image has sample watermark overlays and a preview-only banner.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "playground",
+        "severity_proposal": "high",
+        "severity_reason_ar": "مقعد الأرجوحة ممزق تماما بحواف حادة وقطعة ساقطة أسفله، مما قد يسبب سقوط أو إصابة طفل عند الاستخدام.",
+        "severity_reason_en": "The swing seat is torn in half with jagged edges and a fallen piece below, which could cause a fall or injury if used.",
+        "suggested_questions": [
+          "Is this the only damaged swing in the playground?",
+          "Is the swing area currently fenced off or still open for use?"
+        ],
+        "title_ar": "مقعد أرجوحة مكسور في ملعب",
+        "title_en": "Broken Swing Seat in Playground"
+      },
+      "final_priority": "critical",
+      "floor_applied": "CRITICAL — child safety",
+      "signals": [
+        "child_equipment_hazard",
+        "location_playground"
+      ],
+      "latency_ms": 9185.74504100252,
+      "usage": {
+        "input_tokens": 2509,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1298,
+        "output_tokens_details": {
+          "reasoning_tokens": 462
+        },
+        "total_tokens": 3807
+      },
+      "cached": false
+    },
+    {
+      "file": "generated/syn_fake_cartoon_pothole.jpg",
+      "label": {
+        "file": "generated/syn_fake_cartoon_pothole.jpg",
+        "source": "synthetic",
+        "category": "pothole_pavement",
+        "expected_severity_min": "low",
+        "child_risk": false,
+        "urgent": false,
+        "plausible": false,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Cartoon illustration of a pothole. Should be rejected."
+      },
+      "pred": {
+        "category": "not_an_issue",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "الصورة رسم كرتوني وليست صورة حقيقية، وتُظهر سيارة حمراء تقفز فوق حفرة في الطريق.",
+        "description_en": "The image is a cartoon illustration, not a real photo, showing a red car jumping over a pothole in a road.",
+        "hazards": [],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Cartoon illustration, not a live photograph of a real place.",
+          "shows_reported_issue": false
+        },
+        "scene_type": "street",
+        "severity_proposal": "low",
+        "severity_reason_ar": "لا توجد مشكلة حقيقية ظاهرة لأن الصورة رسم كرتوني وليست مشهدا واقعيا.",
+        "severity_reason_en": "No real issue is visible because the image is a cartoon illustration, not a real scene.",
+        "suggested_questions": [],
+        "title_ar": "رسم كرتوني لا يظهر مشكلة حقيقية",
+        "title_en": "Cartoon drawing with no real issue"
+      },
+      "final_priority": "low",
+      "floor_applied": null,
+      "signals": [
+        "not_an_issue"
+      ],
+      "latency_ms": 4964.364874991588,
+      "usage": {
+        "input_tokens": 2509,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 990,
+        "output_tokens_details": {
+          "reasoning_tokens": 718
+        },
+        "total_tokens": 3499
+      },
+      "cached": false
+    },
+    {
+      "file": "generated/syn_fake_meme.jpg",
+      "label": {
+        "file": "generated/syn_fake_meme.jpg",
+        "source": "synthetic",
+        "category": "pothole_pavement",
+        "expected_severity_min": "low",
+        "child_risk": false,
+        "urgent": false,
+        "plausible": false,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Meme with Impact text over a flooded pothole. Should be rejected."
+      },
+      "pred": {
+        "category": "pothole_pavement",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "medium",
+        "description_ar": "حفرة كبيرة ممتلئة بمياه المطر في وسط طريق أسفلتي مبلل، وتطفو فوقها لعبة بطة صفراء، وتظهر سيارة في الخلفية.",
+        "description_en": "A large pothole filled with rainwater sits in a wet asphalt road with a yellow toy duck floating in it, and a car visible in the background.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 998,
+              "x_min": 5,
+              "y_max": 862,
+              "y_min": 307
+            },
+            "kind": "traffic",
+            "label": "large water-filled pothole on roadway"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": true,
+          "notes": "Image has large meme text overlays and a staged toy duck, suggesting an edited or shared image.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "street",
+        "severity_proposal": "high",
+        "severity_reason_ar": "الحفرة كبيرة وممتلئة بالماء وتشغل جزءا من الطريق وتظهر سيارة قادمة خلفها.",
+        "severity_reason_en": "The pothole is large, full of water and covers part of the driving lane with a car approaching in the background.",
+        "suggested_questions": [
+          "Is this pothole still full of water at the moment?",
+          "Have any vehicles had difficulty passing this spot?"
+        ],
+        "title_ar": "حفرة ممتلئة بالماء في الطريق",
+        "title_en": "Water-filled pothole on wet road"
+      },
+      "final_priority": "high",
+      "floor_applied": null,
+      "signals": [],
+      "latency_ms": 10594.197082915343,
+      "usage": {
+        "input_tokens": 2509,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1579,
+        "output_tokens_details": {
+          "reasoning_tokens": 736
+        },
+        "total_tokens": 4088
+      },
+      "cached": false
+    },
+    {
+      "file": "generated/syn_fake_unrelated.jpg",
+      "label": {
+        "file": "generated/syn_fake_unrelated.jpg",
+        "source": "synthetic",
+        "category": "not_an_issue",
+        "expected_severity_min": "low",
+        "child_risk": false,
+        "urgent": false,
+        "plausible": false,
+        "pair_id": null,
+        "pair_role": null,
+        "fixed": null,
+        "notes": "Food photo, unrelated to any civic issue. Should be rejected."
+      },
+      "pred": {
+        "category": "not_an_issue",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "تُظهر الصورة طبق أرز مع دجاج مشوي وكوب مشروب أبيض على طاولة. لا يوجد أي خطر عام أو مشكلة في الحي ظاهرة في الصورة.",
+        "description_en": "The photo shows a plate of rice with roasted chicken and a glass of white drink on a table. No public hazard or neighbourhood issue is visible.",
+        "hazards": [],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo shows a normal indoor meal with no issue.",
+          "shows_reported_issue": false
+        },
+        "scene_type": "other",
+        "severity_proposal": "low",
+        "severity_reason_ar": "لا يظهر أي خطر، فقط طعام مقدم على طاولة مطعم.",
+        "severity_reason_en": "No hazard is visible, only prepared food on a restaurant table.",
+        "suggested_questions": [],
+        "title_ar": "طبق طعام مع مشروب على الطاولة",
+        "title_en": "Plate of food with drink on table"
+      },
+      "final_priority": "low",
+      "floor_applied": null,
+      "signals": [
+        "not_an_issue"
+      ],
+      "latency_ms": 4346.339207957499,
+      "usage": {
+        "input_tokens": 2509,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 728,
+        "output_tokens_details": {
+          "reasoning_tokens": 466
+        },
+        "total_tokens": 3237
+      },
+      "cached": false
+    },
+    {
+      "file": "generated/syn_pair1_before.jpg",
+      "label": {
+        "file": "generated/syn_pair1_before.jpg",
+        "source": "synthetic",
+        "category": "waste_overflow_dumping",
+        "expected_severity_min": "medium",
+        "child_risk": false,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": "pair1",
+        "pair_role": "before",
+        "fixed": null,
+        "notes": "Overflowing communal bins with bags piled around."
+      },
+      "pred": {
+        "category": "waste_overflow_dumping",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "حاويتان خضراوان ممتلئتان تماما تفيض منهما أكياس النفايات، مع أكياس وقمامة متناثرة على الرصيف وحافة الطريق في منطقة سكنية.",
+        "description_en": "Two green dumpsters are completely overflowing with garbage bags, with many more bags and loose litter piled and scattered on the sidewalk and curb in a residential area.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 1000,
+              "x_min": 120,
+              "y_max": 775,
+              "y_min": 230
+            },
+            "kind": "sanitation",
+            "label": "overflowing bins and scattered waste bags"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo shows natural outdoor light and a real street scene.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "residential",
+        "severity_proposal": "medium",
+        "severity_reason_ar": "الحاويات فائضة والنفايات متراكمة على الرصيف مع تناثر القمامة، لكن لا يوجد خطر إصابة فوري ظاهر.",
+        "severity_reason_en": "Bins are overflowing with bags piled on the ground and litter scattered, but no immediate injury risk is visible.",
+        "suggested_questions": [
+          "How long have the bins been in this overflowing state?",
+          "Is waste collection regularly missed at this spot?"
+        ],
+        "title_ar": "حاويات ممتلئة ونفايات على الرصيف",
+        "title_en": "Overflowing bins with trash on sidewalk"
+      },
+      "final_priority": "medium",
+      "floor_applied": null,
+      "signals": [],
+      "latency_ms": 4784.926790976897,
+      "usage": {
+        "input_tokens": 2509,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1024,
+        "output_tokens_details": {
+          "reasoning_tokens": 636
+        },
+        "total_tokens": 3533
+      },
+      "cached": false
+    },
+    {
+      "file": "generated/syn_pair1_after.jpg",
+      "label": {
+        "file": "generated/syn_pair1_after.jpg",
+        "source": "synthetic",
+        "category": "waste_overflow_dumping",
+        "expected_severity_min": "low",
+        "child_risk": false,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": "pair1",
+        "pair_role": "after",
+        "fixed": false,
+        "notes": "BAD FIX: bins emptied but bags still visible at the left edge."
+      },
+      "pred": {
+        "category": "waste_overflow_dumping",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "medium",
+        "description_ar": "ثلاث حاويات خضراء مغلقة على الرصيف، وبجانبها كيسان أسودان مربوطان وكرتون موضوعان على الأرض.",
+        "description_en": "Three closed green bins on the sidewalk, with two tied black bags and cardboard placed on the pavement beside them.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 320,
+              "x_min": 115,
+              "y_max": 555,
+              "y_min": 418
+            },
+            "kind": "sanitation",
+            "label": "waste bags and cardboard on pavement"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Live outdoor photo with no screen or stock artifacts.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "residential",
+        "severity_proposal": "low",
+        "severity_reason_ar": "النفايات موجودة خارج الحاويات على الرصيف لكنها مغلقة ومرتبة ولا يوجد تناثر أو انسكاب ظاهر.",
+        "severity_reason_en": "Waste is placed outside the bins on the pavement, but bins are closed and bags are tied with no visible spill.",
+        "suggested_questions": [
+          "How long have the bags and cardboard been left there?",
+          "Is this the usual collection spot for these bins?"
+        ],
+        "title_ar": "أكياس نفايات بجانب الحاويات",
+        "title_en": "Waste bags left beside bins"
+      },
+      "final_priority": "low",
+      "floor_applied": null,
+      "signals": [],
+      "latency_ms": 7823.619749979116,
+      "usage": {
+        "input_tokens": 2509,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1365,
+        "output_tokens_details": {
+          "reasoning_tokens": 1013
+        },
+        "total_tokens": 3874
+      },
+      "cached": false
+    },
+    {
+      "file": "generated/syn_pair2_before.jpg",
+      "label": {
+        "file": "generated/syn_pair2_before.jpg",
+        "source": "synthetic",
+        "category": "pothole_pavement",
+        "expected_severity_min": "medium",
+        "child_risk": false,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": "pair2",
+        "pair_role": "before",
+        "fixed": null,
+        "notes": "Large pothole near the kerb."
+      },
+      "pred": {
+        "category": "pothole_pavement",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "توجد حفرة كبيرة وعميقة في الأسفلت على حافة الطريق بجانب الرصيف في شارع سكني. حافة الحفرة متكسرة وقاعها مليء بالحصى.",
+        "description_en": "A large deep pothole has opened in the asphalt at the edge of the road next to the sidewalk in a residential street. The edges are broken and the base is filled with loose gravel.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 690,
+              "x_min": 265,
+              "y_max": 785,
+              "y_min": 570
+            },
+            "kind": "traffic",
+            "label": "large deep pothole in road"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo looks like a direct live capture of the street.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "residential",
+        "severity_proposal": "high",
+        "severity_reason_ar": "الحفرة كبيرة وعميقة وتقع في مسار المركبات وقد تسبب تلف الإطارات أو حادثا للمشاة.",
+        "severity_reason_en": "The hole is large and deep in the vehicle path and could damage tires or cause a crash or fall.",
+        "suggested_questions": [
+          "How long has the pothole been there?",
+          "Has it grown larger recently?"
+        ],
+        "title_ar": "حفرة كبيرة على حافة الشارع",
+        "title_en": "Large pothole on residential street edge"
+      },
+      "final_priority": "high",
+      "floor_applied": null,
+      "signals": [],
+      "latency_ms": 9086.073874961585,
+      "usage": {
+        "input_tokens": 2509,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1446,
+        "output_tokens_details": {
+          "reasoning_tokens": 580
+        },
+        "total_tokens": 3955
+      },
+      "cached": false
+    },
+    {
+      "file": "generated/syn_pair2_after.jpg",
+      "label": {
+        "file": "generated/syn_pair2_after.jpg",
+        "source": "synthetic",
+        "category": "pothole_pavement",
+        "expected_severity_min": "medium",
+        "child_risk": false,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": "pair2",
+        "pair_role": "after",
+        "fixed": false,
+        "notes": "BAD FIX: pothole only half filled."
+      },
+      "pred": {
+        "category": "pothole_pavement",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "توجد حفرة كبيرة على حافة الطريق الأسفلتي بجانب الرصيف، نصفها مملوء بالإسفلت والنصف الآخر مكشوف يظهر الحصى.",
+        "description_en": "A large pothole on the edge of an asphalt road beside the sidewalk, half filled with loose asphalt and half open showing gravel.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 713,
+              "x_min": 268,
+              "y_max": 756,
+              "y_min": 573
+            },
+            "kind": "traffic",
+            "label": "Large open pothole"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo appears to be a direct outdoor capture of the street.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "street",
+        "severity_proposal": "high",
+        "severity_reason_ar": "الحفرة كبيرة ومكشوفة على حافة الطريق وقد تسبب ضررا للمركبات أو حوادث قريبا.",
+        "severity_reason_en": "The hole is large and still open on the road edge where vehicles pass, risking tire damage or a crash.",
+        "suggested_questions": [
+          "Is the hole getting larger over time?",
+          "Have any vehicles hit this pothole recently?"
+        ],
+        "title_ar": "حفرة كبيرة في شارع سكني",
+        "title_en": "Large half-filled pothole on residential street"
+      },
+      "final_priority": "high",
+      "floor_applied": null,
+      "signals": [],
+      "latency_ms": 8058.1069169566035,
+      "usage": {
+        "input_tokens": 2509,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1457,
+        "output_tokens_details": {
+          "reasoning_tokens": 641
+        },
+        "total_tokens": 3966
+      },
+      "cached": false
+    },
+    {
+      "file": "generated/syn_pair3_before.jpg",
+      "label": {
+        "file": "generated/syn_pair3_before.jpg",
+        "source": "synthetic",
+        "category": "playground_equipment",
+        "expected_severity_min": "high",
+        "child_risk": true,
+        "urgent": true,
+        "plausible": true,
+        "pair_id": "pair3",
+        "pair_role": "before",
+        "fixed": null,
+        "notes": "Swing with snapped chain, seat hanging from one chain."
+      },
+      "pred": {
+        "category": "not_an_issue",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "تظهر الصورة أرجوحتين معلقتين بسلاسل سليمة فوق أرضية مطاطية تحت مظلة في منطقة سكنية. لا يوجد تلف أو خطر ظاهر.",
+        "description_en": "The photo shows two swings hanging from intact chains over rubber safety tiles under a shade in a residential area. No damage or hazard is visible.",
+        "hazards": [],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Live photo of a playground with no visible issue.",
+          "shows_reported_issue": false
+        },
+        "scene_type": "playground",
+        "severity_proposal": "low",
+        "severity_reason_ar": "المقاعد والسلاسل تبدو سليمة والأرضية نظيفة بدون تلف ظاهر.",
+        "severity_reason_en": "Both swing seats and chains appear intact with no visible damage or immediate danger.",
+        "suggested_questions": [],
+        "title_ar": "أرجوحتان بحالة جيدة",
+        "title_en": "Swings in good condition"
+      },
+      "final_priority": "low",
+      "floor_applied": null,
+      "signals": [
+        "not_an_issue"
+      ],
+      "latency_ms": 7685.3924579918385,
+      "usage": {
+        "input_tokens": 2509,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1315,
+        "output_tokens_details": {
+          "reasoning_tokens": 632
+        },
+        "total_tokens": 3824
+      },
+      "cached": false
+    },
+    {
+      "file": "generated/syn_pair3_after.jpg",
+      "label": {
+        "file": "generated/syn_pair3_after.jpg",
+        "source": "synthetic",
+        "category": "playground_equipment",
+        "expected_severity_min": "low",
+        "child_risk": false,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": "pair3",
+        "pair_role": "after",
+        "fixed": true,
+        "notes": "Fixed: swing re-hung on two new chains."
+      },
+      "pred": {
+        "category": "not_an_issue",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "تُظهر الصورة أرجوحتين سليمتين معلقتين بسلاسل على إطار أزرق تحت مظلة، وأرضية مطاطية نظيفة. لا يظهر أي تلف أو خطر واضح.",
+        "description_en": "The photo shows two intact swings hanging by chains from a blue frame under a shade, over clean rubber flooring. No damage or hazard is visible.",
+        "hazards": [],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo appears to be a direct live capture of an outdoor playground.",
+          "shows_reported_issue": false
+        },
+        "scene_type": "playground",
+        "severity_proposal": "low",
+        "severity_reason_ar": "الأرجوحات والإطار والأرضية تبدو سليمة بدون تلف ظاهر.",
+        "severity_reason_en": "Swings, frame and flooring look intact with no visible damage.",
+        "suggested_questions": [],
+        "title_ar": "أرجوحات سليمة في ملعب",
+        "title_en": "Intact playground swings in park"
+      },
+      "final_priority": "low",
+      "floor_applied": null,
+      "signals": [
+        "not_an_issue"
+      ],
+      "latency_ms": 7196.796083007939,
+      "usage": {
+        "input_tokens": 2509,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1329,
+        "output_tokens_details": {
+          "reasoning_tokens": 627
+        },
+        "total_tokens": 3838
+      },
+      "cached": false
+    },
+    {
+      "file": "generated/syn_pair4_before.jpg",
+      "label": {
+        "file": "generated/syn_pair4_before.jpg",
+        "source": "synthetic",
+        "category": "other",
+        "expected_severity_min": "low",
+        "child_risk": false,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": "pair4",
+        "pair_role": "before",
+        "fixed": null,
+        "notes": "Park bench with snapped/missing seat slats."
+      },
+      "pred": {
+        "category": "other",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "مقعد خشبي في منطقة خارجية مكسور فيه لوحان من المقعد، وأحدهما ساقط على الأرض. تظهر أطراف الخشب المكسورة متشققة وحادة.",
+        "description_en": "A wooden outdoor bench with two seat slats broken, one slat lying detached on the pavement in front. The broken ends look splintered and sharp.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 730,
+              "x_min": 110,
+              "y_max": 540,
+              "y_min": 420
+            },
+            "kind": "sharp_edge",
+            "label": "splintered broken bench seat slats"
+          },
+          {
+            "box": {
+              "x_max": 860,
+              "x_min": 115,
+              "y_max": 835,
+              "y_min": 620
+            },
+            "kind": "trip",
+            "label": "detached wooden slat lying on pavement"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo looks like a direct live capture with natural light and no screen artifacts.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "sidewalk",
+        "severity_proposal": "high",
+        "severity_reason_ar": "ألواح المقعد مكسورة بأطراف حادة ولوح ساقط على الأرض، وقد يسقط أو يصاب من يجلس عليه.",
+        "severity_reason_en": "Seat slats are broken with splintered ends and a loose plank on the ground, so someone sitting could fall or get cut.",
+        "suggested_questions": [
+          "Is the bench still open for people to sit on?",
+          "Is the fallen wooden plank still lying on the ground?"
+        ],
+        "title_ar": "مقعد متنزه مكسور بألواح ساقطة",
+        "title_en": "Broken park bench with missing slats"
+      },
+      "final_priority": "high",
+      "floor_applied": null,
+      "signals": [],
+      "latency_ms": 8114.039000007324,
+      "usage": {
+        "input_tokens": 2509,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1488,
+        "output_tokens_details": {
+          "reasoning_tokens": 988
+        },
+        "total_tokens": 3997
+      },
+      "cached": false
+    },
+    {
+      "file": "generated/syn_pair4_after.jpg",
+      "label": {
+        "file": "generated/syn_pair4_after.jpg",
+        "source": "synthetic",
+        "category": "other",
+        "expected_severity_min": "low",
+        "child_risk": false,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": "pair4",
+        "pair_role": "after",
+        "fixed": true,
+        "notes": "Fixed: slats replaced."
+      },
+      "pred": {
+        "category": "not_an_issue",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "مقعد خشبي على رصيف مرصوف في منطقة سكنية ويبدو سليما ونظيفا بدون أي تلف ظاهر.",
+        "description_en": "A wooden and metal bench on a paved sidewalk in a residential area appears intact, clean, and undamaged with no visible hazard.",
+        "hazards": [],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo looks like a direct live capture of an intact bench.",
+          "shows_reported_issue": false
+        },
+        "scene_type": "residential",
+        "severity_proposal": "low",
+        "severity_reason_ar": "لا يوجد تلف ظاهر أو خطر، فالمقعد يبدو سليما ومستقرا.",
+        "severity_reason_en": "No damage or danger is visible; the bench looks intact and stable.",
+        "suggested_questions": [],
+        "title_ar": "مقعد سليم بدون مشكلة",
+        "title_en": "Intact bench with no issue"
+      },
+      "final_priority": "low",
+      "floor_applied": null,
+      "signals": [
+        "not_an_issue"
+      ],
+      "latency_ms": 6786.148915998638,
+      "usage": {
+        "input_tokens": 2509,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1000,
+        "output_tokens_details": {
+          "reasoning_tokens": 416
+        },
+        "total_tokens": 3509
+      },
+      "cached": false
+    },
+    {
+      "file": "generated/syn_pair5_before.jpg",
+      "label": {
+        "file": "generated/syn_pair5_before.jpg",
+        "source": "synthetic",
+        "category": "electrical_hazard",
+        "expected_severity_min": "critical",
+        "child_risk": true,
+        "urgent": true,
+        "plausible": true,
+        "pair_id": "pair5",
+        "pair_role": "before",
+        "fixed": null,
+        "notes": "Open electrical cabinet with exposed bare wires at child height."
+      },
+      "pred": {
+        "category": "electrical_hazard",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "خزانة كهربائية رمادية بجانب الرصيف بابها مفتوح وبداخلها أسلاك ملونة مكشوفة ووصلات كهربائية ظاهرة.",
+        "description_en": "A grey outdoor electrical cabinet beside the sidewalk stands with its door open, exposing tangled colored wires and terminal connections.",
+        "hazards": [
+          {
+            "box": {
+              "x_max": 555,
+              "x_min": 215,
+              "y_max": 595,
+              "y_min": 205
+            },
+            "kind": "electrical",
+            "label": "exposed wiring in open cabinet"
+          }
+        ],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Photo appears to be a direct outdoor capture of the cabinet.",
+          "shows_reported_issue": true
+        },
+        "scene_type": "sidewalk",
+        "severity_proposal": "critical",
+        "severity_reason_ar": "الباب مفتوح والأسلاك مكشوفة على ارتفاع يمكن الوصول إليه بجانب ممر مشاة، مما يشكل خطر صعقة كهربائية.",
+        "severity_reason_en": "The door is open with wiring exposed at reachable height beside a walkway, creating immediate shock risk.",
+        "suggested_questions": [
+          "Can the cabinet door be closed or locked?",
+          "How long has the box been left open?"
+        ],
+        "title_ar": "صندوق كهرباء مفتوح بأسلاك مكشوفة",
+        "title_en": "Open Electrical Box with Exposed Wiring"
+      },
+      "final_priority": "critical",
+      "floor_applied": null,
+      "signals": [
+        "electrical"
+      ],
+      "latency_ms": 7619.533665943891,
+      "usage": {
+        "input_tokens": 2509,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1343,
+        "output_tokens_details": {
+          "reasoning_tokens": 460
+        },
+        "total_tokens": 3852
+      },
+      "cached": false
+    },
+    {
+      "file": "generated/syn_pair5_after.jpg",
+      "label": {
+        "file": "generated/syn_pair5_after.jpg",
+        "source": "synthetic",
+        "category": "electrical_hazard",
+        "expected_severity_min": "low",
+        "child_risk": false,
+        "urgent": false,
+        "plausible": true,
+        "pair_id": "pair5",
+        "pair_role": "after",
+        "fixed": true,
+        "notes": "Fixed: cabinet door re-hung and closed."
+      },
+      "pred": {
+        "category": "not_an_issue",
+        "child_present": false,
+        "child_use_equipment": false,
+        "confidence": "high",
+        "description_ar": "يظهر في الصورة صندوق مرافق رمادي مغلق ومقفل على رصيف مرصوف بجانب شارع سكني. لا يوجد تلف أو باب مفتوح أو أسلاك مكشوفة.",
+        "description_en": "A closed and locked grey utility cabinet stands on a paved sidewalk near a residential street. No damage, open door, or exposed wiring is visible.",
+        "hazards": [],
+        "plausibility": {
+          "looks_like_screen_or_print": false,
+          "looks_like_stock_or_watermarked": false,
+          "notes": "Live photo of an intact street cabinet with no visible problem.",
+          "shows_reported_issue": false
+        },
+        "scene_type": "sidewalk",
+        "severity_proposal": "low",
+        "severity_reason_ar": "الصندوق يبدو مغلقا وسليما وثابتا بدون أي خطر ظاهر.",
+        "severity_reason_en": "The cabinet appears closed, upright and undamaged with no visible risk.",
+        "suggested_questions": [],
+        "title_ar": "صندوق كهرباء سليم على الرصيف",
+        "title_en": "Intact electrical cabinet on sidewalk"
+      },
+      "final_priority": "low",
+      "floor_applied": null,
+      "signals": [
+        "not_an_issue"
+      ],
+      "latency_ms": 7168.56270795688,
+      "usage": {
+        "input_tokens": 2509,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1207,
+        "output_tokens_details": {
+          "reasoning_tokens": 497
+        },
+        "total_tokens": 3716
+      },
+      "cached": false
+    }
+  ],
+  "fix_pairs": [
+    {
+      "pair_id": "pair1",
+      "before": "generated/syn_pair1_before.jpg",
+      "after": "generated/syn_pair1_after.jpg",
+      "expected_resolved": false,
+      "pred": {
+        "reason_ar": "أصبحت الحاويات مغلقة ونظيفة وتم إزالة معظم القمامة، لكن لا يزال هناك كيسان أسودان على الرصيف يسار الحاويات.",
+        "reason_en": "Bins are now closed and the sidewalk is largely cleared, but two black trash bags still remain on the sidewalk left of the bins.",
+        "remaining_issues": [
+          {
+            "box": {
+              "x_max": 305,
+              "x_min": 118,
+              "y_max": 611,
+              "y_min": 489
+            },
+            "label": "trash bags on sidewalk"
+          }
+        ],
+        "resolved": false,
+        "same_location_likely": true
+      },
+      "latency_ms": 4192.876750021242,
+      "usage": {
+        "input_tokens": 3225,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 735,
+        "output_tokens_details": {
+          "reasoning_tokens": 588
+        },
+        "total_tokens": 3960
+      },
+      "cached": false
+    },
+    {
+      "pair_id": "pair2",
+      "before": "generated/syn_pair2_before.jpg",
+      "after": "generated/syn_pair2_after.jpg",
+      "expected_resolved": false,
+      "pred": {
+        "reason_ar": "تم ملء نصف الحفرة فقط بالإسفلت الجديد ولا يزال جزء كبير مفتوحا من الحصى، والموقع نفسه يطابق خلفية الشارع.",
+        "reason_en": "The pothole is only half-filled with new asphalt; a large open gravel section remains at the same street edge.",
+        "remaining_issues": [
+          {
+            "box": {
+              "x_max": 670,
+              "x_min": 240,
+              "y_max": 775,
+              "y_min": 575
+            },
+            "label": "pothole_pavement"
+          }
+        ],
+        "resolved": false,
+        "same_location_likely": true
+      },
+      "latency_ms": 4330.636500031687,
+      "usage": {
+        "input_tokens": 3225,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 376,
+        "output_tokens_details": {
+          "reasoning_tokens": 232
+        },
+        "total_tokens": 3601
+      },
+      "cached": false
+    },
+    {
+      "pair_id": "pair3",
+      "before": "generated/syn_pair3_before.jpg",
+      "after": "generated/syn_pair3_after.jpg",
+      "expected_resolved": true,
+      "pred": {
+        "reason_ar": "الأرجوحتان سليمتان ومعلقتان بشكل صحيح في الصورة اللاحقة، والتفاف مقعد الأرجوحة اليمنى الظاهر قبلا اختفى، مع نفس خلفية الملعب.",
+        "reason_en": "Both swings hang properly in AFTER with intact seats and chains; the twisted right seat seen in BEFORE is now straight, same playground background.",
+        "remaining_issues": [],
+        "resolved": true,
+        "same_location_likely": true
+      },
+      "latency_ms": 3642.281417036429,
+      "usage": {
+        "input_tokens": 3221,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 542,
+        "output_tokens_details": {
+          "reasoning_tokens": 429
+        },
+        "total_tokens": 3763
+      },
+      "cached": false
+    },
+    {
+      "pair_id": "pair4",
+      "before": "generated/syn_pair4_before.jpg",
+      "after": "generated/syn_pair4_after.jpg",
+      "expected_resolved": true,
+      "pred": {
+        "reason_ar": "ألواح المقعد المكسورة الظاهرة في صورة قبل تم استبدالها وأصبحت سليمة في صورة بعد، مع إزالة اللوح الساقط من الأرض.",
+        "reason_en": "The broken seat slats seen in BEFORE are replaced and intact in AFTER, with the fallen slat removed from the pavement.",
+        "remaining_issues": [],
+        "resolved": true,
+        "same_location_likely": true
+      },
+      "latency_ms": 3632.24258297123,
+      "usage": {
+        "input_tokens": 3221,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 299,
+        "output_tokens_details": {
+          "reasoning_tokens": 192
+        },
+        "total_tokens": 3520
+      },
+      "cached": false
+    },
+    {
+      "pair_id": "pair5",
+      "before": "generated/syn_pair5_before.jpg",
+      "after": "generated/syn_pair5_after.jpg",
+      "expected_resolved": true,
+      "pred": {
+        "reason_ar": "باب صندوق الكهرباء الذي كان مفتوحا وتظهر منه الأسلاك أصبح الآن مغلقا ومقفلا، ولم يعد هناك أسلاك مكشوفة ظاهرة.",
+        "reason_en": "The electrical cabinet door that was open with exposed wiring in BEFORE is now closed and latched in AFTER, with no wiring visible.",
+        "remaining_issues": [],
+        "resolved": true,
+        "same_location_likely": true
+      },
+      "latency_ms": 2590.3247920796275,
+      "usage": {
+        "input_tokens": 3224,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 385,
+        "output_tokens_details": {
+          "reasoning_tokens": 280
+        },
+        "total_tokens": 3609
+      },
+      "cached": false
+    }
+  ],
+  "same_issue_pairs": [
+    {
+      "new": "variant:generated/syn_pair2_before.jpg",
+      "existing": "generated/syn_pair2_before.jpg",
+      "expected_same": true,
+      "pred": {
+        "reason": "Both show the same round gravel-filled pothole at the road edge beside the identical brick sidewalk, curb, palm trees, villa wall and parked cars.",
+        "same_issue": true
+      },
+      "latency_ms": 3399.1652500117198,
+      "usage": {
+        "input_tokens": 2752,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 371,
+        "output_tokens_details": {
+          "reasoning_tokens": 322
+        },
+        "total_tokens": 3123
+      },
+      "cached": false
+    },
+    {
+      "new": "variant:real/real_open_manhole_4.jpg",
+      "existing": "real/real_open_manhole_4.jpg",
+      "expected_same": true,
+      "pred": {
+        "reason": "Both images show the same displaced lid, stained shaft walls, internal ladder rungs and BEGU rim markings.",
+        "same_issue": true
+      },
+      "latency_ms": 3518.802958074957,
+      "usage": {
+        "input_tokens": 2280,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 310,
+        "output_tokens_details": {
+          "reasoning_tokens": 269
+        },
+        "total_tokens": 2590
+      },
+      "cached": false
+    },
+    {
+      "new": "variant:real/real_playground_equipment_2.jpg",
+      "existing": "real/real_playground_equipment_2.jpg",
+      "expected_same": true,
+      "pred": {
+        "reason": "Both images show the identical swing frame with the center seat hanging vertically beside a loose chain over the same green mat with the same hedge, slide, and brick buildings behind.",
+        "same_issue": true
+      },
+      "latency_ms": 4107.450915966183,
+      "usage": {
+        "input_tokens": 1894,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 443,
+        "output_tokens_details": {
+          "reasoning_tokens": 391
+        },
+        "total_tokens": 2337
+      },
+      "cached": false
+    },
+    {
+      "new": "real/real_pothole_pavement_2.jpg",
+      "existing": "real/real_pothole_pavement_1.jpg",
+      "expected_same": false,
+      "pred": {
+        "reason": "The new pothole is beside a white crossing line with a glove for scale, while the existing hole is a much larger collapsed cavity with a white barrier and no crossing markings.",
+        "same_issue": false
+      },
+      "latency_ms": 3727.8742499183863,
+      "usage": {
+        "input_tokens": 2090,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 296,
+        "output_tokens_details": {
+          "reasoning_tokens": 242
+        },
+        "total_tokens": 2386
+      },
+      "cached": false
+    },
+    {
+      "new": "real/real_open_manhole_1.jpg",
+      "existing": "real/real_open_manhole_4.jpg",
+      "expected_same": false,
+      "pred": {
+        "reason": "The frames differ, with a thin rim beside an orange post versus a wide toothed rim exposing ladder rungs inside.",
+        "same_issue": false
+      },
+      "latency_ms": 5008.297250024043,
+      "usage": {
+        "input_tokens": 2275,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 335,
+        "output_tokens_details": {
+          "reasoning_tokens": 292
+        },
+        "total_tokens": 2610
+      },
+      "cached": false
+    },
+    {
+      "new": "real/real_waste_overflow_dumping_2.jpg",
+      "existing": "generated/syn_pair1_before.jpg",
+      "expected_same": false,
+      "pred": {
+        "reason": "New shows a single black LITTER bin beside a yellow grit box while existing shows two large green dumpsters in front of a beige wall.",
+        "same_issue": false
+      },
+      "latency_ms": 3609.4222080428153,
+      "usage": {
+        "input_tokens": 2565,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 204,
+        "output_tokens_details": {
+          "reasoning_tokens": 158
+        },
+        "total_tokens": 2769
+      },
+      "cached": false
+    }
+  ],
+  "aux_vision_calls": [
+    {
+      "file": "variant:generated/syn_pair2_before.jpg",
+      "usage": {
+        "input_tokens": 2164,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1005,
+        "output_tokens_details": {
+          "reasoning_tokens": 616
+        },
+        "total_tokens": 3169
+      },
+      "latency_ms": 6092.036416055635
+    },
+    {
+      "file": "variant:real/real_open_manhole_4.jpg",
+      "usage": {
+        "input_tokens": 2112,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1318,
+        "output_tokens_details": {
+          "reasoning_tokens": 501
+        },
+        "total_tokens": 3430
+      },
+      "latency_ms": 9510.176541982219
+    },
+    {
+      "file": "variant:real/real_playground_equipment_2.jpg",
+      "usage": {
+        "input_tokens": 1917,
+        "input_tokens_details": {
+          "cached_tokens": 1009
+        },
+        "output_tokens": 1050,
+        "output_tokens_details": {
+          "reasoning_tokens": 684
+        },
+        "total_tokens": 2967
+      },
+      "latency_ms": 6833.819541032426
+    }
+  ],
+  "metrics": {
+    "category_accuracy": {
+      "hits": 36,
+      "total": 42
+    },
+    "per_category": {
+      "blocked_accessibility": {
+        "hits": 4,
+        "total": 4
+      },
+      "electrical_hazard": {
+        "hits": 4,
+        "total": 5
+      },
+      "fitness_equipment": {
+        "hits": 1,
+        "total": 1
+      },
+      "not_an_issue": {
+        "hits": 3,
+        "total": 3
+      },
+      "open_manhole": {
+        "hits": 5,
+        "total": 5
+      },
+      "other": {
+        "hits": 2,
+        "total": 3
+      },
+      "playground_equipment": {
+        "hits": 4,
+        "total": 7
+      },
+      "pothole_pavement": {
+        "hits": 5,
+        "total": 5
+      },
+      "waste_overflow_dumping": {
+        "hits": 6,
+        "total": 6
+      },
+      "water_leak": {
+        "hits": 2,
+        "total": 3
+      }
+    },
+    "severity_raw": {
+      "hits": 40,
+      "total": 42
+    },
+    "severity_final": {
+      "hits": 40,
+      "total": 42
+    },
+    "urgent_recall_raw": {
+      "hits": 11,
+      "total": 12
+    },
+    "urgent_recall_final": {
+      "hits": 11,
+      "total": 12
+    },
+    "child_risk_recall": {
+      "hits": 12,
+      "total": 15
+    },
+    "implausible_flagged": {
+      "hits": 6,
+      "total": 6
+    },
+    "false_flag_all_plausible": {
+      "hits": 9,
+      "total": 42
+    },
+    "false_flag_real_issues": {
+      "hits": 6,
+      "total": 39
+    },
+    "fix_accuracy": {
+      "hits": 5,
+      "total": 5
+    },
+    "same_issue_accuracy": {
+      "hits": 6,
+      "total": 6
+    },
+    "calls": 62,
+    "latency_mean_ms": 7204.77973509978,
+    "latency_p95_ms": 11596.240125014447,
+    "calls_over_app_timeout": 0,
+    "input_tokens": 143158,
+    "cached_input_tokens": 47423,
+    "output_tokens": 68136,
+    "reasoning_tokens": 35744,
+    "est_cost_usd": 0.4164
+  }
+}
