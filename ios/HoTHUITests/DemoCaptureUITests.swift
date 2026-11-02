@@ -263,6 +263,11 @@ final class DemoCaptureUITests: XCTestCase {
         mark("comment_typed", extra: ["text": comment])
         let send = app.buttons["commentSendButton"]
         XCTAssertTrue(send.waitForExistence(timeout: 5), "Send button missing")
+        // Stop rather than tap through to Settings: a covered send once opened the key card on camera.
+        XCTAssertTrue(send.isHittable, "Send button is covered")
+        if app.keyboards.firstMatch.exists {
+            XCTAssertFalse(app.buttons["settingsTabButton"].isHittable, "Tab bar is over the keyboard")
+        }
         tap(send, mark: "comment_sent")
 
         // Live Muse Spark moderation: "Checking…" then the comment stays (or is removed).
