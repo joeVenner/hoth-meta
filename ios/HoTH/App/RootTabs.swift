@@ -2,7 +2,8 @@ import SwiftUI
 
 /// Top-level navigation: Feed, Map | Report | Hero (or Crew), Settings.
 /// A custom bar replaces the system tab bar; the TabView keeps each tab's state alive.
-/// Report opens full screen (camera → interview → ticket) so the floating bar never covers the flow.
+/// Report opens full screen (camera → interview → ticket) so the floating bar never covers the flow,
+/// and the bar hides while the keyboard is up so it never covers a text field (the comment composer).
 struct RootTabs: View {
     enum Tab: Hashable, CaseIterable {
         case feed, map, hero, settings
@@ -14,6 +15,7 @@ struct RootTabs: View {
     @ObservedObject private var services = AppServices.shared
     @State private var selection: Tab = .feed
     @State private var isReporting = false
+    @StateObject private var keyboard = KeyboardVisibility()
     @AppStorage(OnboardingView.storageKey) private var isOnboardingDone = false
 
     var body: some View {
@@ -34,8 +36,12 @@ struct RootTabs: View {
             .environment(\.layoutDirection, services.layoutDirection)
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            HoTHTabBar(selection: $selection) { isReporting = true }
+            if !keyboard.isVisible {
+                HoTHTabBar(selection: $selection) { isReporting = true }
+                    .transition(.opacity)
+            }
         }
+        .animation(.easeOut(duration: 0.2), value: keyboard.isVisible)
         .tint(Color.hothAccent)
         .environment(\.locale, services.localeOverride ?? Locale.autoupdatingCurrent)
         .environment(\.layoutDirection, services.layoutDirection)
