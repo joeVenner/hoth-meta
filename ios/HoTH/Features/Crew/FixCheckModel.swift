@@ -42,6 +42,8 @@ final class FixCheckModel: ObservableObject {
     private let outlinerFactory: () -> HazardOutlining?
     /// On-device face/plate blur for both photos before the verifier or SAM sees them.
     private let redactor: @Sendable (UIImage) async -> FaceAndPlateBlur.Upload?
+    /// Records each redaction and the Meta requests that send it (DEBUG capture log; no-op in release).
+    private let audit: UploadAudit
     private var outlineTask: Task<Void, Never>?
     /// Identifies the current check so a late SAM answer for an earlier photo is dropped.
     private var checkID = UUID()
@@ -50,9 +52,12 @@ final class FixCheckModel: ObservableObject {
     ///   - verifierFactory: returns the verifier for a pick (nil → no verifier available).
     ///   - outlinerFactory: SAM for rejected verdicts (nil → Muse Spark's boxes only).
     ///   - redactor: blurs faces and plates before any upload (tests inject a fake).
+    ///   - audit: records that each upload was redacted before its request (tests inject a recorder).
     init(verifierFactory: ((DemoFixPhoto?) -> FixVerifying?)? = nil,
          outlinerFactory: (() -> HazardOutlining?)? = nil,
-         redactor: @escaping @Sendable (UIImage) async -> FaceAndPlateBlur.Upload? = { await FixCheckModel.redactForUpload($0) }) {
+         redactor: @escaping @Sendable (UIImage) async -> FaceAndPlateBlur.Upload? = { await FixCheckModel.redactForUpload($0) },
+         audit: UploadAudit = .live) {
+        self.audit = audit
         self.verifierFactory = verifierFactory ?? FixCheckModel.defaultVerifier
         self.outlinerFactory = outlinerFactory ?? { AppServices.shared.hazardOutliner() }
         self.redactor = redactor
@@ -123,13 +128,16 @@ final class FixCheckModel: ObservableObject {
         // Same size cap as the after photo: seed or asset befores can be large, and the blur has a time limit.
         let beforeSized = ImageResizing.normalizedAndDownsized(before, maxEdge: ImageResizing.maxPixelEdge)
         var afterUpload: FaceAndPlateBlur.Upload?
+        var afterUploadID: String?
         let beforeData: Data
         let afterData: Data
         if verifier.sendsPhotos {
             // Privacy: both photos are blurred on the phone before either leaves it. If either cannot be
             // redacted (or times out), nothing is sent.
-            async let redactedBefore = redactor(beforeSized)
-            async let redactedAfter = redactor(after)
+            let redactor = redactor
+            let audit = audit
+            async let redactedBefore = audit.redact(beforeSized, path: .fixcheck, with: redactor)
+            async let redactedAfter = audit.redact(after, path: .fixcheck, with: redactor)
             let uploads = (await redactedBefore, await redactedAfter)
             guard check == checkID, !Task.isCancelled else { return }
             guard let beforeUpload = uploads.0, let redactedAfterUpload = uploads.1 else {
@@ -137,9 +145,11 @@ final class FixCheckModel: ObservableObject {
                                        defaultValue: "Couldn't blur faces and number plates on these photos, so nothing was sent. Please try again."))
                 return
             }
-            afterUpload = redactedAfterUpload
+            afterUpload = redactedAfterUpload.upload
+            afterUploadID = redactedAfterUpload.uploadID
             beforeData = beforeUpload.jpegData
             afterData = redactedAfterUpload.jpegData
+            audit.request(.fixcheck, [beforeUpload.uploadID, redactedAfterUpload.uploadID])
         } else {
             // Canned demo verdict: nothing leaves the phone, so don't wait on blurs it never reads.
             beforeData = Data()
@@ -163,8 +173,8 @@ final class FixCheckModel: ObservableObject {
             guard check == checkID, !Task.isCancelled else { return }
         }
         verdict = result
-        if !result.resolved, !result.isCanned, afterUpload != nil, let category = ReportCategory(rawValue: report.categoryRaw) {
-            startOutline(afterData: afterData, category: category)
+        if !result.resolved, !result.isCanned, let afterUploadID, let category = ReportCategory(rawValue: report.categoryRaw) {
+            startOutline(afterData: afterData, uploadID: afterUploadID, category: category)
         }
 
         do {
@@ -207,11 +217,13 @@ final class FixCheckModel: ObservableObject {
     // MARK: SAM
 
     /// SAM on the exact after JPEG the verifier saw. Failure or timeout keeps Muse Spark's boxes.
-    private func startOutline(afterData: Data, category: ReportCategory) {
+    private func startOutline(afterData: Data, uploadID: String, category: ReportCategory) {
         guard let outliner = outlinerFactory() else { return }
         let check = checkID
+        let audit = audit
         outlineTask = Task { [weak self] in
             do {
+                audit.request(.sam, [uploadID])
                 let result = try await outliner.outline(jpegData: afterData, category: category)
                 guard let self, check == self.checkID, !Task.isCancelled else { return }
                 self.samRemaining = result

@@ -179,7 +179,13 @@ final class VisionStubURLProtocol: URLProtocol {
 
     /// Request bodies since the last `resetRecording()`.
     static var bodies: [Data] { lock.withLock { recordedBodies } }
-    static func resetRecording() { lock.withLock { recordedBodies = [] } }
+    static func resetRecording() { lock.withLock { recordedBodies = []; requestHook = nil } }
+    nonisolated(unsafe) private static var requestHook: (@Sendable (Data) -> Void)?
+    /// Called with each request body as it reaches the stub (tests that check call order set it).
+    static var onRequest: (@Sendable (Data) -> Void)? {
+        get { lock.withLock { requestHook } }
+        set { lock.withLock { requestHook = newValue } }
+    }
 
     /// Every `data:image/jpeg;base64,` payload in the recorded bodies, decoded, in request order.
     static var sentJPEGs: [Data] { bodies.flatMap(Self.jpegs(inBody:)) }
@@ -208,7 +214,11 @@ final class VisionStubURLProtocol: URLProtocol {
     override func startLoading() {
         // URLSession moves the body into a stream before it reaches a URLProtocol.
         let body = request.httpBody ?? request.httpBodyStream.map(Self.readAll) ?? Data()
-        Self.lock.withLock { Self.recordedBodies.append(body) }
+        let hook = Self.lock.withLock { () -> (@Sendable (Data) -> Void)? in
+            Self.recordedBodies.append(body)
+            return Self.requestHook
+        }
+        hook?(body)
         let text = String(decoding: Self.payload ?? Data(), as: UTF8.self)
         let envelope: [String: Any] = [
             "status": "completed",
