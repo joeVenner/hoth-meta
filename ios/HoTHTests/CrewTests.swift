@@ -1,4 +1,5 @@
 import CoreGraphics
+import HoTHCore
 import SwiftData
 import UIKit
 import XCTest
@@ -169,6 +170,91 @@ final class CrewTests: XCTestCase {
         XCTAssertTrue(ar.contains("حفرة") && ar.contains("+10"))
     }
 
+    // MARK: SAM "what's left"
+
+    private var liveRejected: FixVerdict {
+        FixVerdict(resolved: false, reasonEN: notResolved.reasonEN, reasonAR: notResolved.reasonAR,
+                   remaining: notResolved.remaining, isCanned: false)
+    }
+
+    private func demoSeedReport() -> Report {
+        let mine = makeReport(reporter: me, status: .open)
+        mine.photoFileName = "demo_fix_before"
+        mine.isDemoSeed = true
+        return mine
+    }
+
+    func testRejectedLiveVerdictPrefersSAMBoxes() async throws {
+        let stub = StubVerifier(verdict: liveRejected)
+        let sam = SegmentOutline(concept: "pothole", boxes: [NormalizedBox(x: 0.1, y: 0.6, w: 0.3, h: 0.2)])
+        let fake = FakeOutliner { _, _ in sam }
+        let model = FixCheckModel(verifierFactory: { _ in stub }, outlinerFactory: { fake })
+        await model.check(report: demoSeedReport(), after: Self.sampleImage(), demo: nil, context: context)
+        await model.waitForOutline()
+
+        XCTAssertEqual(model.phase, .verdict)
+        XCTAssertEqual(model.samRemaining, sam)
+        XCTAssertEqual(fake.calls.first?.category, .potholePavement)
+        XCTAssertEqual(fake.calls.first?.jpeg, stub.lastAfter, "SAM sees exactly the after JPEG the verifier saw")
+        let shown = FixCheckModel.remainingRegions(verdict: try XCTUnwrap(model.verdict), sam: model.samRemaining)
+        XCTAssertTrue(shown.isFromSAM)
+        XCTAssertEqual(shown.regions, [.init(label: "pothole", box: CGRect(x: 0.1, y: 0.6, width: 0.3, height: 0.2))])
+    }
+
+    func testSAMFailureOrNoMatchKeepsSparkBoxes() async throws {
+        let failing = FakeOutliner { _, _ in throw HazardSegmenter.Failure.timedOut }
+        let model = FixCheckModel(verifierFactory: { _ in StubVerifier(verdict: self.liveRejected) },
+                                  outlinerFactory: { failing })
+        await model.check(report: demoSeedReport(), after: Self.sampleImage(), demo: nil, context: context)
+        await model.waitForOutline()
+        XCTAssertEqual(model.phase, .verdict)
+        XCTAssertNil(model.samRemaining)
+        XCTAssertEqual(failing.calls.count, 1)
+
+        let verdict = liveRejected
+        XCTAssertEqual(FixCheckModel.remainingRegions(verdict: verdict, sam: nil).regions, verdict.remaining)
+        let none = FixCheckModel.remainingRegions(verdict: verdict, sam: SegmentOutline(concept: "pothole", boxes: []))
+        XCTAssertFalse(none.isFromSAM)
+        XCTAssertEqual(none.regions, verdict.remaining)
+        let fixed = FixCheckModel.remainingRegions(verdict: resolved, sam: SegmentOutline(
+            concept: "pothole", boxes: [NormalizedBox(x: 0, y: 0, w: 1, h: 1)]))
+        XCTAssertTrue(fixed.regions.isEmpty, "a resolved repair shows nothing left")
+    }
+
+    func testCannedOrResolvedVerdictsNeverCallSAM() async throws {
+        let fake = FakeOutliner { _, _ in SegmentOutline(concept: "pothole", boxes: []) }
+        let canned = FixCheckModel(verifierFactory: { _ in StubVerifier(verdict: self.notResolved) },
+                                   outlinerFactory: { fake })
+        await canned.check(report: demoSeedReport(), after: Self.sampleImage(), demo: .bad, context: context)
+        await canned.waitForOutline()
+        let liveResolved = FixVerdict(resolved: true, reasonEN: "Patched", reasonAR: "تم", remaining: [], isCanned: false)
+        let fixedModel = FixCheckModel(verifierFactory: { _ in StubVerifier(verdict: liveResolved) },
+                                       outlinerFactory: { fake })
+        await fixedModel.check(report: demoSeedReport(), after: Self.sampleImage(), demo: nil, context: context)
+        await fixedModel.waitForOutline()
+        XCTAssertTrue(fake.calls.isEmpty)
+    }
+
+    func testAfterPhotoIsMadeUprightBeforeChecking() async throws {
+        let format = UIGraphicsImageRendererFormat.default()
+        format.scale = 1
+        let sensor = try XCTUnwrap(UIGraphicsImageRenderer(size: CGSize(width: 60, height: 30), format: format)
+            .image { context in
+                UIColor.gray.setFill()
+                context.fill(CGRect(x: 0, y: 0, width: 60, height: 30))
+            }.cgImage)
+        let portrait = UIImage(cgImage: sensor, scale: 1, orientation: .right)
+        let stub = StubVerifier(verdict: notResolved)
+        let model = FixCheckModel(verifierFactory: { _ in stub }, outlinerFactory: { nil })
+        await model.check(report: demoSeedReport(), after: portrait, demo: nil, context: context)
+        XCTAssertEqual(model.afterImage?.imageOrientation, .up)
+        XCTAssertEqual(model.afterImage?.cgImage?.width, 30)
+        XCTAssertEqual(model.afterImage?.cgImage?.height, 60)
+        XCTAssertEqual(JPEGSize.pixelSize(of: try XCTUnwrap(stub.lastAfter)), PixelSize(width: 30, height: 60))
+        model.reset()
+        XCTAssertNil(model.samRemaining)
+    }
+
     private static func sampleImage() -> UIImage {
         UIGraphicsImageRenderer(size: CGSize(width: 40, height: 40)).image { context in
             UIColor.gray.setFill()
@@ -180,12 +266,14 @@ final class CrewTests: XCTestCase {
 private final class StubVerifier: FixVerifying, @unchecked Sendable {
     let verdict: FixVerdict
     private(set) var callCount = 0
+    private(set) var lastAfter: Data?
 
     init(verdict: FixVerdict) { self.verdict = verdict }
 
     func verify(before: Data, after: Data, reportTitle: String, categoryRaw: String,
                 beforeCapturedAt: Date) async throws -> FixVerdict {
         callCount += 1
+        lastAfter = after
         return verdict
     }
 }

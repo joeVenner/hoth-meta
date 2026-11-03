@@ -20,7 +20,8 @@ struct ReportEntryView: View {
             language: { AppServices.shared.isArabic ? "ar" : "en" },
             isDemoMode: { AppServices.shared.demoMode },
             hasAPIKey: { AppServices.shared.hasAPIKey() },
-            visionModel: { AppServices.shared.visionModel }))
+            visionModel: { AppServices.shared.visionModel },
+            outliner: { AppServices.shared.hazardOutliner() }))
     }
 
     var body: some View {
@@ -93,7 +94,7 @@ struct ReportEntryView: View {
                 AnalysisCardView(image: photo.image, analysis: analysis, priority: priority,
                                  plausibility: flow.plausibility, isArabic: flow.isArabic,
                                  isDemoAnalysis: flow.isDemoAnalysis, source: photo.source,
-                                 onContinue: flow.continueFromAnalysis, onRetake: flow.retake)
+                                 outline: flow.outline, onContinue: flow.continueFromAnalysis, onRetake: flow.retake)
             }
         case .interview:
             if let context = flow.interviewContext {
@@ -113,7 +114,7 @@ struct ReportEntryView: View {
             if let analysis = flow.analysis, let priority = flow.priority, let team = flow.team {
                 TicketView(ticketNumber: flow.ticketNumber, analysis: analysis, priority: priority, team: team,
                            args: flow.submitArgs, slots: flow.slots, photo: flow.photo?.image,
-                           isArabic: flow.isArabic) { post, anonymous in
+                           outline: flow.outline, isArabic: flow.isArabic) { post, anonymous in
                     await flow.post(toNeighbourhood: post, anonymous: anonymous, context: modelContext)
                 }
             }

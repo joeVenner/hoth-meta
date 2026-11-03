@@ -5,7 +5,8 @@ import SwiftData
 import SwiftUI
 import UIKit
 
-/// Drives one crew fix check: before photo → verifier → verdict → (resolved) blur, save, rewards, Fixed moment.
+/// Drives one crew fix check: before photo → verifier → verdict → (resolved) blur, save, rewards, Fixed moment;
+/// (rejected) SAM 3.1 "what's left" boxes on the after photo.
 @MainActor
 final class FixCheckModel: ObservableObject {
     enum Phase: Equatable {
@@ -32,14 +33,34 @@ final class FixCheckModel: ObservableObject {
     @Published private(set) var verdict: FixVerdict?
     @Published private(set) var afterImage: UIImage?
     @Published private(set) var isDemoPhoto = false
+    /// SAM 3.1 boxes for what is still broken on a rejected live verdict; nil while pending or unavailable.
+    @Published private(set) var samRemaining: SegmentOutline?
     @Published var celebration: Celebration?
 
     private static let logger = Logger(subsystem: "io.fomy.hoth", category: "FixCheck")
     private let verifierFactory: (DemoFixPhoto?) -> FixVerifying?
+    private let outlinerFactory: () -> HazardOutlining?
+    private var outlineTask: Task<Void, Never>?
+    /// Identifies the current check so a late SAM answer for an earlier photo is dropped.
+    private var checkID = UUID()
 
-    /// - Parameter verifierFactory: returns the verifier for a pick (nil → no verifier available).
-    init(verifierFactory: ((DemoFixPhoto?) -> FixVerifying?)? = nil) {
+    /// - Parameters:
+    ///   - verifierFactory: returns the verifier for a pick (nil → no verifier available).
+    ///   - outlinerFactory: SAM for rejected verdicts (nil → Muse Spark's boxes only).
+    init(verifierFactory: ((DemoFixPhoto?) -> FixVerifying?)? = nil,
+         outlinerFactory: (() -> HazardOutlining?)? = nil) {
         self.verifierFactory = verifierFactory ?? FixCheckModel.defaultVerifier
+        self.outlinerFactory = outlinerFactory ?? { AppServices.shared.hazardOutliner() }
+    }
+
+    /// The "what's left" boxes to draw: SAM's when it found something, else the verifier's own.
+    static func remainingRegions(verdict: FixVerdict, sam: SegmentOutline?) -> (regions: [FixVerdict.Region], isFromSAM: Bool) {
+        guard !verdict.resolved else { return ([], false) }
+        guard let sam, !sam.boxes.isEmpty else { return (verdict.remaining, false) }
+        let regions = sam.boxes.map {
+            FixVerdict.Region(label: sam.concept, box: CGRect(x: $0.x, y: $0.y, width: $0.w, height: $0.h))
+        }
+        return (regions, true)
     }
 
     /// Live verifier when a key exists; otherwise the labelled canned verdict for bundled demo photos.
@@ -71,6 +92,10 @@ final class FixCheckModel: ObservableObject {
             phase = .failed(String(localized: "crew.error.notActionable", defaultValue: "This case is already closed."))
             return
         }
+        cancelOutline()
+        // Upright and <= 1024 px, like report photos: a camera shot is often `.right` with raw sensor
+        // pixels, and boxes from either model must land on the image that is shown.
+        let after = ImageResizing.normalizedAndDownsized(after, maxEdge: ImageResizing.maxPixelEdge)
         afterImage = after
         isDemoPhoto = demo != nil
         verdict = nil
@@ -95,6 +120,9 @@ final class FixCheckModel: ObservableObject {
             return
         }
         verdict = result
+        if !result.resolved, !result.isCanned, let category = ReportCategory(rawValue: report.categoryRaw) {
+            startOutline(afterData: afterData, category: category)
+        }
 
         do {
             // Public fix photo is always the redacted one; nothing is saved if blurring fails.
@@ -126,10 +154,41 @@ final class FixCheckModel: ObservableObject {
     }
 
     func reset() {
+        cancelOutline()
         phase = .idle
         verdict = nil
         afterImage = nil
         isDemoPhoto = false
+    }
+
+    // MARK: SAM
+
+    /// SAM on the exact after JPEG the verifier saw. Failure or timeout keeps Muse Spark's boxes.
+    private func startOutline(afterData: Data, category: ReportCategory) {
+        guard let outliner = outlinerFactory() else { return }
+        let check = checkID
+        outlineTask = Task { [weak self] in
+            do {
+                let result = try await outliner.outline(jpegData: afterData, category: category)
+                guard let self, check == self.checkID, !Task.isCancelled else { return }
+                self.samRemaining = result
+            } catch {
+                guard !Task.isCancelled, !(error is CancellationError) else { return }
+                Self.logger.error("SAM what's-left unavailable: \(String(describing: error), privacy: .public)")
+            }
+        }
+    }
+
+    private func cancelOutline() {
+        outlineTask?.cancel()
+        outlineTask = nil
+        samRemaining = nil
+        checkID = UUID()
+    }
+
+    /// Waits for the in-flight SAM call (tests only; the view observes `samRemaining`).
+    func waitForOutline() async {
+        await outlineTask?.value
     }
 
     /// Blurs faces/plates and writes `fix_<id>.jpg` to Documents. Nil when blurring or writing fails.

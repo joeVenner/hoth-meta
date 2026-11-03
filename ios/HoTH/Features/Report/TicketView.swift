@@ -10,6 +10,8 @@ struct TicketView: View {
     let args: SubmitReportArgs?
     let slots: [SlotQuestion]
     let photo: UIImage?
+    /// SAM 3.1 boxes on `photo`, drawn on the thumbnail.
+    var outline: SegmentOutline?
     let isArabic: Bool
     let onSubmit: (_ post: Bool, _ anonymous: Bool) async -> Void
 
@@ -18,8 +20,8 @@ struct TicketView: View {
     @State private var isSubmitting = false
 
     init(ticketNumber: String, analysis: VisionAnalysis, priority: PriorityDecision, team: ReportRouting.Team,
-         args: SubmitReportArgs?, slots: [SlotQuestion], photo: UIImage?, isArabic: Bool,
-         onSubmit: @escaping (_ post: Bool, _ anonymous: Bool) async -> Void) {
+         args: SubmitReportArgs?, slots: [SlotQuestion], photo: UIImage?, outline: SegmentOutline? = nil,
+         isArabic: Bool, onSubmit: @escaping (_ post: Bool, _ anonymous: Bool) async -> Void) {
         self.ticketNumber = ticketNumber
         self.analysis = analysis
         self.priority = priority
@@ -27,6 +29,7 @@ struct TicketView: View {
         self.args = args
         self.slots = slots
         self.photo = photo
+        self.outline = outline
         self.isArabic = isArabic
         self.onSubmit = onSubmit
         _postToNeighbourhood = State(initialValue: args?.wantsToPost ?? true)
@@ -95,6 +98,11 @@ struct TicketView: View {
                         .resizable()
                         .scaledToFill()
                         .frame(width: 76, height: 76)
+                        .overlay {
+                            if let boxes = outline?.boxes, !boxes.isEmpty {
+                                SAMOutlineOverlay(boxes: boxes, imageSize: photo.size, mode: .fill, lineWidth: 1.5)
+                            }
+                        }
                         .clipShape(RoundedRectangle(cornerRadius: HoTHRadius.inner, style: .continuous))
                 }
             }

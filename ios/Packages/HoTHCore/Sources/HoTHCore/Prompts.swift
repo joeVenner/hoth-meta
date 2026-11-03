@@ -64,6 +64,8 @@ public struct Prompts: Codable, Sendable {
     public let slots: [String: [SlotQuestion]]
     public let chatIntake: PromptSpec
     public let moderation: PromptSpec
+    /// SAM 3.1 noun phrase per category raw value (`segment_concepts`); absent in older files.
+    public let segmentConcepts: [String: String]?
 
     enum CodingKeys: String, CodingKey {
         case version, models, categories
@@ -75,6 +77,7 @@ public struct Prompts: Codable, Sendable {
         case slots
         case chatIntake = "chat_intake"
         case moderation
+        case segmentConcepts = "segment_concepts"
     }
 
     public init(data: Data) throws {
@@ -95,6 +98,12 @@ public struct Prompts: Codable, Sendable {
 
     public func slots(for category: ReportCategory) -> [SlotQuestion] {
         slots[category.rawValue] ?? []
+    }
+
+    /// The SAM concept for a category, or nil when it has none (`other`, `not_an_issue`): no SAM call then.
+    public func segmentConcept(for category: ReportCategory) -> String? {
+        let phrase = segmentConcepts?[category.rawValue]?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return phrase.isEmpty ? nil : phrase
     }
 
     /// The vision model to call: a non-blank override (Settings) wins, else `models.vision`.

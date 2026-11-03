@@ -2476,6 +2476,22 @@
         }
       }
     },
+    "Outlined by SAM 3.1" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حدّده SAM 3.1"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outlined by SAM 3.1"
+          }
+        }
+      }
+    },
     "Powers Meta's Muse Spark: photo analysis, chat and repair checks." : {
       "extractionState" : "stale",
       "localizations" : {
