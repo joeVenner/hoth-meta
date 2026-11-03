@@ -271,7 +271,7 @@ private struct PoweredByMetaPageView: View {
                 }
 
                 Label {
-                    Text("Your photo and voice go to the Meta Model API only when you report.")
+                    Text("Your photo and voice go to the Meta Model API only when you report, and faces and number plates your phone detects are blurred before the photo is sent.")
                 } icon: {
                     Image(systemName: "lock.fill")
                 }

@@ -86,6 +86,8 @@ enum ToolCallLogLine {
 enum CaptureLog {
     static let fileName = "hoth_app_log.jsonl"
     private static let logger = Logger(subsystem: "io.fomy.hoth", category: "CaptureLog")
+    /// Records can come from several tasks at once (SAM, the agent's tools); one line at a time.
+    private static let writeLock = NSLock()
 
     // MARK: Events
 
@@ -102,6 +104,36 @@ enum CaptureLog {
             "duration_ms": .number(Double(durationMs)),
             "line": .string(line),
         ])
+    }
+
+    /// A photo finished the on-device blur and may now be sent (`UploadAudit`).
+    static func recordRedaction(_ redaction: UploadAudit.Redaction) {
+        logger.debug("redaction \(redaction.path.rawValue, privacy: .public) faces=\(redaction.faces, privacy: .public) plates=\(redaction.plates, privacy: .public) \(redaction.durationMs, privacy: .public) ms")
+        append(event: "redaction", fields: redactionFields(redaction))
+    }
+
+    /// A Meta request carrying the redactions `uploadIDs` is about to leave the phone.
+    static func recordMetaRequest(path: UploadAudit.Path, uploadIDs: [String]) {
+        logger.debug("meta_request \(path.rawValue, privacy: .public) uploads=\(uploadIDs.joined(separator: ","), privacy: .public)")
+        append(event: "meta_request", fields: metaRequestFields(path: path, uploadIDs: uploadIDs))
+    }
+
+    /// Counts, timing and ids only: never image bytes or keys.
+    static func redactionFields(_ redaction: UploadAudit.Redaction) -> [String: JSONValue] {
+        [
+            "path": .string(redaction.path.rawValue),
+            "upload_id": .string(redaction.uploadID),
+            "faces": .number(Double(redaction.faces)),
+            "plates": .number(Double(redaction.plates)),
+            "ms": .number(Double(redaction.durationMs)),
+        ]
+    }
+
+    static func metaRequestFields(path: UploadAudit.Path, uploadIDs: [String]) -> [String: JSONValue] {
+        [
+            "path": .string(path.rawValue),
+            "upload_ids": .array(uploadIDs.map(JSONValue.string)),
+        ]
     }
 
     /// The app started in capture mode; proves the host log directory (and the WAV playlist, if named)
@@ -135,7 +167,7 @@ enum CaptureLog {
             record["scene"] = .string(scene)
         }
         do {
-            try append(record: record, to: directory.appendingPathComponent(fileName))
+            try writeLock.withLock { try append(record: record, to: directory.appendingPathComponent(fileName)) }
         } catch {
             logger.error("Capture log write failed: \(String(describing: error), privacy: .public)")
         }

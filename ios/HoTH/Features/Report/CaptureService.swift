@@ -169,6 +169,9 @@ final class CaptureService: NSObject, ObservableObject {
                                           source: .liveCamera, demoSampleID: nil)
     }
 
+    /// JPEG quality for report photos (the local original and the redacted upload alike).
+    nonisolated static let jpegQuality: CGFloat = 0.82
+
     /// Normalizes orientation, downsizes and encodes a photo.
     nonisolated static func makeCapturedPhoto(
         from image: UIImage,
@@ -178,7 +181,7 @@ final class CaptureService: NSObject, ObservableObject {
         demoSampleID: String?
     ) throws -> CapturedPhoto {
         let prepared = ImageResizing.normalizedAndDownsized(image, maxEdge: ImageResizing.maxPixelEdge)
-        guard let jpeg = prepared.jpegData(compressionQuality: 0.82) else {
+        guard let jpeg = prepared.jpegData(compressionQuality: jpegQuality) else {
             throw CaptureError.captureFailed("JPEG encoding failed")
         }
         return CapturedPhoto(image: prepared, jpegData: jpeg, capturedAt: capturedAt, gps: gps,

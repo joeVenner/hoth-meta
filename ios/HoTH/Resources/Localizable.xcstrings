@@ -1418,35 +1418,34 @@
         }
       }
     },
-    "Faces and number plates are blurred on your phone before anything is posted to the neighbourhood. To analyse the hazard, the photo is sent to Meta's Muse Spark model." : {
-      "extractionState" : "stale",
+    "Faces and number plates your phone detects are blurred before the photo leaves it, and only the blurred photo is posted to the neighbourhood. Detection can miss some." : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تُموَّه الوجوه وأرقام اللوحات على هاتفك قبل نشر أي شيء في الحي. ولتحليل الخطر، تُرسل الصورة إلى نموذج Muse Spark من Meta."
+            "value" : "تُموَّه الوجوه وأرقام اللوحات التي يكتشفها هاتفك قبل أن تغادره الصورة، ولا يُنشر في الحي إلا الصورة المموّهة. قد يفوت الكشفُ بعضها."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Faces and number plates are blurred on your phone before anything is posted to the neighbourhood. To analyse the hazard, the photo is sent to Meta's Muse Spark model."
+            "value" : "Faces and number plates your phone detects are blurred before the photo leaves it, and only the blurred photo is posted to the neighbourhood. Detection can miss some."
           }
         }
       }
     },
-    "Faces and plates are blurred on your phone before posting." : {
+    "Faces and plates your phone detects are blurred before analysis and posting." : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "يتم تمويه الوجوه واللوحات على هاتفك قبل النشر."
+            "value" : "تُموَّه الوجوه واللوحات التي يكتشفها هاتفك قبل التحليل والنشر."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Faces and plates are blurred on your phone before posting."
+            "value" : "Faces and plates your phone detects are blurred before analysis and posting."
           }
         }
       }
@@ -4688,34 +4687,34 @@
         }
       }
     },
-    "Your photo and location are sent to Meta's Muse Spark model to analyse the hazard." : {
+    "Faces and plates your phone detects are blurred first; then the photo and approximate location go to Meta's Muse Spark model to analyse the hazard." : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تُرسل صورتك وموقعك إلى نموذج Muse Spark من Meta لتحليل الخطر."
+            "value" : "تُموَّه الوجوه واللوحات التي يكتشفها هاتفك أولاً، ثم تُرسل الصورة والموقع التقريبي إلى نموذج Muse Spark من Meta لتحليل الخطر."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your photo and location are sent to Meta's Muse Spark model to analyse the hazard."
+            "value" : "Faces and plates your phone detects are blurred first; then the photo and approximate location go to Meta's Muse Spark model to analyse the hazard."
           }
         }
       }
     },
-    "Your photo and voice go to the Meta Model API only when you report." : {
+    "Your photo and voice go to the Meta Model API only when you report, and faces and number plates your phone detects are blurred before the photo is sent." : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "لا تُرسَل صورتك وصوتك إلى Meta Model API إلا عندما تُبلغ."
+            "value" : "لا تُرسَل صورتك وصوتك إلى Meta Model API إلا عندما تُبلغ، وتُموَّه الوجوه وأرقام اللوحات التي يكتشفها هاتفك قبل إرسال الصورة."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your photo and voice go to the Meta Model API only when you report."
+            "value" : "Your photo and voice go to the Meta Model API only when you report, and faces and number plates your phone detects are blurred before the photo is sent."
           }
         }
       }
@@ -4732,6 +4731,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "حيّ · Hay = neighbourhood"
+          }
+        }
+      }
+    },
+    "report.error.redaction" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ما قدرت أخفي الوجوه وأرقام السيارات في هالصورة، فما أرسلتها. صوّرها مرة ثانية."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I couldn't blur faces and number plates on this photo, so it wasn't sent. Please take it again."
+          }
+        }
+      }
+    },
+    "crew.error.redaction" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعذّر تمويه الوجوه وأرقام اللوحات في هذه الصور، لذلك لم يُرسل شيء. حاول مرة أخرى."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't blur faces and number plates on these photos, so nothing was sent. Please try again."
           }
         }
       }

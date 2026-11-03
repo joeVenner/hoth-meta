@@ -11,7 +11,7 @@ HoTH is a neighbourhood social network for reporting unsafe public spaces. A res
 - **Explained priority.** Every ticket shows why it is ranked where it is. Deterministic safety floors in `HoTHCore` mean child-safety hazards are never ranked below CRITICAL, whatever the model says.
 - **Neighbourhood layer.** Feed and map, "I saw it too" confirmations, moderated comments, nearby-hazard alerts, reputation levels.
 - **Verified fixes.** A case closes only when the before/after pair is accepted.
-- **Privacy.** Faces and licence plates are blurred on device; the photo posted to the feed is always the blurred one.
+- **Privacy.** Faces and licence plates the phone detects are blurred on device before any upload (detection can miss some); the photo posted to the feed is always the blurred one.
 
 ## Meta adaptation (in progress)
 

@@ -64,7 +64,8 @@ final class ReportFlowModel: ObservableObject {
     @Published private(set) var nearbyPlace: LocationType?
     /// Set while the interview records an optional voice note for a merged duplicate.
     @Published private(set) var voiceNoteTarget: DuplicateOutcome?
-    /// SAM 3.1 boxes for the analysed category, on `photo` (the exact JPEG vision saw). Arrives after the
+    /// SAM 3.1 boxes for the analysed category, on the exact redacted JPEG vision saw (same pixel size as
+    /// `photo.image`, so the boxes land on the shown photo). Arrives after the
     /// analysis card is up; nil while pending, on failure, or for canned/demo analyses.
     @Published private(set) var outline: SegmentOutline?
 
@@ -77,6 +78,15 @@ final class ReportFlowModel: ObservableObject {
     private let languageProvider: () -> String
     private let visionModelProvider: () -> String?
     private let outlinerProvider: () -> HazardOutlining?
+    /// On-device face/plate blur for every photo sent to Meta; nil means "could not redact, send nothing".
+    private let redactor: @Sendable (UIImage) async -> FaceAndPlateBlur.Upload?
+    /// The redacted JPEG this run sends to Meta (vision, SAM, duplicate judge, intake `segment_hazard`).
+    /// Nil for canned analyses: nothing from this photo is sent then.
+    private var analysisJPEG: Data?
+    /// Audit id of the redaction that produced `analysisJPEG` (see `UploadAudit`).
+    private var analysisUploadID: String?
+    /// Records each redaction and the Meta requests that send it (DEBUG capture log; no-op in release).
+    private let audit: UploadAudit
     private var outlineTask: Task<Void, Never>?
     private var blurTask: Task<FaceAndPlateBlur.Result, Never>?
     private var nearbyPlaceTask: Task<LocationType?, Never>?
@@ -94,11 +104,17 @@ final class ReportFlowModel: ObservableObject {
     ///   - hasAPIKey: read live; without a key a demo photo uses its canned analysis (no doomed call).
     ///   - visionModel: read live; the Settings override (nil/blank → prompts.json `models.vision`).
     ///   - outliner: read per photo; nil (no key, UI tests) means no SAM overlay.
+    ///   - redactor: blurs faces and plates before any upload (tests inject a fake).
+    ///   - audit: records that each upload was redacted before its request (tests inject a recorder).
     init(client: MetaModelClient, prompts: Prompts, language: @escaping () -> String,
          isDemoMode: @escaping () -> Bool, hasAPIKey: @escaping () -> Bool = { true },
          visionModel: @escaping () -> String? = { nil },
-         outliner: @escaping () -> HazardOutlining? = { nil }) {
+         outliner: @escaping () -> HazardOutlining? = { nil },
+         redactor: @escaping @Sendable (UIImage) async -> FaceAndPlateBlur.Upload? = { await ReportFlowModel.redactForUpload($0) },
+         audit: UploadAudit = .live) {
         self.visionModelProvider = visionModel
+        self.audit = audit
+        self.redactor = redactor
         self.outlinerProvider = outliner
         self.client = client
         self.prompts = prompts
@@ -136,8 +152,6 @@ final class ReportFlowModel: ObservableObject {
         let run = runID  // after reset(), which regenerates it
         photo = captured
         step = .analyzing
-        let image = captured.image
-        blurTask = Task.detached(priority: .utility) { await FaceAndPlateBlur.blur(image) }
         // P2-02: runs alongside vision; bounded by NearbyPlaces.timeout so it never holds the flow.
         if NearbyPlaces.shouldLookUp(isDemoMode: isDemoMode, hasGPS: captured.gps != nil), let gps = captured.gps {
             nearbyPlaceTask = Task { await NearbyPlaces.lookUp(latitude: gps.latitude, longitude: gps.longitude) }
@@ -149,12 +163,27 @@ final class ReportFlowModel: ObservableObject {
            sample.assetImage == nil || !hasAPIKeyProvider() {
             // No key (offline demo), or a drawn placeholder that would only confuse the model: canned read.
             // With a key, the real photo gets the real analysis (still labelled "Demo photo").
+            // Nothing is sent, so the blur (needed only for posting) runs in the background.
+            let image = captured.image
+            blurTask = Task.detached(priority: .utility) { await FaceAndPlateBlur.blur(image) }
             vision = sample.cannedAnalysis
             isDemoAnalysis = true
         } else {
+            // Privacy: faces and plates are blurred on the phone BEFORE the photo leaves it. If that
+            // fails (or times out), nothing is sent and the resident is asked to retake.
+            let audited = await audit.redact(captured.image, path: .vision, with: redactor)
+            guard run == runID else { return }
+            guard let audited else {
+                step = .failed(message: Self.redactionFailedMessage(arabic: isArabic))
+                return
+            }
+            let upload = audited.upload
+            adopt(upload)
+            analysisUploadID = audited.uploadID
             do {
+                audit.request(.vision, [audited.uploadID])
                 vision = try await VisionAnalyzer(client: client, prompts: prompts, model: visionModelProvider())
-                    .analyze(imageData: captured.jpegData, language: language, capturedAt: captured.capturedAt,
+                    .analyze(imageData: upload.jpegData, language: language, capturedAt: captured.capturedAt,
                              placeHint: placeHint(for: captured))
                 guard run == runID else { return }
                 isDemoAnalysis = false
@@ -187,7 +216,9 @@ final class ReportFlowModel: ObservableObject {
         }
 
         // SAM runs alongside priority and dedup; the card never waits for it.
-        if !isDemoAnalysis { startOutline(jpegData: captured.jpegData, category: vision.category, run: run) }
+        if !isDemoAnalysis, let analysisJPEG, let analysisUploadID {
+            startOutline(jpegData: analysisJPEG, uploadID: analysisUploadID, category: vision.category, run: run)
+        }
 
         // 3. Priority (before the interview; refined with the answers afterwards). Computed before the
         // duplicate check so a merged duplicate can still record an optional voice note.
@@ -434,7 +465,10 @@ final class ReportFlowModel: ObservableObject {
     /// or a prompts file without `intake_agent`).
     func intakeToolbox(context: ModelContext, outliner: HazardOutlining?) -> IntakeToolbox? {
         guard let agent = prompts.intakeAgent, voiceNoteTarget == nil, let photo, let analysis else { return nil }
-        let jpegData = photo.jpegData
+        // Only the redacted JPEG may be segmented; a canned analysis sent nothing, so offers no SAM tool.
+        let jpegData = analysisJPEG
+        let uploadIDs = analysisUploadID.map { [$0] } ?? []
+        let audit = audit
         let here = coordinate(for: photo)
         let place = nearbyPlace
         return IntakeToolbox(
@@ -444,7 +478,7 @@ final class ReportFlowModel: ObservableObject {
                 PlaceContextSummary(nearbyPlace: place, sceneType: analysis.sceneType,
                                     childUseEquipment: analysis.childUseEquipment)
             },
-            segment: outliner.map { outliner in
+            segment: jpegData.flatMap { jpegData in outliner.map { outliner in
                 { [weak self] concept in
                     // The card's outline (read live: SAM may finish after the interview starts) already
                     // answers its own concept, so no second SAM call.
@@ -452,9 +486,10 @@ final class ReportFlowModel: ObservableObject {
                        existingOutline.concept.caseInsensitiveCompare(concept) == .orderedSame {
                         return existingOutline
                     }
+                    audit.request(.segmentHazard, uploadIDs)
                     return try await outliner.outline(jpegData: jpegData, concept: concept)
                 }
-            })
+            } })
     }
 
     /// Open or in-progress reports within `radius` metres, nearest first.
@@ -515,11 +550,15 @@ final class ReportFlowModel: ObservableObject {
         }
 
         var verdict: SameIssueVerdict?
-        if !isDemoAnalysis, let existingJPEG = ReportPhotoFiles.loadJPEG(match.photoFileName) {
+        if !isDemoAnalysis, let newJPEG = analysisJPEG, let newUploadID = analysisUploadID,
+           let existing = await redactedPhoto(of: match) {
+            guard run == runID else { return nil }
+            let existingJPEG = existing.jpegData
             do {
+                audit.request(.dedup, [newUploadID, existing.uploadID])
                 verdict = try await DuplicateJudge(client: client, prompts: prompts, model: visionModelProvider()).judge(
                     new: ReportSnapshot(summary: vision.descriptionEN, category: vision.category,
-                                        capturedAt: captured.capturedAt, jpegData: captured.jpegData),
+                                        capturedAt: captured.capturedAt, jpegData: newJPEG),
                     existing: ReportSnapshot(summary: match.summaryEN, category: vision.category,
                                              capturedAt: match.createdAt, jpegData: existingJPEG),
                     distanceMeters: nearest.distanceMeters)
@@ -538,6 +577,23 @@ final class ReportFlowModel: ObservableObject {
         }
         guard run == runID else { return nil }
         return merge(into: match, distance: nearest.distanceMeters, context: context)
+    }
+
+    /// The existing report's photo for the duplicate judge: its public (already blurred) file, blurred
+    /// again on this phone so every byte sent has passed `FaceAndPlateBlur` here (seed photos too).
+    /// Nil (no judge call, so a new report) when there is no public file or redaction fails.
+    private func redactedPhoto(of report: Report) async -> AuditedUpload? {
+        guard let data = ReportPhotoFiles.loadJPEG(report.blurredPhotoFileName), let image = UIImage(data: data) else {
+            Self.logger.notice("Duplicate judge skipped: existing report has no public photo")
+            return nil
+        }
+        // Same size cap as a new photo (seed assets can be larger).
+        let sized = ImageResizing.normalizedAndDownsized(image, maxEdge: ImageResizing.maxPixelEdge)
+        guard let upload = await audit.redact(sized, path: .dedup, with: redactor) else {
+            Self.logger.notice("Duplicate judge skipped: existing photo could not be re-blurred")
+            return nil
+        }
+        return upload
     }
 
     /// Demo samples decide by flag, never by distance or judge: only the duplicate demo merges.
@@ -599,10 +655,12 @@ final class ReportFlowModel: ObservableObject {
 
     /// SAM on the same JPEG the vision model saw, so its boxes line up with `photo.image`. Any failure
     /// (timeout included) is logged and leaves the photo without the overlay; it never blocks the report.
-    private func startOutline(jpegData: Data, category: ReportCategory, run: UUID) {
+    private func startOutline(jpegData: Data, uploadID: String, category: ReportCategory, run: UUID) {
         guard let outliner = outlinerProvider() else { return }
+        let audit = audit
         outlineTask = Task { [weak self] in
             do {
+                audit.request(.sam, [uploadID])
                 let result = try await outliner.outline(jpegData: jpegData, category: category)
                 guard let self, run == self.runID, !Task.isCancelled else { return }
                 self.outline = result
@@ -646,6 +704,8 @@ final class ReportFlowModel: ObservableObject {
         plausibility = nil
         submitArgs = nil
         isDemoAnalysis = false
+        analysisJPEG = nil
+        analysisUploadID = nil
         blurredImage = nil
         blurResult = nil
         safetyAlert = nil
@@ -657,6 +717,18 @@ final class ReportFlowModel: ObservableObject {
     }
 
     private var blurResult: FaceAndPlateBlur.Result?
+
+    /// The upload's blur is the one posted later, so `post` never blurs the same photo twice.
+    private func adopt(_ upload: FaceAndPlateBlur.Upload) {
+        analysisJPEG = upload.jpegData
+        blurResult = upload.result
+        blurredImage = upload.result.image
+    }
+
+    /// Production redactor: same JPEG quality as `CaptureService` uses for the original.
+    nonisolated static func redactForUpload(_ image: UIImage) async -> FaceAndPlateBlur.Upload? {
+        await FaceAndPlateBlur.redactForUpload(image, quality: CaptureService.jpegQuality)
+    }
 
     private func finishedBlur(fallback: UIImage) async -> FaceAndPlateBlur.Result {
         if let blurResult { return blurResult }
@@ -712,6 +784,14 @@ final class ReportFlowModel: ObservableObject {
     private func award(_ points: Int, reason: PointsReason, to user: Neighbour, reportID: UUID, context: ModelContext) {
         user.points += points
         context.insert(PointsEvent(user: user, delta: points, reason: reason, reportID: reportID))
+    }
+
+    /// Shown when faces and plates could not be blurred: nothing was sent, so the only safe retry is a new photo.
+    static func redactionFailedMessage(arabic: Bool) -> String {
+        arabic
+            ? "ما قدرت أخفي الوجوه وأرقام السيارات في هالصورة، فما أرسلتها. صوّرها مرة ثانية."
+            : String(localized: "report.error.redaction",
+                     defaultValue: "I couldn't blur faces and number plates on this photo, so it wasn't sent. Please take it again.")
     }
 
     static func friendlyMessage(for error: Error, arabic: Bool) -> String {

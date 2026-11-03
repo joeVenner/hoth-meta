@@ -148,7 +148,7 @@ struct TicketView: View {
                 Toggle(isOn: $postToNeighbourhood.animation(HoTHMotion.spring)) {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Post to your neighbourhood?").font(.hothHeadline).foregroundStyle(Color.hothInk)
-                        Text("Faces and plates are blurred on your phone before posting.")
+                        Text("Faces and plates your phone detects are blurred before analysis and posting.")
                             .font(.hothCaption).foregroundStyle(Color.hothInkSecondary)
                     }
                 }

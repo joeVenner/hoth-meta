@@ -46,8 +46,15 @@ struct FixVerdict: Equatable, Sendable {
 
 /// Compares before/after photos. Stubbed in tests; live calls go through `LiveFixVerifier`.
 protocol FixVerifying: Sendable {
+    /// False when the verifier never reads or sends the photos (canned demo verdicts), so the
+    /// pre-upload blur can be skipped.
+    var sendsPhotos: Bool { get }
     func verify(before: Data, after: Data, reportTitle: String, categoryRaw: String,
                 beforeCapturedAt: Date) async throws -> FixVerdict
+}
+
+extension FixVerifying {
+    var sendsPhotos: Bool { true }
 }
 
 /// Wraps `HoTHCore.FixVerifier` (one Responses API call per `verify`).
