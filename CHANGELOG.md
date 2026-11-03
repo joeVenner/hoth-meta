@@ -47,6 +47,8 @@ The format follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/
 - The realtime-only mid-call urgency path in `ReportFlowModel` (`voiceFlaggedUrgent`, `SafetyAlert.keepsInterview`, `urgentAnswers`); push-to-talk urgency goes through the chat like typing.
 
 ### Fixed
+- Arabic UI showed Muse Spark's hazard labels in English on the analysis photo and legend. The vision schema now asks for `label_ar` next to `label` (decoded as `Hazard.labelAR`, optional for older responses; `label(arabic:)` falls back to English), tag widths are measured on the shown text, and the offline demo hazards carry Arabic labels. The intake agent still gets the English labels. Smoke eval unchanged (3/3 category, fix 1/1).
+- Arabic UI showed the SAM 3.1 concept in English next to «حدّده SAM 3.1» (analysis card and crew fix check, including the fix-check box tags). prompts.json `segment_concepts_ar` gives each category concept an Arabic display name (`Prompts.segmentConceptDisplayName`); SAM still gets the English concept, and free-form agent concepts show their English text.
 - Arabic "Why this priority" showed the safety floor in English ("CRITICAL — child safety"). Floors carry Arabic labels and `PriorityDecision` has `floorAppliedEN` / `floorAppliedAR`.
 - The analysis card's trust chips wrap instead of scrolling sideways, so the "Outlined by SAM 3.1" chip no longer runs off-screen (Arabic, iPhone 17 Pro); `ReportWrapLayout` lets an over-wide chip wrap its text.
 - Demo capture C2: in DEBUG capture mode the neighbour-alert notification goes to Notification Centre without a foreground banner, so it no longer covers the in-app "Demo" alert banner. Release behaviour unchanged.

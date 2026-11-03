@@ -221,6 +221,16 @@ final class CrewTests: XCTestCase {
         XCTAssertTrue(fixed.regions.isEmpty, "a resolved repair shows nothing left")
     }
 
+    func testRemainingLabelsHaveArabicNames() throws {
+        let canned = try XCTUnwrap(DemoFixPhoto.bad.cannedVerdict.remaining.first)
+        XCTAssertEqual(canned.label(arabic: false), "Unfilled gravel")
+        XCTAssertEqual(canned.label(arabic: true), "حصى غير مردوم")
+        let old = FixVerdict.Region(label: "loose gravel", box: .zero)
+        XCTAssertEqual(old.label(arabic: true), "loose gravel", "no label_ar falls back to English")
+        let blank = FixVerdict.Region(label: "loose gravel", labelAR: "  ", box: .zero)
+        XCTAssertEqual(blank.label(arabic: true), "loose gravel")
+    }
+
     func testCannedOrResolvedVerdictsNeverCallSAM() async throws {
         let fake = FakeOutliner { _, _ in SegmentOutline(concept: "pothole", boxes: []) }
         let canned = FixCheckModel(verifierFactory: { _ in StubVerifier(verdict: self.notResolved) },

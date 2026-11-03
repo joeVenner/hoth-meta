@@ -73,6 +73,24 @@ final class ReportFlowDemoTests: XCTestCase {
         XCTAssertLessThanOrEqual(distance, Dedup.radiusMeters)
     }
 
+    func testDemoHazardsHaveArabicLabels() throws {
+        for sample in DemoSamples.all {
+            for hazard in sample.cannedAnalysis.hazards {
+                let arabic = hazard.label(arabic: true)
+                XCTAssertNotEqual(arabic, hazard.label, "\(sample.id): \(hazard.label) has no Arabic label")
+                XCTAssertNil(arabic.range(of: "[A-Za-z]", options: .regularExpression), "\(sample.id): \(arabic)")
+            }
+        }
+    }
+
+    func testBundledPromptsShowSAMConceptInArabic() throws {
+        let prompts = try Prompts(bundle: .main)
+        let concept = try XCTUnwrap(prompts.segmentConcept(for: .playgroundEquipment))
+        let shown = prompts.segmentConceptDisplayName(concept, arabic: true)
+        XCTAssertEqual(concept, "broken playground equipment", "SAM keeps the English concept")
+        XCTAssertNil(shown.range(of: "[A-Za-z]", options: .regularExpression), shown)
+    }
+
     func testDuplicateDemoMergesIntoSeededR10() async throws {
         let r10 = insertReport(category: .potholePavement, at: Coordinate(latitude: 24.4183, longitude: 54.5803),
                                photo: DemoSamples.duplicateDemoSeedPhoto, isDemoSeed: true)

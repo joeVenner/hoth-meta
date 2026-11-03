@@ -73,6 +73,37 @@ final class HazardSegmenterTests: XCTestCase {
         XCTAssertNil(prompts.segmentConcept(for: .potholePavement))
     }
 
+    func testEveryConceptHasAnArabicDisplayName() throws {
+        let prompts = try Fixtures.prompts()
+        let english = try XCTUnwrap(prompts.segmentConcepts)
+        let arabic = try XCTUnwrap(prompts.segmentConceptsAR)
+        XCTAssertEqual(Set(arabic.keys), Set(english.keys))
+        for (category, concept) in english {
+            let name = prompts.segmentConceptDisplayName(concept, arabic: true)
+            XCTAssertNotEqual(name, concept, category)
+            XCTAssertNil(name.range(of: "[A-Za-z]", options: .regularExpression), "\(category): Arabic script only")
+        }
+    }
+
+    func testConceptDisplayNameMapsCategoryConceptsOnlyInArabic() throws {
+        let prompts = try Fixtures.prompts()
+        XCTAssertEqual(prompts.segmentConceptDisplayName("broken playground equipment", arabic: true), "ألعاب أطفال مكسورة")
+        XCTAssertEqual(prompts.segmentConceptDisplayName(" Pothole ", arabic: true), "حفرة", "case and space insensitive")
+        XCTAssertEqual(prompts.segmentConceptDisplayName("pothole", arabic: false), "pothole")
+        // Free-form agent concepts have no Arabic entry: show the English text.
+        XCTAssertEqual(prompts.segmentConceptDisplayName("broken swing chain", arabic: true), "broken swing chain")
+        // The concept sent to SAM stays English.
+        XCTAssertEqual(prompts.segmentConcept(for: .potholePavement), "pothole")
+    }
+
+    func testPromptsWithoutArabicConceptMapFallBackToEnglish() throws {
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(with: Fixtures.appPromptsData()) as? [String: Any])
+        object.removeValue(forKey: "segment_concepts_ar")
+        let prompts = try Prompts(data: JSONSerialization.data(withJSONObject: object))
+        XCTAssertNil(prompts.segmentConceptsAR)
+        XCTAssertEqual(prompts.segmentConceptDisplayName("pothole", arabic: true), "pothole")
+    }
+
     // MARK: Segmenter
 
     func testOutlineSendsCategoryConceptAndReturnsSelectedBoxes() async throws {

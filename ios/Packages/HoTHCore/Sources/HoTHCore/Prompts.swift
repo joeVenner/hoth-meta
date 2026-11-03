@@ -80,6 +80,8 @@ public struct Prompts: Codable, Sendable {
     public let moderation: PromptSpec
     /// SAM 3.1 noun phrase per category raw value (`segment_concepts`); absent in older files.
     public let segmentConcepts: [String: String]?
+    /// Arabic display name per category raw value (`segment_concepts_ar`). Display only: SAM always gets English.
+    public let segmentConceptsAR: [String: String]?
     /// Tool-calling intake agent (`intake_agent`); absent in older files, which keeps single-turn chat.
     public let intakeAgent: IntakeAgentSpec?
 
@@ -94,6 +96,7 @@ public struct Prompts: Codable, Sendable {
         case chatIntake = "chat_intake"
         case moderation
         case segmentConcepts = "segment_concepts"
+        case segmentConceptsAR = "segment_concepts_ar"
         case intakeAgent = "intake_agent"
     }
 
@@ -121,6 +124,18 @@ public struct Prompts: Codable, Sendable {
     public func segmentConcept(for category: ReportCategory) -> String? {
         let phrase = segmentConcepts?[category.rawValue]?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         return phrase.isEmpty ? nil : phrase
+    }
+
+    /// How to show a SAM concept: in Arabic, a category concept maps to its `segment_concepts_ar` name;
+    /// free-form concepts (the intake agent's) and missing entries fall back to the English text.
+    public func segmentConceptDisplayName(_ concept: String, arabic: Bool) -> String {
+        guard arabic else { return concept }
+        let needle = concept.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let category = segmentConcepts?.first(where: {
+            $0.value.trimmingCharacters(in: .whitespacesAndNewlines).caseInsensitiveCompare(needle) == .orderedSame
+        })?.key else { return concept }
+        let arabicName = segmentConceptsAR?[category]?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return arabicName.isEmpty ? concept : arabicName
     }
 
     /// The vision model to call: a non-blank override (Settings) wins, else `models.vision`.

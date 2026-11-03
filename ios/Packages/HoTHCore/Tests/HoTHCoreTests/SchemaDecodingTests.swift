@@ -20,6 +20,26 @@ final class SchemaDecodingTests: XCTestCase {
         XCTAssertEqual(vision.confidence, .high)
     }
 
+    func testHazardArabicLabelDecodesAndFallsBackToEnglish() throws {
+        let vision = try JSONDecoder().decode(VisionAnalysis.self, from: Fixtures.data("vision_analysis"))
+        XCTAssertEqual(vision.hazards[0].labelAR, "عمود معدني حاد مكشوف")
+        XCTAssertEqual(vision.hazards[0].label(arabic: true), "عمود معدني حاد مكشوف")
+        XCTAssertEqual(vision.hazards[0].label(arabic: false), "exposed sharp metal post")
+        // Older responses have no label_ar: Arabic UI falls back to the English label.
+        XCTAssertNil(vision.hazards[1].labelAR)
+        XCTAssertEqual(vision.hazards[1].label(arabic: true), "unstable spring base")
+    }
+
+    func testHazardBlankArabicLabelFallsBackAndRoundTrips() throws {
+        let blank = Hazard(label: "Pothole", labelAR: "  ", kind: .trip, box: NormalizedBox(x: 0.1, y: 0.1, w: 0.2, h: 0.2))
+        XCTAssertEqual(blank.label(arabic: true), "Pothole")
+        let hazard = Hazard(label: "Pothole", labelAR: "حفرة", kind: .trip, box: NormalizedBox(x: 0.1, y: 0.1, w: 0.2, h: 0.2))
+        let encoded = try JSONEncoder().encode(hazard)
+        let object = try XCTUnwrap(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+        XCTAssertEqual(object["label_ar"] as? String, "حفرة")
+        XCTAssertEqual(try JSONDecoder().decode(Hazard.self, from: encoded), hazard)
+    }
+
     func testVisionAnalysisRoundTripsWithSnakeCaseKeys() throws {
         let original = try JSONDecoder().decode(VisionAnalysis.self, from: Fixtures.data("vision_analysis"))
         let encoded = try JSONEncoder().encode(original)
@@ -83,6 +103,22 @@ final class SchemaDecodingTests: XCTestCase {
         XCTAssertTrue(fix.sameLocationLikely)
         XCTAssertEqual(fix.remainingIssues.first?.box.w ?? 0, 0.14, accuracy: 1e-9)
         XCTAssertFalse(fix.reasonAR.isEmpty)
+    }
+
+    func testRemainingIssueArabicLabelDecodesAndFallsBack() throws {
+        let fix = try JSONDecoder().decode(FixVerification.self, from: Fixtures.data("fix_verification"))
+        let issue = try XCTUnwrap(fix.remainingIssues.first)
+        XCTAssertEqual(issue.labelAR, "عمود معدني حاد ما زال مكشوفًا")
+        XCTAssertEqual(issue.label(arabic: true), "عمود معدني حاد ما زال مكشوفًا")
+        XCTAssertEqual(issue.label(arabic: false), "sharp metal post still exposed")
+
+        // Older responses have no label_ar; a blank one also falls back to English.
+        let old = Data(#"{"label":"loose gravel","box":{"x_min":0,"y_min":0,"x_max":100,"y_max":100}}"#.utf8)
+        let decoded = try JSONDecoder().decode(RemainingIssue.self, from: old)
+        XCTAssertNil(decoded.labelAR)
+        XCTAssertEqual(decoded.label(arabic: true), "loose gravel")
+        let blank = RemainingIssue(label: "loose gravel", labelAR: " ", box: NormalizedBox(x: 0, y: 0, w: 0.1, h: 0.1))
+        XCTAssertEqual(blank.label(arabic: true), "loose gravel")
     }
 
     func testDecodesSameIssueFixture() throws {

@@ -10,8 +10,23 @@ import SwiftData
 struct FixVerdict: Equatable, Sendable {
     struct Region: Equatable, Sendable {
         let label: String
+        /// Arabic name from the verifier (`label_ar`); nil for SAM regions and older responses.
+        let labelAR: String?
         /// Normalised 0...1 rect on the AFTER image (top-left origin).
         let box: CGRect
+
+        init(label: String, labelAR: String? = nil, box: CGRect) {
+            self.label = label
+            self.labelAR = labelAR
+            self.box = box
+        }
+
+        /// The name to show: Arabic when asked for and present, else English.
+        func label(arabic: Bool) -> String {
+            guard arabic, let labelAR else { return label }
+            let trimmed = labelAR.trimmingCharacters(in: .whitespacesAndNewlines)
+            return trimmed.isEmpty ? label : trimmed
+        }
     }
 
     let resolved: Bool
@@ -54,7 +69,7 @@ struct LiveFixVerifier: FixVerifying {
             reasonEN: result.reasonEN,
             reasonAR: result.reasonAR,
             remaining: result.remainingIssues.map {
-                FixVerdict.Region(label: $0.label,
+                FixVerdict.Region(label: $0.label, labelAR: $0.labelAR,
                                   box: CGRect(x: $0.box.x, y: $0.box.y, width: $0.box.w, height: $0.box.h))
             },
             isCanned: false
@@ -77,7 +92,7 @@ enum DemoFixPhoto: String, CaseIterable, Identifiable, Sendable {
                 resolved: false,
                 reasonEN: "Only half of the pothole was filled. Loose gravel is still exposed on the left side.",
                 reasonAR: "تم ردم نصف الحفرة فقط. لا يزال الحصى المفكك ظاهراً في الجهة اليسرى.",
-                remaining: [Region(label: "Unfilled gravel", box: CGRect(x: 0.25, y: 0.55, width: 0.22, height: 0.20))],
+                remaining: [Region(label: "Unfilled gravel", labelAR: "حصى غير مردوم", box: CGRect(x: 0.25, y: 0.55, width: 0.22, height: 0.20))],
                 isCanned: true
             )
         case .good:

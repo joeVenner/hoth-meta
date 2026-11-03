@@ -113,12 +113,28 @@ public struct NormalizedBox: Codable, Equatable, Sendable {
 }
 
 public struct Hazard: Codable, Equatable, Sendable {
+    /// English name; also what the intake agent sees.
     public let label: String
+    /// Arabic name (`label_ar`); nil in responses from older prompts.
+    public let labelAR: String?
     public let kind: HazardKind
     public let box: NormalizedBox
 
-    public init(label: String, kind: HazardKind, box: NormalizedBox) {
-        self.label = label; self.kind = kind; self.box = box
+    enum CodingKeys: String, CodingKey {
+        case label
+        case labelAR = "label_ar"
+        case kind, box
+    }
+
+    public init(label: String, labelAR: String? = nil, kind: HazardKind, box: NormalizedBox) {
+        self.label = label; self.labelAR = labelAR; self.kind = kind; self.box = box
+    }
+
+    /// The name to show: Arabic when asked for and present, else English.
+    public func label(arabic: Bool) -> String {
+        guard arabic, let labelAR else { return label }
+        let trimmed = labelAR.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? label : trimmed
     }
 }
 
@@ -244,8 +260,28 @@ extension VisionAnalysis {
 }
 
 public struct RemainingIssue: Codable, Equatable, Sendable {
+    /// English name.
     public let label: String
+    /// Arabic name (`label_ar`); nil in responses from older prompts.
+    public let labelAR: String?
     public let box: NormalizedBox
+
+    enum CodingKeys: String, CodingKey {
+        case label
+        case labelAR = "label_ar"
+        case box
+    }
+
+    public init(label: String, labelAR: String? = nil, box: NormalizedBox) {
+        self.label = label; self.labelAR = labelAR; self.box = box
+    }
+
+    /// The name to show: Arabic when asked for and present, else English.
+    public func label(arabic: Bool) -> String {
+        guard arabic, let labelAR else { return label }
+        let trimmed = labelAR.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? label : trimmed
+    }
 }
 
 /// `fix_verify.json_schema` (name `fix_verification`).
