@@ -69,13 +69,13 @@ enum KeychainStore {
 
 // MARK: - API key provider
 
-/// Supplies the OpenAI key from the Keychain at call time. Never logs the key.
-/// DEBUG simulator builds fall back to the `OPENAI_API_KEY` scheme environment variable.
+/// Supplies the Meta Model API key from the Keychain at call time. Never logs the key.
+/// DEBUG simulator builds fall back to the `META_API_KEY` scheme environment variable.
 struct KeychainAPIKeyProvider: APIKeyProvider {
-    static let service = "HoTH.OpenAIKey"
+    static let service = "HoTH.MetaKey"
 
     func apiKey() async throws -> String {
-        guard let key = currentKey() else { throw OpenAIError.missingKey }
+        guard let key = currentKey() else { throw ModelAPIError.missingKey }
         return key
     }
 
@@ -86,7 +86,7 @@ struct KeychainAPIKeyProvider: APIKeyProvider {
             return stored.trimmingCharacters(in: .whitespacesAndNewlines)
         }
         #if DEBUG && targetEnvironment(simulator)
-        if let env = ProcessInfo.processInfo.environment["OPENAI_API_KEY"], !env.isEmpty {
+        if let env = ProcessInfo.processInfo.environment["META_API_KEY"], !env.isEmpty {
             return env
         }
         #endif
@@ -131,7 +131,7 @@ final class AppServices: ObservableObject {
     }
 
     let keyProvider: KeychainAPIKeyProvider
-    var openAI: OpenAIClient
+    var modelClient: MetaModelClient
     var prompts: Prompts
 
     // Settings are UserDefaults-backed (same keys work with `@AppStorage` in views). Explicit
@@ -140,7 +140,7 @@ final class AppServices: ObservableObject {
         static let demoMode = "hoth.settings.demoMode"
         static let role = "hoth.settings.role"
         static let visionModel = "hoth.settings.visionModel"
-        static let realtimeModel = "hoth.settings.realtimeModel"
+        static let textModel = "hoth.settings.textModel"
         static let language = "hoth.settings.language"
         static let voiceFirstInterview = "hoth.settings.voiceFirstInterview"
     }
@@ -169,9 +169,9 @@ final class AppServices: ObservableObject {
         set { objectWillChange.send(); defaults.set(newValue, forKey: SettingsKey.visionModel) }
     }
 
-    var realtimeModelOverride: String {
-        get { defaults.string(forKey: SettingsKey.realtimeModel) ?? "" }
-        set { objectWillChange.send(); defaults.set(newValue, forKey: SettingsKey.realtimeModel) }
+    var textModelOverride: String {
+        get { defaults.string(forKey: SettingsKey.textModel) ?? "" }
+        set { objectWillChange.send(); defaults.set(newValue, forKey: SettingsKey.textModel) }
     }
 
     /// "system", "en" or "ar".
@@ -185,7 +185,7 @@ final class AppServices: ObservableObject {
     private init() {
         let provider = KeychainAPIKeyProvider()
         keyProvider = provider
-        openAI = OpenAIClient(keyProvider: provider)
+        modelClient = MetaModelClient(keyProvider: provider)
         do {
             prompts = try Prompts(bundle: .main)
         } catch {
@@ -200,10 +200,9 @@ final class AppServices: ObservableObject {
         Prompts.resolveVisionModel(override: visionModelOverride, prompts: prompts)
     }
 
-    /// Realtime model: the user override when set, else the prompts.json default.
-    var realtimeModel: String {
-        let trimmed = realtimeModelOverride.trimmingCharacters(in: .whitespaces)
-        return trimmed.isEmpty ? prompts.models.realtime : trimmed
+    /// Text model (chat intake, moderation): the user override when set, else the prompts.json default.
+    var textModel: String {
+        Prompts.resolveTextModel(override: textModelOverride, prompts: prompts)
     }
 
     var isCrew: Bool { role == Role.crew.rawValue }

@@ -16,9 +16,6 @@ settings:
     DEVELOPMENT_TEAM: ""
 
 packages:
-  WebRTC:
-    url: https://github.com/stasel/WebRTC
-    exactVersion: 154.0.0
   HoTHCore:
     path: Packages/HoTHCore
 
@@ -31,7 +28,6 @@ targets:
         excludes:
           - "**/.gitkeep"
     dependencies:
-      - package: WebRTC
       - package: HoTHCore
     info:
       path: HoTH/Info.plist

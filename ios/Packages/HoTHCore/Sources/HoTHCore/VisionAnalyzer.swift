@@ -2,13 +2,13 @@ import Foundation
 
 /// Classifies one live photo with the `vision_analyze` prompt from prompts.json.
 public struct VisionAnalyzer: Sendable {
-    private let client: OpenAIClient
+    private let client: MetaModelClient
     private let prompts: Prompts
     private let modelOverride: String?
 
     /// - Parameter model: optional model id (e.g. the Settings override); blank or nil falls back to
     ///   `prompts.models.vision`.
-    public init(client: OpenAIClient, prompts: Prompts, model: String? = nil) {
+    public init(client: MetaModelClient, prompts: Prompts, model: String? = nil) {
         self.client = client
         self.prompts = prompts
         self.modelOverride = model
@@ -25,11 +25,10 @@ public struct VisionAnalyzer: Sendable {
         language: String,
         capturedAt: Date = Date(),
         placeHint: String = "unknown",
-        userNote: String = "",
-        detail: ImageInput.Detail = .original
+        userNote: String = ""
     ) async throws -> VisionAnalysis {
         let spec = prompts.visionAnalyze
-        guard let schema = spec.jsonSchema else { throw OpenAIError.decoding("vision_analyze has no json_schema") }
+        guard let schema = spec.jsonSchema else { throw ModelAPIError.decoding("vision_analyze has no json_schema") }
         let values = [
             "user_language": language,
             "captured_at": ISO8601DateFormatter().string(from: capturedAt),
@@ -40,7 +39,7 @@ public struct VisionAnalyzer: Sendable {
             model: model,
             system: Prompts.fill(spec.system, values),
             user: Prompts.fill(spec.userTemplate, values),
-            images: [ImageInput(jpegData: imageData, detail: detail)],
+            images: [ImageInput(jpegData: imageData)],
             schema: schema,
             as: VisionAnalysis.self
         )

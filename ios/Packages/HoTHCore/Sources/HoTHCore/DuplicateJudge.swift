@@ -17,13 +17,13 @@ public struct ReportSnapshot: Sendable {
 
 /// Asks the model whether two nearby reports show the same physical issue (`same_issue` prompt).
 public struct DuplicateJudge: Sendable {
-    private let client: OpenAIClient
+    private let client: MetaModelClient
     private let prompts: Prompts
     private let modelOverride: String?
 
     /// - Parameter model: optional model id (e.g. the Settings override); blank or nil falls back to
     ///   `prompts.models.vision`.
-    public init(client: OpenAIClient, prompts: Prompts, model: String? = nil) {
+    public init(client: MetaModelClient, prompts: Prompts, model: String? = nil) {
         self.client = client
         self.prompts = prompts
         self.modelOverride = model
@@ -34,7 +34,7 @@ public struct DuplicateJudge: Sendable {
 
     public func judge(new: ReportSnapshot, existing: ReportSnapshot, distanceMeters: Double) async throws -> SameIssueVerdict {
         let spec = prompts.sameIssue
-        guard let schema = spec.jsonSchema else { throw OpenAIError.decoding("same_issue has no json_schema") }
+        guard let schema = spec.jsonSchema else { throw ModelAPIError.decoding("same_issue has no json_schema") }
         let formatter = ISO8601DateFormatter()
         let values = [
             "new_summary": new.summary,

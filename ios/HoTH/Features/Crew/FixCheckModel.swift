@@ -46,7 +46,7 @@ final class FixCheckModel: ObservableObject {
     private static func defaultVerifier(for demo: DemoFixPhoto?) -> FixVerifying? {
         let services = AppServices.shared
         if services.hasAPIKey() {
-            return LiveFixVerifier(verifier: FixVerifier(client: services.openAI, prompts: services.prompts,
+            return LiveFixVerifier(verifier: FixVerifier(client: services.modelClient, prompts: services.prompts,
                                                          model: services.visionModel))
         }
         if let demo, services.demoMode { return CannedFixVerifier(photo: demo) }
@@ -80,7 +80,7 @@ final class FixCheckModel: ObservableObject {
             return
         }
         guard let verifier = verifierFactory(demo) else {
-            phase = .failed(String(localized: "crew.error.noKey", defaultValue: "Add an OpenAI key in Settings to check repairs."))
+            phase = .failed(String(localized: "crew.error.noKey", defaultValue: "Add a Meta Model API key in Settings to check repairs."))
             return
         }
 

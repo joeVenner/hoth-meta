@@ -2,13 +2,13 @@ import Foundation
 
 /// Compares BEFORE/AFTER photos with the `fix_verify` prompt from prompts.json.
 public struct FixVerifier: Sendable {
-    private let client: OpenAIClient
+    private let client: MetaModelClient
     private let prompts: Prompts
     private let modelOverride: String?
 
     /// - Parameter model: optional model id (e.g. the Settings override); blank or nil falls back to
     ///   `prompts.models.vision`.
-    public init(client: OpenAIClient, prompts: Prompts, model: String? = nil) {
+    public init(client: MetaModelClient, prompts: Prompts, model: String? = nil) {
         self.client = client
         self.prompts = prompts
         self.modelOverride = model
@@ -26,7 +26,7 @@ public struct FixVerifier: Sendable {
         afterCapturedAt: Date
     ) async throws -> FixVerification {
         let spec = prompts.fixVerify
-        guard let schema = spec.jsonSchema else { throw OpenAIError.decoding("fix_verify has no json_schema") }
+        guard let schema = spec.jsonSchema else { throw ModelAPIError.decoding("fix_verify has no json_schema") }
         let formatter = ISO8601DateFormatter()
         let values = [
             "report_title": reportTitle,

@@ -7,13 +7,16 @@ final class SchemaDecodingTests: XCTestCase {
         XCTAssertEqual(vision.category, .playgroundEquipment)
         XCTAssertEqual(vision.hazards.count, 2)
         XCTAssertEqual(vision.hazards[0].kind, .sharpEdge)
-        XCTAssertEqual(vision.hazards[0].box, NormalizedBox(x: 0.41, y: 0.52, w: 0.12, h: 0.1))
+        // Model boxes arrive on the 0-1000 grid and are normalized (and clamped) on decode.
+        assertBox(vision.hazards[0].box, NormalizedBox(x: 0.41, y: 0.52, w: 0.12, h: 0.1))
+        assertBox(vision.hazards[1].box, NormalizedBox(x: 0.35, y: 0.6, w: 0.25, h: 0.4))
         XCTAssertTrue(vision.childUseEquipment)
         XCTAssertFalse(vision.childPresent)
         XCTAssertEqual(vision.sceneType, .playground)
         XCTAssertEqual(vision.severityProposal, .high)
         XCTAssertFalse(vision.plausibility.looksLikeScreenOrPrint)
-        XCTAssertEqual(vision.suggestedQuestions.count, 1)
+        XCTAssertEqual(vision.suggestedQuestions, ["Are children using it right now?", "Is anyone hurt?"],
+                       "trimmed to maxSuggestedQuestions")
         XCTAssertEqual(vision.confidence, .high)
     }
 
@@ -24,6 +27,21 @@ final class SchemaDecodingTests: XCTestCase {
         XCTAssertNotNil(object["child_use_equipment"])
         XCTAssertNotNil(object["severity_proposal"])
         XCTAssertEqual(try JSONDecoder().decode(VisionAnalysis.self, from: encoded), original)
+    }
+
+    func testStoredBoxShapeReloadsUnchangedAndClamps() throws {
+        let stored = NormalizedBox(x: 0.41, y: 0.52, w: 0.12, h: 0.1)
+        let encoded = try JSONEncoder().encode(stored)
+        let object = try XCTUnwrap(JSONSerialization.jsonObject(with: encoded) as? [String: Double])
+        XCTAssertEqual(Set(object.keys), ["x", "y", "w", "h"])
+        XCTAssertEqual(try JSONDecoder().decode(NormalizedBox.self, from: encoded), stored)
+
+        let outOfRange = Data(#"{"x":-0.2,"y":0.9,"w":0.5,"h":0.5}"#.utf8)
+        XCTAssertEqual(try JSONDecoder().decode(NormalizedBox.self, from: outOfRange),
+                       NormalizedBox(x: 0, y: 0.9, w: 0.5, h: 0.09999999999999998))
+
+        let swapped = Data(#"{"x_min":800,"y_min":900,"x_max":200,"y_max":-5}"#.utf8)
+        assertBox(try JSONDecoder().decode(NormalizedBox.self, from: swapped), NormalizedBox(x: 0.2, y: 0, w: 0.6, h: 0.9))
     }
 
     func testVisionKeysMatchPromptsSchemaRequiredList() throws {
@@ -63,7 +81,7 @@ final class SchemaDecodingTests: XCTestCase {
         let fix = try JSONDecoder().decode(FixVerification.self, from: Fixtures.data("fix_verification"))
         XCTAssertFalse(fix.resolved)
         XCTAssertTrue(fix.sameLocationLikely)
-        XCTAssertEqual(fix.remainingIssues.first?.box.w, 0.14)
+        XCTAssertEqual(fix.remainingIssues.first?.box.w ?? 0, 0.14, accuracy: 1e-9)
         XCTAssertFalse(fix.reasonAR.isEmpty)
     }
 
@@ -86,5 +104,13 @@ final class SchemaDecodingTests: XCTestCase {
         XCTAssertLessThan(Severity.medium, .high)
         XCTAssertLessThan(Severity.high, .critical)
         XCTAssertEqual([Severity.critical, .low, .high].max(), .critical)
+    }
+
+    private func assertBox(_ actual: NormalizedBox, _ expected: NormalizedBox,
+                           file: StaticString = #filePath, line: UInt = #line) {
+        XCTAssertEqual(actual.x, expected.x, accuracy: 1e-9, file: file, line: line)
+        XCTAssertEqual(actual.y, expected.y, accuracy: 1e-9, file: file, line: line)
+        XCTAssertEqual(actual.w, expected.w, accuracy: 1e-9, file: file, line: line)
+        XCTAssertEqual(actual.h, expected.h, accuracy: 1e-9, file: file, line: line)
     }
 }

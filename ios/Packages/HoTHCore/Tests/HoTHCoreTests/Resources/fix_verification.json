@@ -3,7 +3,7 @@
   "reason_en": "Tape now surrounds the spring rider but the sharp post is still visible.",
   "reason_ar": "يحيط الشريط باللعبة الآن لكن العمود الحاد ما زال ظاهرًا.",
   "remaining_issues": [
-    { "label": "sharp metal post still exposed", "box": { "x": 0.4, "y": 0.5, "w": 0.14, "h": 0.12 } }
+    { "label": "sharp metal post still exposed", "box": { "x_min": 400, "y_min": 500, "x_max": 540, "y_max": 620 } }
   ],
   "same_location_likely": true
 }

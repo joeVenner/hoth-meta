@@ -50,6 +50,11 @@ public enum SceneType: String, Codable, CaseIterable, Sendable {
 }
 
 /// Approximate highlight region, normalized 0...1 (x,y = top-left).
+///
+/// Decodes two shapes and always encodes the first:
+/// - `{x, y, w, h}` in 0...1: what the app stores (`analysisJSON`) and the demo samples use.
+/// - `{x_min, y_min, x_max, y_max}` on Muse Spark's 0-1000 grounding grid: what the model returns.
+/// This is the one place the 0-1000 grid is converted; values are clamped, so stored boxes reload unchanged.
 public struct NormalizedBox: Codable, Equatable, Sendable {
     public let x: Double
     public let y: Double
@@ -58,6 +63,52 @@ public struct NormalizedBox: Codable, Equatable, Sendable {
 
     public init(x: Double, y: Double, w: Double, h: Double) {
         self.x = x; self.y = y; self.w = w; self.h = h
+    }
+
+    /// Muse Spark grounding grid size (dev.meta.ai/docs/image-understanding).
+    public static let modelGridSize = 1000.0
+
+    private enum CodingKeys: String, CodingKey {
+        case x, y, w, h
+        case xMin = "x_min", yMin = "y_min", xMax = "x_max", yMax = "y_max"
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        if container.contains(.xMin) {
+            let grid = Self.modelGridSize
+            self = Self.fromCorners(
+                x1: try container.decode(Double.self, forKey: .xMin), y1: try container.decode(Double.self, forKey: .yMin),
+                x2: try container.decode(Double.self, forKey: .xMax), y2: try container.decode(Double.self, forKey: .yMax),
+                width: grid, height: grid)
+        } else {
+            // Clamp field by field (no corner round-trip) so in-range stored values reload bit-for-bit.
+            let x = min(max(try container.decode(Double.self, forKey: .x), 0), 1)
+            let y = min(max(try container.decode(Double.self, forKey: .y), 0), 1)
+            let w = min(max(try container.decode(Double.self, forKey: .w), 0), 1 - x)
+            let h = min(max(try container.decode(Double.self, forKey: .h), 0), 1 - y)
+            self.init(x: x, y: y, w: w, h: h)
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(x, forKey: .x)
+        try container.encode(y, forKey: .y)
+        try container.encode(w, forKey: .w)
+        try container.encode(h, forKey: .h)
+    }
+
+    /// Builds a box from corner coordinates on a `width` x `height` grid (source pixels for SAM, 1000 x 1000
+    /// for Muse Spark grounding). Corners are reordered and clamped, so slightly out-of-range values
+    /// (models emit e.g. 1001 at an edge) still land inside 0...1.
+    public static func fromCorners(x1: Double, y1: Double, x2: Double, y2: Double,
+                                   width: Double, height: Double) -> NormalizedBox {
+        guard width > 0, height > 0 else { return NormalizedBox(x: 0, y: 0, w: 0, h: 0) }
+        func unit(_ value: Double, _ size: Double) -> Double { min(max(value / size, 0), 1) }
+        let left = unit(min(x1, x2), width), right = unit(max(x1, x2), width)
+        let top = unit(min(y1, y2), height), bottom = unit(max(y1, y2), height)
+        return NormalizedBox(x: left, y: top, w: right - left, h: bottom - top)
     }
 }
 
@@ -164,6 +215,32 @@ public struct VisionAnalysis: Codable, Equatable, Sendable {
     }
 
     public func hasHazard(_ kind: HazardKind) -> Bool { hazards.contains { $0.kind == kind } }
+
+    /// The prompt asks for at most this many; the schema can't say so (no `maxItems`), so decoding trims.
+    public static let maxSuggestedQuestions = 2
+}
+
+extension VisionAnalysis {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(
+            category: try container.decode(ReportCategory.self, forKey: .category),
+            titleEN: try container.decode(String.self, forKey: .titleEN),
+            titleAR: try container.decode(String.self, forKey: .titleAR),
+            descriptionEN: try container.decode(String.self, forKey: .descriptionEN),
+            descriptionAR: try container.decode(String.self, forKey: .descriptionAR),
+            hazards: try container.decode([Hazard].self, forKey: .hazards),
+            childUseEquipment: try container.decode(Bool.self, forKey: .childUseEquipment),
+            childPresent: try container.decode(Bool.self, forKey: .childPresent),
+            sceneType: try container.decode(SceneType.self, forKey: .sceneType),
+            severityProposal: try container.decode(Severity.self, forKey: .severityProposal),
+            severityReasonEN: try container.decode(String.self, forKey: .severityReasonEN),
+            severityReasonAR: try container.decode(String.self, forKey: .severityReasonAR),
+            plausibility: try container.decode(PlausibilitySignals.self, forKey: .plausibility),
+            suggestedQuestions: Array(try container.decode([String].self, forKey: .suggestedQuestions)
+                .prefix(Self.maxSuggestedQuestions)),
+            confidence: try container.decode(QualitativeConfidence.self, forKey: .confidence))
+    }
 }
 
 public struct RemainingIssue: Codable, Equatable, Sendable {
@@ -204,7 +281,7 @@ public struct SameIssueVerdict: Codable, Equatable, Sendable {
     }
 }
 
-/// Arguments of the Realtime `submit_report` tool (`realtime_tools[0].parameters`).
+/// The interview's final report details (chat intake `done` turn, local flow, safety sheet).
 public struct SubmitReportArgs: Codable, Equatable, Sendable {
     public let summaryEN: String
     public let summaryAR: String

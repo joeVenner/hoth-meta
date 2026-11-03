@@ -197,7 +197,7 @@ struct StatusPill: View {
 
 // MARK: - Comment moderation hook
 
-/// Moderation hook for new comments (P1-06: `OpenAICommentModerator`, `LocalCommentModerator`).
+/// Moderation hook for new comments (P1-06: `ModelCommentModerator`, `LocalCommentModerator`).
 protocol CommentModerator {
     func moderate(_ text: String, reportTitle: String) async -> ModerationStatus
 }

@@ -5,8 +5,8 @@
   "description_en": "The seat of a spring rider has snapped off, leaving a jagged metal post exposed.",
   "description_ar": "انكسر مقعد اللعبة النابضية وظهر عمود معدني بحواف حادة.",
   "hazards": [
-    { "label": "exposed sharp metal post", "kind": "sharp_edge", "box": { "x": 0.41, "y": 0.52, "w": 0.12, "h": 0.1 } },
-    { "label": "unstable spring base", "kind": "fall", "box": { "x": 0.35, "y": 0.6, "w": 0.25, "h": 0.3 } }
+    { "label": "exposed sharp metal post", "kind": "sharp_edge", "box": { "x_min": 410, "y_min": 520, "x_max": 530, "y_max": 620 } },
+    { "label": "unstable spring base", "kind": "fall", "box": { "x_min": 350, "y_min": 600, "x_max": 600, "y_max": 1001 } }
   ],
   "child_use_equipment": true,
   "child_present": false,
@@ -20,6 +20,6 @@
     "looks_like_stock_or_watermarked": false,
     "notes": "Outdoor daylight photo of playground equipment."
   },
-  "suggested_questions": ["Are children using it right now?"],
+  "suggested_questions": ["Are children using it right now?", "Is anyone hurt?", "Is it fenced off?"],
   "confidence": "high"
 }

@@ -70,7 +70,7 @@ final class ReportFlowModel: ObservableObject {
 
     // MARK: Dependencies
 
-    private let client: OpenAIClient
+    private let client: MetaModelClient
     private let prompts: Prompts
     private let isDemoModeProvider: () -> Bool
     private let hasAPIKeyProvider: () -> Bool
@@ -82,7 +82,7 @@ final class ReportFlowModel: ObservableObject {
     /// Answers recovered from a voice `flag_urgent` reason, merged into the final priority.
     private var urgentAnswers: [String: String] = [:]
     /// Identifies the current submit run; regenerated on every reset so results from an abandoned run
-    /// (retake / close while an OpenAI call is in flight) are dropped instead of overwriting the new one.
+    /// (retake / close while a model call is in flight) are dropped instead of overwriting the new one.
     private var runID = UUID()
     /// Re-entrancy guard for `post`: `step` only changes after the blur await, so a double tap needs this.
     private var isPosting = false
@@ -93,7 +93,7 @@ final class ReportFlowModel: ObservableObject {
     ///   - isDemoMode: read live; demo mode allows bundled photos and the offline canned analysis.
     ///   - hasAPIKey: read live; without a key a demo photo uses its canned analysis (no doomed call).
     ///   - visionModel: read live; the Settings override (nil/blank → prompts.json `models.vision`).
-    init(client: OpenAIClient, prompts: Prompts, language: @escaping () -> String,
+    init(client: MetaModelClient, prompts: Prompts, language: @escaping () -> String,
          isDemoMode: @escaping () -> Bool, hasAPIKey: @escaping () -> Bool = { true },
          visionModel: @escaping () -> String? = { nil }) {
         self.visionModelProvider = visionModel
@@ -602,7 +602,7 @@ final class ReportFlowModel: ObservableObject {
     }
 
     static func friendlyMessage(for error: Error, arabic: Bool) -> String {
-        switch error as? OpenAIError {
+        switch error as? ModelAPIError {
         case .missingKey, .invalidKey:
             return arabic
                 ? "مفتاح الذكاء الاصطناعي غير مضبوط. أضفه من الإعدادات أو فعّل الوضع التجريبي."

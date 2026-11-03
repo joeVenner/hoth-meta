@@ -76,7 +76,7 @@ final class CommunityTests: XCTestCase {
         XCTAssertEqual(ModerationVerdict(decision: "allow", reason: "x").status, .allowed)
     }
 
-    // MARK: OpenAI moderator fallback
+    // MARK: Model moderator fallback
 
     func testNoKeyFallsBackToLocalChecks() async throws {
         let moderator = try makeModerator(hasKey: false)
@@ -94,12 +94,12 @@ final class CommunityTests: XCTestCase {
     }
 
     private struct ThrowingKeyProvider: APIKeyProvider {
-        func apiKey() async throws -> String { throw OpenAIError.missingKey }
+        func apiKey() async throws -> String { throw ModelAPIError.missingKey }
     }
 
-    private func makeModerator(hasKey: Bool) throws -> OpenAICommentModerator {
+    private func makeModerator(hasKey: Bool) throws -> ModelCommentModerator {
         let prompts = try Prompts(bundle: .main)
-        return OpenAICommentModerator(client: OpenAIClient(keyProvider: ThrowingKeyProvider()),
-                                      prompts: prompts, hasKey: { hasKey })
+        return ModelCommentModerator(client: MetaModelClient(keyProvider: ThrowingKeyProvider()),
+                                     prompts: prompts, model: prompts.models.text, hasKey: { hasKey })
     }
 }

@@ -1,8 +1,8 @@
 import XCTest
 @testable import HoTHCore
 
-final class OpenAIClientTests: XCTestCase {
-    private let testKey = "sk-test-123456789"
+final class MetaModelClientTests: XCTestCase {
+    private let testKey = "LLM_000000_test-secret-123456789"
 
     override func setUp() {
         super.setUp()
@@ -10,26 +10,26 @@ final class OpenAIClientTests: XCTestCase {
         StubURLProtocol.captured = []
     }
 
-    private func makeClient(key: APIKeyProvider? = nil) -> OpenAIClient {
-        OpenAIClient(keyProvider: key ?? StaticKey(key: testKey), session: StubURLProtocol.makeSession(),
+    private func makeClient(key: APIKeyProvider? = nil) -> MetaModelClient {
+        MetaModelClient(keyProvider: key ?? StaticKey(key: testKey), session: StubURLProtocol.makeSession(),
                      baseURL: URL(string: "https://stub.invalid/v1")!)
     }
 
     func testVisionAnalyzerUsesModelOverrideWhenSet() async throws {
         let envelope = try Fixtures.responsesEnvelope(payload: Fixtures.data("vision_analysis"))
         StubURLProtocol.handler = { _ in (200, envelope) }
-        let analyzer = VisionAnalyzer(client: makeClient(), prompts: try Fixtures.prompts(), model: " gpt-test-override ")
+        let analyzer = VisionAnalyzer(client: makeClient(), prompts: try Fixtures.prompts(), model: " muse-test-override ")
         _ = try await analyzer.analyze(imageData: Data([0xFF, 0xD8, 0xFF]), language: "en")
         let captured = try XCTUnwrap(StubURLProtocol.captured.first)
         let body = try JSONDecoder().decode(JSONValue.self, from: captured.body)
-        XCTAssertEqual(body["model"], .string("gpt-test-override"))
+        XCTAssertEqual(body["model"], .string("muse-test-override"))
     }
 
     func testBlankModelOverrideFallsBackToPrompts() throws {
         let prompts = try Fixtures.prompts()
         XCTAssertEqual(VisionAnalyzer(client: makeClient(), prompts: prompts, model: "  ").model, prompts.models.vision)
         XCTAssertEqual(DuplicateJudge(client: makeClient(), prompts: prompts, model: nil).model, prompts.models.vision)
-        XCTAssertEqual(FixVerifier(client: makeClient(), prompts: prompts, model: "gpt-x").model, "gpt-x")
+        XCTAssertEqual(FixVerifier(client: makeClient(), prompts: prompts, model: "muse-x").model, "muse-x")
     }
 
     func testVisionAnalyzerSendsStrictSchemaAndDecodes() async throws {
@@ -44,7 +44,8 @@ final class OpenAIClientTests: XCTestCase {
         XCTAssertEqual(captured.request.url?.path, "/v1/responses")
         XCTAssertEqual(captured.request.httpMethod, "POST")
         XCTAssertEqual(captured.request.value(forHTTPHeaderField: "Authorization"), "Bearer \(testKey)")
-        XCTAssertEqual(captured.request.timeoutInterval, 30)
+        XCTAssertEqual(captured.request.timeoutInterval, 60)
+        XCTAssertEqual(captured.request.url?.host, "stub.invalid")
 
         let body = try JSONDecoder().decode(JSONValue.self, from: captured.body)
         let format = body["text"]?["format"]
@@ -57,6 +58,8 @@ final class OpenAIClientTests: XCTestCase {
         }
         let image = try XCTUnwrap(userContent.first { $0["type"] == .string("input_image") })
         XCTAssertTrue(image["image_url"]?.stringValue?.hasPrefix("data:image/jpeg;base64,") ?? false)
+        XCTAssertNil(image["detail"], "Meta documents no image detail parameter")
+        XCTAssertEqual(body["reasoning"]?["effort"], .string("low"))
         guard case .array(let systemContent)? = input.first?["content"] else { return XCTFail("no system") }
         let systemText = systemContent.first?["text"]?.stringValue ?? ""
         XCTAssertFalse(systemText.contains("{{user_language}}"))
@@ -88,13 +91,13 @@ final class OpenAIClientTests: XCTestCase {
 
     func testStatus401MapsToInvalidKeyWithoutLeakingKey() async throws {
         StubURLProtocol.handler = { _ in
-            (401, Data(#"{"error":{"message":"Incorrect API key provided: sk-test-123456789."}}"#.utf8))
+            (401, Data(#"{"error":{"message":"Incorrect API key provided: LLM_000000_test-secret-123456789."}}"#.utf8))
         }
         do {
             let _: SameIssueVerdict = try await makeClient().structured(
                 model: "m", system: "s", user: "u", schema: try Fixtures.prompts().sameIssue.jsonSchema!)
             XCTFail("expected error")
-        } catch let error as OpenAIError {
+        } catch let error as ModelAPIError {
             XCTAssertEqual(error, .invalidKey)
             XCTAssertFalse(String(describing: error).contains(testKey))
         }
@@ -107,17 +110,18 @@ final class OpenAIClientTests: XCTestCase {
 
     func testStatus500MapsToHTTPWithScrubbedMessage() async throws {
         StubURLProtocol.handler = { _ in
-            (500, Data(#"{"error":{"message":"boom for sk-test-123456789"}}"#.utf8))
+            (500, Data(#"{"error":{"message":"boom for LLM_000000_test-secret-123456789 and LLM_42_other"}}"#.utf8))
         }
         do {
             let _: SameIssueVerdict = try await makeClient().structured(
                 model: "m", system: "s", user: "u", schema: try Fixtures.prompts().sameIssue.jsonSchema!)
             XCTFail("expected error")
-        } catch let error as OpenAIError {
+        } catch let error as ModelAPIError {
             guard case .http(let code, let message) = error else { return XCTFail("wrong error \(error)") }
             XCTAssertEqual(code, 500)
             XCTAssertFalse(message.contains(testKey))
-            XCTAssertTrue(message.contains("sk-***"))
+            XCTAssertFalse(message.contains("LLM_42_other"))
+            XCTAssertTrue(message.contains("LLM_***"))
         }
     }
 
@@ -147,53 +151,58 @@ final class OpenAIClientTests: XCTestCase {
             let _: SameIssueVerdict = try await makeClient(key: FailingKey()).structured(
                 model: "m", system: "s", user: "u", schema: try Fixtures.prompts().sameIssue.jsonSchema!)
             XCTFail("expected error")
-        } catch let error as OpenAIError {
+        } catch let error as ModelAPIError {
             XCTAssertEqual(error, .missingKey)
             XCTAssertTrue(StubURLProtocol.captured.isEmpty)
         }
     }
 
-    func testRealtimeClientSecretTopLevelShape() async throws {
-        StubURLProtocol.handler = { _ in (200, Data(#"{"value":"ek_test_abc","expires_at":1760000000}"#.utf8)) }
-        let tools = try Fixtures.prompts().realtimeTools
-        let secret = try await makeClient().createRealtimeClientSecret(
-            model: "gpt-realtime-2.1", instructions: "hi", tools: tools, voice: "marin")
-        XCTAssertEqual(secret.value, "ek_test_abc")
-        XCTAssertEqual(secret.expiresAt, Date(timeIntervalSince1970: 1_760_000_000))
-
-        let captured = try XCTUnwrap(StubURLProtocol.captured.first)
-        XCTAssertEqual(captured.request.url?.path, "/v1/realtime/client_secrets")
-        let body = try JSONDecoder().decode(JSONValue.self, from: captured.body)
-        XCTAssertEqual(body["session"]?["type"], .string("realtime"))
-        XCTAssertEqual(body["session"]?["model"], .string("gpt-realtime-2.1"))
-        XCTAssertEqual(body["session"]?["audio"]?["output"]?["voice"], .string("marin"))
-        guard case .array(let sentTools)? = body["session"]?["tools"] else { return XCTFail("no tools") }
-        XCTAssertEqual(sentTools, tools)
+    func testDefaultsTargetMetaModelAPI() {
+        let client = MetaModelClient(keyProvider: StaticKey(key: testKey))
+        XCTAssertEqual(client.baseURL.absoluteString, "https://api.meta.ai/v1")
+        XCTAssertEqual(client.timeout, 60)
+        XCTAssertEqual(client.reasoningEffort, "low")
     }
 
-    func testRealtimeClientSecretNestedShape() async throws {
-        StubURLProtocol.handler = { _ in
-            (200, Data(#"{"client_secret":{"value":"ek_nested","expires_at":1760000100}}"#.utf8))
-        }
-        let secret = try await makeClient().createRealtimeClientSecret(model: "m", instructions: "", tools: [])
-        XCTAssertEqual(secret.value, "ek_nested")
+    func testReasoningEffortIsConfigurableAndOmittable() async throws {
+        let envelope = try Fixtures.responsesEnvelope(payload: Fixtures.data("same_issue_check"))
+        StubURLProtocol.handler = { _ in (200, envelope) }
+        let schema = try XCTUnwrap(try Fixtures.prompts().sameIssue.jsonSchema)
+
+        let minimal = MetaModelClient(keyProvider: StaticKey(key: testKey), session: StubURLProtocol.makeSession(),
+                                      baseURL: URL(string: "https://stub.invalid/v1")!, reasoningEffort: "minimal")
+        let _: SameIssueVerdict = try await minimal.structured(model: "m", system: "s", user: "u", schema: schema)
+        var body = try JSONDecoder().decode(JSONValue.self, from: StubURLProtocol.captured.last!.body)
+        XCTAssertEqual(body["reasoning"]?["effort"], .string("minimal"))
+
+        let omitted = MetaModelClient(keyProvider: StaticKey(key: testKey), session: StubURLProtocol.makeSession(),
+                                      baseURL: URL(string: "https://stub.invalid/v1")!, reasoningEffort: nil)
+        let _: SameIssueVerdict = try await omitted.structured(model: "m", system: "s", user: "u", schema: schema)
+        body = try JSONDecoder().decode(JSONValue.self, from: StubURLProtocol.captured.last!.body)
+        XCTAssertNil(body["reasoning"])
     }
 
-    func testRealtimeClientSecretMissingValueIsDecodingError() {
-        XCTAssertThrowsError(try OpenAIClient.parseClientSecret(Data(#"{"foo":1}"#.utf8))) { error in
-            guard case .decoding? = error as? OpenAIError else { return XCTFail("wrong error") }
-        }
+    func testEmptyOutputIsDecodingErrorForStructured() async throws {
+        let empty = #"{"status":"completed","output":[]}"#
+        StubURLProtocol.handler = { _ in (200, Data(empty.utf8)) }
+        await assertDecodingError()
+    }
+
+    func testSanitizerScrubsBearerAndLegacyTokens() {
+        let body = Data(#"{"error":{"message":"bad Bearer abc.def-123 and sk-live-xyz"}}"#.utf8)
+        let message = MetaModelClient.sanitizedErrorMessage(body)
+        XCTAssertEqual(message, "bad Bearer *** and sk-***")
     }
 
     // MARK: Helpers
 
-    private func assertThrows(_ expected: OpenAIError, file: StaticString = #filePath, line: UInt = #line) async {
+    private func assertThrows(_ expected: ModelAPIError, file: StaticString = #filePath, line: UInt = #line) async {
         do {
             let _: SameIssueVerdict = try await makeClient().structured(
                 model: "m", system: "s", user: "u", schema: try Fixtures.prompts().sameIssue.jsonSchema!)
             XCTFail("expected \(expected)", file: file, line: line)
         } catch {
-            XCTAssertEqual(error as? OpenAIError, expected, file: file, line: line)
+            XCTAssertEqual(error as? ModelAPIError, expected, file: file, line: line)
         }
     }
 
@@ -203,7 +212,7 @@ final class OpenAIClientTests: XCTestCase {
                 model: "m", system: "s", user: "u", schema: try Fixtures.prompts().sameIssue.jsonSchema!)
             XCTFail("expected decoding error", file: file, line: line)
         } catch {
-            guard case .decoding? = error as? OpenAIError else {
+            guard case .decoding? = error as? ModelAPIError else {
                 return XCTFail("wrong error \(error)", file: file, line: line)
             }
         }

@@ -1,7 +1,7 @@
 """HoTH eval harness: runs the app's exact prompts (ios/HoTH/Resources/prompts.json) against the labelled dataset.
 
 Usage (key read inline from the macOS Keychain; never printed or written):
-    OPENAI_API_KEY=$(...keychain retrieve openai default) uv run --project tools/eval tools/eval/run_eval.py --subset smoke
+    META_API_KEY=$(...keychain retrieve meta default) uv run --project tools/eval tools/eval/run_eval.py --subset smoke
 
 --subset smoke : 3 vision cases + 1 bad-fix pair (cheap sanity check, the default)
 --subset full  : all 48 images, 5 fix pairs, 6 same-issue pairs
@@ -36,8 +36,9 @@ REPO = ROOT.parent.parent
 PROMPTS_PATH = REPO / "ios" / "HoTH" / "Resources" / "prompts.json"
 DATASET = ROOT / "dataset"
 CACHE = ROOT / "cache"
-API_URL = "https://api.openai.com/v1/responses"
-APP_TIMEOUT_S = 30.0  # OpenAIClient default timeout in the iOS app
+API_URL = "https://api.meta.ai/v1/responses"
+APP_TIMEOUT_S = 60.0  # MetaModelClient default timeout in the iOS app
+REASONING_EFFORT = "low"  # MetaModelClient default reasoning effort ("none" is rejected by Muse Spark)
 MAX_EDGE = 1024  # CaptureService.maxPixelEdge
 JPEG_QUALITY = 82  # CaptureService compressionQuality 0.82
 CONCURRENCY = 6
@@ -107,11 +108,12 @@ def make_variant(ref: str) -> bytes:
     return data
 
 
-def build_body(model: str, system: str, user: str, images: list[bytes], detail: str, schema: dict[str, Any]) -> dict:
+def build_body(model: str, system: str, user: str, images: list[bytes], schema: dict[str, Any]) -> dict:
+    """Same request shape as MetaModelClient.structured (no image `detail`: Meta documents none)."""
     content: list[dict[str, Any]] = [{"type": "input_text", "text": user}]
     for data in images:
         url = "data:image/jpeg;base64," + base64.b64encode(data).decode()
-        content.append({"type": "input_image", "image_url": url, "detail": detail})
+        content.append({"type": "input_image", "image_url": url})
     return {
         "model": model,
         "input": [
@@ -120,6 +122,7 @@ def build_body(model: str, system: str, user: str, images: list[bytes], detail: 
         ],
         "text": {"format": {"type": "json_schema", "name": schema["name"], "strict": schema["strict"],
                             "schema": schema["schema"]}},
+        "reasoning": {"effort": REASONING_EFFORT},
     }
 
 
@@ -143,10 +146,10 @@ class Caller:
         self.key = key
         self.sem = asyncio.Semaphore(CONCURRENCY)
 
-    async def call(self, task: str, model: str, system: str, user: str, images: list[bytes], detail: str,
+    async def call(self, task: str, model: str, system: str, user: str, images: list[bytes],
                    schema: dict[str, Any]) -> CallResult:
         digest = hashlib.sha256()
-        for part in (task, model, system, user, detail, json.dumps(schema, sort_keys=True)):
+        for part in (API_URL, task, model, system, user, REASONING_EFFORT, json.dumps(schema, sort_keys=True)):
             digest.update(part.encode())
         for data in images:
             digest.update(hashlib.sha256(data).digest())
@@ -155,7 +158,7 @@ class Caller:
             entry = json.loads(path.read_text())
             return CallResult(extract_output(entry["raw"]), entry["latency_ms"], entry["usage"], True)
 
-        body = build_body(model, system, user, images, detail, schema)
+        body = build_body(model, system, user, images, schema)
         last_error = "unknown"
         async with self.sem:
             for attempt in range(RETRIES):
@@ -173,8 +176,8 @@ class Caller:
                     await asyncio.sleep(2 ** (attempt + 1))
                     continue
                 if resp.status_code != 200:
-                    # Error bodies from the API contain no secrets; truncate to keep logs short.
-                    raise RuntimeError(f"{task}: HTTP {resp.status_code}: {resp.text[:400]}")
+                    # Scrub the key in case the body echoes it; truncate to keep logs short.
+                    raise RuntimeError(f"{task}: HTTP {resp.status_code}: {resp.text.replace(self.key, '***')[:400]}")
                 raw = resp.json()
                 output = extract_output(raw)  # raises before caching on a bad response
                 usage = raw.get("usage") or {}
@@ -184,9 +187,9 @@ class Caller:
 
 
 async def run(subset: str) -> dict[str, Any]:
-    key = os.environ.get("OPENAI_API_KEY", "").strip()
+    key = os.environ.get("META_API_KEY", "").strip()
     if not key:
-        sys.exit("OPENAI_API_KEY is not set (export it inline from the Keychain).")
+        sys.exit("META_API_KEY is not set (export it inline from the Keychain).")
     prompts = json.loads(PROMPTS_PATH.read_text())
     labels = json.loads((DATASET / "labels.json").read_text())
     by_file = {lab["file"]: lab for lab in labels}
@@ -217,7 +220,7 @@ async def run(subset: str) -> dict[str, Any]:
 
         async def vision(ref: str) -> tuple[str, CallResult]:
             res = await caller.call("vision_analyze", model, fill(va["system"], values), fill(va["user_template"], values),
-                                    [load_image(ref)], "original", va["json_schema"])
+                                    [load_image(ref)], va["json_schema"])
             return ref, res
 
         vision_results = dict(await asyncio.gather(*(vision(r) for r in needed)))
@@ -229,7 +232,7 @@ async def run(subset: str) -> dict[str, Any]:
             vals = {"report_title": vision_results[before["file"]].output["title_en"], "category": before["category"],
                     "before_captured_at": "2026-10-01T09:00:00Z", "after_captured_at": "2026-10-06T15:00:00Z"}
             res = await caller.call("fix_verify", model, fill(fv["system"], vals), fill(fv["user_template"], vals),
-                                    [load_image(before["file"]), load_image(after["file"])], "auto", fv["json_schema"])
+                                    [load_image(before["file"]), load_image(after["file"])], fv["json_schema"])
             return {"pair_id": pid, "before": before["file"], "after": after["file"], "expected_resolved": after["fixed"],
                     "pred": res.output, "latency_ms": res.latency_ms, "usage": res.usage, "cached": res.cached}
 
@@ -244,7 +247,7 @@ async def run(subset: str) -> dict[str, Any]:
                     "existing_category": nv["category"], "existing_captured_at": "2026-10-05T09:00:00Z",
                     "distance_m": "15"}
             res = await caller.call("same_issue", model, fill(si["system"], vals), fill(si["user_template"], vals),
-                                    [load_image(new), load_image(existing)], "auto", si["json_schema"])
+                                    [load_image(new), load_image(existing)], si["json_schema"])
             return {"new": new, "existing": existing, "expected_same": expected, "pred": res.output,
                     "latency_ms": res.latency_ms, "usage": res.usage, "cached": res.cached}
 
@@ -310,7 +313,7 @@ def render_md(res: dict[str, Any], met: dict[str, Any]) -> str:
                   "48 images (29 CC-licensed Wikimedia Commons photos + 19 clearly-labelled AI-generated images), "
                   "5 fix pairs and 6 same-issue pairs.", ""]
     lines += [f"- Model: `{res['model']}` (from `prompts.json` `models.vision`). Prompts, JSON schemas and image "
-              "preprocessing (<=1024 px, JPEG q0.82, `detail` as in the app) are **exactly those shipped in the iOS app** "
+              "preprocessing (<=1024 px, JPEG q0.82, reasoning effort as in the app) are **exactly those shipped in the iOS app** "
               "(`ios/HoTH/Resources/prompts.json`).",
               f"- Run: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}, {j['calls']} API calls.",
               "- Final priority = Python port of the app's deterministic `PriorityAgent` floors (no interview answers, no map POI).",
@@ -337,9 +340,10 @@ def render_md(res: dict[str, Any], met: dict[str, Any]) -> str:
                   f"| Same-issue accuracy | {pct(r['same_issue_accuracy'])} |"]
     lines += [f"| Fix-verification accuracy | {pct(r['fix_accuracy'])} |",
               f"| Latency mean / p95 per call | {j['latency_mean_ms'] / 1000:.1f} s / {j['latency_p95_ms'] / 1000:.1f} s |",
-              f"| Calls slower than the app's 30 s timeout | {j['calls_over_app_timeout']} |",
+              f"| Calls slower than the app's {APP_TIMEOUT_S:.0f} s timeout | {j['calls_over_app_timeout']} |",
               f"| Tokens in / out (of which reasoning) | {j['input_tokens']:,} / {j['output_tokens']:,} ({j['reasoning_tokens']:,}) |",
-              f"| Estimated cost | ${j['est_cost_usd']:.3f} (at $2.00 / 1M input, $10.00 / 1M output) |", ""]
+              f"| Estimated cost | ${j['est_cost_usd']:.3f} (at ${m.PRICE_INPUT:.2f} / 1M input, "
+              f"${m.PRICE_CACHED_INPUT:.2f} / 1M cached input, ${m.PRICE_OUTPUT:.2f} / 1M output) |", ""]
     if not smoke:
         lines += ["### Per category", "", "| Category | Accuracy |", "|---|---|"]
         lines += [f"| {c} | {pct(v)} |" for c, v in r["per_category"].items()] + [""]

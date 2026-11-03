@@ -144,7 +144,7 @@ struct CaptureView: View {
                 .background(Capsule().fill(.ultraThinMaterial.opacity(0.9)))
                 .environment(\.colorScheme, .dark)
             // Disclosure: the unblurred photo and location leave the phone for analysis.
-            Text("Your photo and location are sent to OpenAI to analyse the hazard.")
+            Text("Your photo and location are sent to Meta's Muse Spark model to analyse the hazard.")
                 .font(.system(size: 11, weight: .medium))
                 .foregroundStyle(.white.opacity(0.85))
                 .multilineTextAlignment(.center)

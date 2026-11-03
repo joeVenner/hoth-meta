@@ -61,9 +61,12 @@ struct SettingsView: View {
 
     private var apiKeySection: some View {
         VStack(alignment: .leading, spacing: HoTHSpacing.s) {
-            SectionHeader(title: "OpenAI API key")
+            SectionHeader(title: "Meta Model API key")
             HoTHCard {
                 VStack(alignment: .leading, spacing: HoTHSpacing.m) {
+                    Text("Powers Meta's Muse Spark: photo analysis, chat and repair checks.")
+                        .font(.hothCaption)
+                        .foregroundStyle(Color.hothInkSecondary)
                     HStack(spacing: HoTHSpacing.s) {
                         Image(systemName: keyStatus == nil ? "key" : "key.fill")
                             .foregroundStyle(keyStatus == nil ? Color.hothInkSecondary : Color.hothSuccess)
@@ -87,7 +90,7 @@ struct SettingsView: View {
                             .font(.hothCaption)
                             .foregroundStyle(Color.hothInkSecondary)
                     }
-                    SecureField(text: $keyDraft) { Text(verbatim: "sk-…") }
+                    SecureField(text: $keyDraft) { Text(verbatim: "LLM_…") }
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                         .font(.system(.body, design: .monospaced))
@@ -186,8 +189,8 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: HoTHSpacing.m) {
                     modelField(title: "Vision model", text: $services.visionModelOverride,
                                placeholder: services.prompts.models.vision)
-                    modelField(title: "Voice (Realtime) model", text: $services.realtimeModelOverride,
-                               placeholder: services.prompts.models.realtime)
+                    modelField(title: "Text model", text: $services.textModelOverride,
+                               placeholder: services.prompts.models.text)
                     Text("Leave empty to use the defaults.")
                         .font(.hothCaption)
                         .foregroundStyle(Color.hothInkSecondary)
@@ -214,8 +217,8 @@ struct SettingsView: View {
             HoTHCard {
                 VStack(alignment: .leading, spacing: HoTHSpacing.m) {
                     privacyRow(symbol: "iphone", text: "Reports, comments and points live on this device. There is no HoTH server.")
-                    privacyRow(symbol: "eye.slash", text: "Faces and number plates are blurred on your phone before anything is posted to the neighbourhood. To analyse the hazard, the photo is sent to OpenAI.")
-                    privacyRow(symbol: "network", text: "Photos and voice go directly to OpenAI with your own key, only when you report.")
+                    privacyRow(symbol: "eye.slash", text: "Faces and number plates are blurred on your phone before anything is posted to the neighbourhood. To analyse the hazard, the photo is sent to Meta's Muse Spark model.")
+                    privacyRow(symbol: "network", text: "Photos and voice go directly to the Meta Model API with your own key, only when you report.")
                     privacyRow(symbol: "person.2", text: "The demo community is fictional and labelled as such.")
                     HStack {
                         Text(verbatim: "HoTH · Heroes of the Hay")

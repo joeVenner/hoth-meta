@@ -15,7 +15,7 @@ struct ReportEntryView: View {
         self.onClose = onClose
         let services = AppServices.shared
         _flow = StateObject(wrappedValue: ReportFlowModel(
-            client: services.openAI,
+            client: services.modelClient,
             prompts: services.prompts,
             language: { AppServices.shared.isArabic ? "ar" : "en" },
             isDemoMode: { AppServices.shared.demoMode },
@@ -101,9 +101,12 @@ struct ReportEntryView: View {
                     context: context,
                     slots: flow.slots,
                     // UI tests use the local chat so the golden path costs one live call (vision).
-                    client: services.hasAPIKey() && !AppServices.isUITestRun ? services.openAI : nil,
+                    client: services.hasAPIKey() && !AppServices.isUITestRun ? services.modelClient : nil,
                     prompts: services.prompts,
-                    voiceBuilder: voiceBuilder,
+                    textModel: services.textModel,
+                    // No voice builder yet: Talk is hidden and the interview runs as text until the
+                    // push-to-talk interview (Muse Voice Transcribe + on-device speech) lands.
+                    voiceBuilder: nil,
                     initialMode: InterviewStepView.initialMode(prefersVoice: services.voiceFirstInterview,
                                                                isUITestRun: AppServices.isUITestRun),
                     onComplete: { flow.interviewCompleted($0, context: modelContext) },
@@ -122,16 +125,6 @@ struct ReportEntryView: View {
         }
     }
 
-    /// The realtime voice interview (HoTH/Voice). Kept behind a builder so the flow compiles on its own.
-    /// Voice urgency goes to `voiceFlaggedUrgent`, which keeps the call alive under the safety sheet.
-    private var voiceBuilder: VoiceInterviewBuilder? {
-        let flow = flow
-        return { context, onComplete, _, onSwitchToText in
-            AnyView(VoiceInterviewView(context: context, onComplete: onComplete,
-                                       onUrgent: { flow.voiceFlaggedUrgent($0) },
-                                       onSwitchToText: onSwitchToText, keyProvider: AppServices.shared.keyProvider))
-        }
-    }
 }
 
 // MARK: - Analyzing

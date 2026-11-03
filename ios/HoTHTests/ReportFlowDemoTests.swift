@@ -7,7 +7,7 @@ import XCTest
 @MainActor
 final class ReportFlowDemoTests: XCTestCase {
     private struct NoKeyProvider: APIKeyProvider {
-        func apiKey() async throws -> String { throw OpenAIError.missingKey }
+        func apiKey() async throws -> String { throw ModelAPIError.missingKey }
     }
 
     private var container: ModelContainer!
@@ -22,7 +22,7 @@ final class ReportFlowDemoTests: XCTestCase {
     }
 
     private func makeFlow() throws -> ReportFlowModel {
-        ReportFlowModel(client: OpenAIClient(keyProvider: NoKeyProvider()), prompts: try Prompts(bundle: .main),
+        ReportFlowModel(client: MetaModelClient(keyProvider: NoKeyProvider()), prompts: try Prompts(bundle: .main),
                         language: { "en" }, isDemoMode: { true }, hasAPIKey: { false })
     }
 

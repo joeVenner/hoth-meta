@@ -1,0 +1,22 @@
+{
+  "_comment": "Doc-derived zero-match case: the response completes with an empty output_text lane.",
+  "id": "resp_sam_empty_doc",
+  "object": "response",
+  "status": "completed",
+  "model": "sam-3.1",
+  "output": [
+    {
+      "id": "msg_sam_empty",
+      "type": "message",
+      "role": "assistant",
+      "status": "completed",
+      "content": [
+        {
+          "type": "output_text",
+          "annotations": [],
+          "text": ""
+        }
+      ]
+    }
+  ]
+}

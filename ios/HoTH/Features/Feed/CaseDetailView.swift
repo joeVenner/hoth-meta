@@ -6,7 +6,7 @@ import SwiftUI
 /// Case detail (P0-17): photo, AI priority reasoning, timeline, votes, comments, "I saw it too".
 struct CaseDetailView: View {
     @Bindable var report: Report
-    /// Injected moderator; nil uses the live OpenAI-backed one (local checks when offline / no key).
+    /// Injected moderator; nil uses the live Muse Spark-backed one (local checks when offline / no key).
     var moderator: CommentModerator?
 
     @Environment(\.modelContext) private var modelContext
@@ -362,7 +362,7 @@ struct CaseDetailView: View {
         isComposerFocused = false
         save()
         isPostingComment = false
-        let activeModerator = moderator ?? OpenAICommentModerator.live()
+        let activeModerator = moderator ?? ModelCommentModerator.live()
         let reportTitle = report.titleEN.isEmpty ? report.titleAR : report.titleEN
         Task { @MainActor in
             let status = await activeModerator.moderate(text, reportTitle: reportTitle)
