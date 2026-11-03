@@ -101,6 +101,8 @@ Real frames from a screen recording of the app on an iPhone. **Live test, Abu Dh
 | <img src="docs/images/live-04-voice-transcript.jpg" width="240" alt="Resident's spoken answer transcribed into a chat bubble"><br>Push-to-talk answer, transcribed by Muse Voice Transcribe | <img src="docs/images/live-05-read-back.jpg" width="240" alt="Assistant reads the report back and asks about posting"><br>Read-back and the posting question | <img src="docs/images/live-06-ticket.jpg" width="240" alt="Ticket HOTH-4184 with priority, reason, routed team and answers"><br>Ticket HOTH-4184 |
 | <img src="docs/images/live-07-posted.jpg" width="240" alt="Posted confirmation screen"><br>Posted: only the blurred photo is shared | | |
 
+This is a single-device build. "Neighbours nearby will be alerted" and "Routed to Waste Management" are labels inside the app. Nothing is sent to other users or to any authority (see [Limitations](#limitations-and-roadmap)).
+
 ## Privacy and safety
 
 - **Blur before upload, fail closed.**
@@ -126,13 +128,13 @@ What does leave the phone, and the honest gaps, are listed in [docs/privacy-and-
 | Urgent-hazard recall (final ≥ high) | 11/12 (92%) |
 | Implausible images flagged | 6/6 (100%) |
 | Fix-verification accuracy | 5/5 (100%) |
-| Same-issue (duplicate) accuracy | 6/6 (100%) |
+| Same-issue (duplicate) accuracy | 6/6 (100%), easy pairs: 3 crop/rotate variants and 3 clear negatives |
 | Latency mean / p95 per call | 7.2 s / 11.6 s |
 
 The weak spots:
 
 - Playground category accuracy is 4/7 (57%). Small or subtle breakage is often read as "not an issue".
-- 6 of 39 plausible real-issue photos (15%) were wrongly flagged as implausible.
+- 6 of 39 plausible issue images (15%) were wrongly flagged as implausible. Two are Wikimedia photos and four are AI-generated, three of those being "after repair" images.
 
 Full tables, method and caveats: [docs/evaluation.md](docs/evaluation.md).
 
@@ -191,7 +193,7 @@ Limitations:
   - Neighbour alerts are local notifications, simulated in demo mode.
   - "Routed to" is a category-to-team label. Nothing is dispatched to any authority.
   - The crew role is a Settings toggle with no sign-in.
-- **Blur can miss.** Face and plate detection is Apple Vision on the device and can miss some faces and plates. Blur timing on a real iPhone has not been measured yet. Simulator runs took 0.21–0.38 s on the spring rider photo.
+- **Blur can miss.** Face and plate detection is Apple Vision on the device and can miss some faces and plates. Blur timing on a real iPhone has not been measured yet. Simulator runs took 0.21–0.38 s on the spring rider photo. That photo has no faces or plates, so this measures detection only, not the blur rendering.
 - **Playground recall.** Playground category accuracy is 57% in the eval. When Muse Spark calls a photo "not an issue", the safety floors never get a chance to fire.
 - **Small eval.** It is one run on 48 images, 19 of which are AI-generated. The intake agent, SAM, transcription and moderation are not in the offline eval. They are only covered by opt-in live smoke tests (`LiveMetaTests`).
 - **Arabic speech.** Arabic transcription has only been checked on synthetic (`say`-generated) clips, not on recordings of real Gulf Arabic speakers.

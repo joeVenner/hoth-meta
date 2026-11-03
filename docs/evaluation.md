@@ -76,8 +76,8 @@ Raw responses are cached in `tools/eval/cache/` (gitignored), so reruns are free
 | Urgent-hazard recall (≥ high), model / final | 11/12 (92%) / 11/12 (92%) |
 | Child-risk recall | 12/15 (80%) |
 | Implausible images flagged | 6/6 (100%) |
-| False-flag rate, plausible real issues | 6/39 (15%) |
-| Same-issue accuracy | 6/6 (100%) |
+| False-flag rate, plausible issue images | 6/39 (15%): 2 Wikimedia, 4 AI-generated |
+| Same-issue accuracy | 6/6 (100%) on easy pairs (see Dataset) |
 | Fix-verification accuracy | 5/5 (100%) |
 | Latency mean / p95 per call | 7.2 s / 11.6 s |
 | Calls slower than the app's 60 s timeout | 0 |
@@ -100,7 +100,7 @@ Raw responses are cached in `tools/eval/cache/` (gitignored), so reruns are free
 ## Reading the results honestly
 
 - **Playground equipment is the weakest category (57%).** A wide shot with a small broken swing, and a synthetic swing with one snapped chain, were both called `not_an_issue`. When that happens the report stays LOW, the safety floors never fire, and the photo is flagged as implausible. This is the most important failure mode for a child-safety app.
-- **False flags.** 6 of 39 plausible real-issue photos (15%) were flagged as implausible, so those residents would be asked to retake. Some of them are "after" photos of fixed issues, where `not_an_issue` is arguably correct.
+- **False flags.** 6 of 39 plausible issue images (15%) were flagged as implausible, so those residents would be asked to retake. Two are Wikimedia photos (a wide playground shot and a subtle water leak). Four are AI-generated, and three of those are "after repair" images, where `not_an_issue` is arguably correct.
 - **Floors did not change the severity score here.** Severity ≥ expected minimum is 40/42 both with and without the floors. They raised several items to CRITICAL (open manholes, child equipment), but every item that missed was a category miss.
 - **Small and partly synthetic.** It is 48 images, 19 of them AI-generated, from a single run. Treat the percentages as a smoke-level signal, not a benchmark.
 - **Unblurred input.** The harness does not blur. The app sends blurred photos, and the eval does not measure the blur's effect on accuracy.

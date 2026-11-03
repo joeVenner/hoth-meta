@@ -41,7 +41,7 @@ To run on a device, open `ios/HoTH.xcodeproj` and set your development team unde
 | `CrewUITests` | Fix check: reject, then accept |
 | `CommentComposerUITests` | Posting a comment with the keyboard up, in English and Arabic |
 | `PriorityAgentTests`, `PlausibilityTests`, `DedupTests` (HoTHCore) | The deterministic rules |
-| `MetaModelClientTests` (HoTHCore) | Request bodies and response parsing against recorded fixtures in `Tests/HoTHCoreTests/Resources/` |
+| `MetaModelClientTests` (HoTHCore) | Request bodies and response parsing against JSON fixtures in `Tests/HoTHCoreTests/Resources/`, some of them taken from Meta's docs |
 
 ### Live (paid) tests
 

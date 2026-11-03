@@ -12,7 +12,7 @@ Code: `ios/HoTH/Privacy/FaceAndPlateBlur.swift`.
 - plate-like text, with `VNRecognizeTextRequest`. A text box counts as plate-like when all of these hold:
   - it is wide and short (aspect 1.5–6.5)
   - it is small (0.02%–5% of the image)
-  - it has 2–10 characters, mostly alphanumeric, with at least one digit
+  - it has 2–10 letters or digits (spaces, hyphens and dots are ignored), including at least one digit
 
 **Blur.** Each detected region is padded and covered with a blur plus pixellation. The rest of the image is left untouched.
 
@@ -40,7 +40,7 @@ In DEBUG capture mode, `UploadAudit` logs each redaction and each photo-carrying
 **Limits:**
 
 - Detection can miss faces and plates (angle, distance, partial occlusion, unusual plates). The app's privacy copy says "faces and plates your phone detects".
-- Blur latency has been measured only on the simulator (0.21–0.38 s on the spring rider photo), not yet on a real iPhone.
+- Blur latency has been measured only on the simulator (0.21–0.38 s on the spring rider photo, which has no faces or plates, so the blur rendering itself was not timed), not yet on a real iPhone.
 - Offline canned demo analyses send nothing, so they skip the upload blur.
 
 ## What leaves the phone
@@ -100,7 +100,7 @@ Every factor becomes a chip under "Why this priority", in English and Arabic. Th
 **Guarantees and limits:**
 
 - The intake agent's output schema has no priority field, so the model cannot write a priority directly.
-- The floors depend on Muse Spark's category and hazard kinds. If the model calls a photo `not_an_issue`, the report stays LOW and is flagged for review, and no floor fires. That is the main failure mode in the eval (see [evaluation.md](evaluation.md)).
+- The floors depend on Muse Spark's category and hazard kinds. If the model calls a photo `not_an_issue`, plausibility asks the resident to retake it. No ticket is made and no floor fires. That is the main failure mode in the eval (see [evaluation.md](evaluation.md)).
 
 ## Safety sheet and urgent answers
 

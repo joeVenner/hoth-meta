@@ -105,9 +105,9 @@ There is no priority field. Answers go through `PriorityAgent`, so the safety fl
 
 | What went wrong | What the interview does |
 |---|---|
-| HTTP 400 or an undecodable turn | Tools are switched off for the session and the turn is retried single-turn. |
+| HTTP 400, 404 or 422, a decoding error, or a refusal | Tools are switched off for the session and the turn is retried single-turn. |
 | Round limit | That turn finishes single-turn, with the tool results in the prompt. |
-| Key, billing, rate-limit or network error | Switches to the deterministic local chat, which asks the category's slot questions, reads back and asks about posting. |
+| Key, billing, rate-limit, network, server or incomplete-response error | Switches to the deterministic local chat, which asks the category's slot questions, reads back and asks about posting. |
 
 Across turns, earlier tool results are resent as text ("Tool results so far"), so the agent does not call them again.
 
