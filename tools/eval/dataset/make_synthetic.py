@@ -1,8 +1,10 @@
 """Generate the synthetic (`syn_`) part of the eval dataset with the gpt-image skill, then merge labels.
 
-Run (key read inline from the macOS Keychain, never written to disk):
-    OPENAI_API_KEY=$(KEYCHAIN_MANAGER_AGENT_MODE=1 bash /Users/macbook/.claude/skills/claude-keychain-skill/scripts/keychain_manager.sh retrieve openai default) \
+Run (load the key from your secret store inline; never write it to disk):
+    GPT_IMAGE_SCRIPTS=/path/to/gpt-image/scripts OPENAI_API_KEY=... \
         python3 -I tools/eval/dataset/make_synthetic.py
+
+GPT_IMAGE_SCRIPTS points at a folder holding the gpt-image `generate.py` and `edit.py` scripts.
 
 Stage 1 generates all non-"after" images, stage 2 makes each "after" as an image EDIT of its "before".
 Existing files are skipped, so the script is safe to re-run. Labels for every syn_ file that exists are
@@ -14,7 +16,7 @@ import subprocess
 import sys
 from concurrent.futures import ThreadPoolExecutor
 
-SKILL = "/Users/macbook/.claude/skills/gpt-image/scripts"
+SKILL = os.environ.get("GPT_IMAGE_SCRIPTS", "")
 PHONE = (" Photorealistic handheld smartphone photo taken by a resident reporting the issue, natural daylight,"
          " slightly imperfect framing, mild sensor noise and JPEG compression, not a professional photo."
          " No people, no faces, no text, no watermark.")
@@ -151,6 +153,8 @@ def run(cmd: list) -> str:
 
 
 def main(out: str) -> None:
+    if not SKILL:
+        sys.exit("Set GPT_IMAGE_SCRIPTS to the folder with the gpt-image generate.py and edit.py scripts.")
     os.makedirs(out, exist_ok=True)
     for stage in ("gen", "edit"):
         jobs = []
