@@ -9,8 +9,16 @@ struct HoTHApp: App {
 
     init() {
         let logger = Logger(subsystem: "io.fomy.hoth", category: "App")
+        #if DEBUG
+        if AppServices.isDemoCaptureRun {
+            DemoCapture.prepareLaunch(defaults: .standard, environment: ProcessInfo.processInfo.environment)
+            CaptureLog.recordLaunch()
+        }
+        #endif
         do {
-            modelContainer = try HoTHStore.makeContainer(inMemory: AppServices.isUITestRun)
+            // Capture runs reseed every launch too, so each take starts from the same community.
+            modelContainer = try HoTHStore.makeContainer(
+                inMemory: AppServices.isUITestRun || AppServices.isDemoCaptureRun)
         } catch {
             // Keep the demo running on a broken store rather than crashing on launch.
             logger.error("Persistent store failed, using in-memory store: \(error.localizedDescription)")
@@ -36,13 +44,13 @@ struct HoTHApp: App {
 }
 
 /// Hosts the branded launch splash above the app, then cross-fades into RootTabs (or onboarding).
-/// Skipped in UI-test runs so tests aren't slowed.
+/// Skipped in UI-test runs so tests aren't slowed, and in capture runs that ask for it.
 private struct AppRootView: View {
     @ObservedObject private var services = AppServices.shared
     @AppStorage(OnboardingView.storageKey) private var isOnboardingDone = false
-    @State private var isSplashVisible = !AppServices.isUITestRun
+    @State private var isSplashVisible = !AppServices.isUITestRun && !AppServices.skipsCaptureSplash
     /// Holds onboarding back; released separately so the splash can stay mounted beneath the cover.
-    @State private var isLaunching = !AppServices.isUITestRun
+    @State private var isLaunching = !AppServices.isUITestRun && !AppServices.skipsCaptureSplash
 
     var body: some View {
         ZStack {

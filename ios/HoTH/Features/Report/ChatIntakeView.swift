@@ -67,9 +67,16 @@ struct ChatIntakeView: View {
         _model = StateObject(wrappedValue: ChatIntakeModel(
             context: context, slots: slots, client: client, prompts: prompts, model: textModel, toolbox: toolbox,
             onComplete: onComplete, onUrgent: onUrgent, onConfirmExisting: onConfirmExisting))
-        _voice = StateObject(wrappedValue: PushToTalkModel(
-            transcriber: transcriber, recorder: WAVVoiceRecorder(), speaker: SystemSpeechSpeaker(),
-            startsInVoice: startsWithVoice))
+        _voice = StateObject(wrappedValue: Self.makeVoiceModel(transcriber: transcriber,
+                                                               startsWithVoice: startsWithVoice))
+    }
+
+    /// Built inside the `StateObject` autoclosure, so the recorder (and a capture playlist) is made once.
+    private static func makeVoiceModel(transcriber: SpeechTranscribing?, startsWithVoice: Bool) -> PushToTalkModel {
+        let recorder = VoiceRecorderFactory.make()
+        return PushToTalkModel(
+            transcriber: transcriber, recorder: recorder, speaker: SystemSpeechSpeaker(),
+            startsInVoice: startsWithVoice, micStatus: VoiceRecorderFactory.micStatus(for: recorder))
     }
 
     var body: some View {
@@ -147,6 +154,7 @@ struct ChatIntakeView: View {
                     RoundedRectangle(cornerRadius: 20, style: .continuous)
                         .strokeBorder(Color.hothInk.opacity(isAssistant ? 0.06 : 0))
                 )
+                .accessibilityIdentifier(isAssistant ? "chatBubble_assistant" : "chatBubble_resident")
             if isAssistant { Spacer(minLength: 48) }
         }
     }
@@ -184,7 +192,7 @@ struct ChatIntakeView: View {
             if !model.quickReplies.isEmpty && !model.isFinished {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: HoTHSpacing.s) {
-                        ForEach(model.quickReplies, id: \.self) { reply in
+                        ForEach(Array(model.quickReplies.enumerated()), id: \.element) { index, reply in
                             Button(reply) {
                                 voice.stopSpeaking()
                                 model.send(reply)
@@ -195,6 +203,8 @@ struct ChatIntakeView: View {
                                 .padding(.vertical, 9)
                                 .background(Capsule().strokeBorder(Color.hothTeal, lineWidth: 1.5))
                                 .disabled(model.isThinking)
+                                // Labels are localized; the index is stable across en / ar runs.
+                                .accessibilityIdentifier("quickReply_\(index)")
                         }
                     }
                     .padding(.horizontal, HoTHSpacing.m)

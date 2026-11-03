@@ -242,22 +242,6 @@ struct SecondaryButtonStyle: ButtonStyle {
     }
 }
 
-// MARK: Demo badge
-
-struct DemoBadge: View {
-    var body: some View {
-        HStack(spacing: HoTHSpacing.xs) {
-            Circle().fill(Color.hothTeal).frame(width: 6, height: 6)
-            Text("Demo community").font(.hothCaption.weight(.semibold))
-        }
-        .foregroundStyle(Color.hothTeal)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 5)
-        .background(Capsule().fill(Color.hothTeal.opacity(0.12)))
-        .accessibilityLabel(Text("Demo community"))
-    }
-}
-
 // MARK: Section header
 
 struct SectionHeader: View {

@@ -73,8 +73,10 @@ public struct PriorityDecision: Equatable, Sendable {
     public let reasonEN: String
     public let reasonAR: String
     public let signals: [Signal]
-    /// Label of the safety floor that set the level, e.g. "CRITICAL — child safety".
-    public let floorApplied: String?
+    /// Label of the safety floor that set the level, e.g. "CRITICAL — child safety"; nil when no floor did.
+    public let floorAppliedEN: String?
+    /// Arabic label of the same floor, e.g. "حرج — سلامة الأطفال"; nil exactly when `floorAppliedEN` is.
+    public let floorAppliedAR: String?
     /// True when the photo was judged not to show a neighbourhood issue.
     public let isFlagged: Bool
 }
@@ -114,7 +116,8 @@ public enum PriorityAgent {
 
     private struct Floor {
         let level: Severity
-        let label: String
+        let labelEN: String
+        let labelAR: String
     }
 
     public static func decide(_ input: PriorityInput) -> PriorityDecision {
@@ -128,7 +131,7 @@ public enum PriorityAgent {
                 level: .low, score: 0,
                 reasonEN: "The photo does not show a neighbourhood issue — kept at low and flagged for review.",
                 reasonAR: "الصورة لا تُظهر مشكلة في الحي — بقيت منخفضة وتم وضع علامة للمراجعة.",
-                signals: [signal], floorApplied: nil, isFlagged: true)
+                signals: [signal], floorAppliedEN: nil, floorAppliedAR: nil, isFlagged: true)
         }
 
         var signals: [Signal] = []
@@ -147,23 +150,23 @@ public enum PriorityAgent {
                 labelEN: hasSharp ? "Sharp metal on equipment children use" : "Fall risk on equipment children use",
                 labelAR: hasSharp ? "معدن حاد في لعبة يستخدمها الأطفال" : "خطر سقوط في لعبة يستخدمها الأطفال",
                 weight: 15))
-            floors.append(Floor(level: .high, label: "HIGH — child equipment"))
+            floors.append(Floor(level: .high, labelEN: "HIGH — child equipment", labelAR: "مرتفع — لعبة أطفال"))
             if childContext {
                 signals.append(contentsOf: contextSignals)
-                floors.append(Floor(level: .critical, label: "CRITICAL — child safety"))
+                floors.append(Floor(level: .critical, labelEN: "CRITICAL — child safety", labelAR: "حرج — سلامة الأطفال"))
             }
         }
 
         // Floor 2: an open manhole is always critical.
         if vision.category == .openManhole {
             signals.append(Signal(id: "open_manhole", labelEN: "Open manhole", labelAR: "فتحة صرف مكشوفة", weight: 30))
-            floors.append(Floor(level: .critical, label: "CRITICAL — open manhole"))
+            floors.append(Floor(level: .critical, labelEN: "CRITICAL — open manhole", labelAR: "حرج — فتحة صرف مكشوفة"))
         }
 
         // Floor 3: electrical hazard.
         if vision.hasHazard(.electrical) || vision.category == .electricalHazard {
             signals.append(Signal(id: "electrical", labelEN: "Electrical hazard", labelAR: "خطر كهربائي", weight: 15))
-            floors.append(Floor(level: .high, label: "HIGH — electrical"))
+            floors.append(Floor(level: .high, labelEN: "HIGH — electrical", labelAR: "مرتفع — خطر كهربائي"))
             let sparking = isAffirmative(input.answers["sparking"])
             let nearWater = isAffirmative(input.answers["near_water"])
             if sparking {
@@ -174,7 +177,7 @@ public enum PriorityAgent {
             }
             if childContext || sparking || nearWater {
                 for signal in contextSignals where !signals.contains(signal) { signals.append(signal) }
-                floors.append(Floor(level: .critical, label: "CRITICAL — electrical danger"))
+                floors.append(Floor(level: .critical, labelEN: "CRITICAL — electrical danger", labelAR: "حرج — خطر كهربائي داهم"))
             }
         }
 
@@ -211,11 +214,12 @@ public enum PriorityAgent {
         let floorLevel = strongestFloor?.level ?? .low
         let level = max(proposal, floorLevel, level(forScore: min(rawScore, 100)))
         let score = clamp(rawScore, to: level)
-        let floorApplied = (strongestFloor.map { $0.level == level } ?? false) ? strongestFloor?.label : nil
+        let appliedFloor = (strongestFloor.map { $0.level == level } ?? false) ? strongestFloor : nil
 
         let reasons = buildReasons(signals: signals, vision: vision, proposal: proposal, level: level)
         return PriorityDecision(level: level, score: score, reasonEN: reasons.en, reasonAR: reasons.ar,
-                                signals: signals, floorApplied: floorApplied, isFlagged: false)
+                                signals: signals, floorAppliedEN: appliedFloor?.labelEN,
+                                floorAppliedAR: appliedFloor?.labelAR, isFlagged: false)
     }
 
     // MARK: Helpers

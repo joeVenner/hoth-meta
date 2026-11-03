@@ -4,7 +4,7 @@ import SwiftData
 
 /// Inserts the bundled demo community (`seed.json`) into SwiftData.
 ///
-/// Seeding is idempotent: it only inserts when no demo rows exist, and records a UserDefaults flag. Every seeded record has `isDemoSeed == true` so the UI can label it "Demo community".
+/// Seeding is idempotent: it only inserts when no demo rows exist, and records a UserDefaults flag. Every seeded record has `isDemoSeed == true` (demo photos, the demo fix check and duplicate matching key off it).
 /// Seed times are stored as "hours ago" and resolved against the moment of seeding.
 @MainActor
 enum SeedLoader {

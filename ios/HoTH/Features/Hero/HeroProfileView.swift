@@ -80,16 +80,17 @@ struct HeroProfileView: View {
                     .shadow(color: Color.black.opacity(0.12), radius: 8, x: 0, y: 4)
                     .accessibilityHidden(true)
                 Spacer()
-                if me.isDemoSeed && services.demoMode { DemoBadge() }
             }
             Text(verbatim: levelTitle(points: me.points))
                 .font(.hothDisplay(34))
                 .foregroundStyle(Color.hothInk)
+                .accessibilityIdentifier("heroLevelTitle")
             HStack(alignment: .firstTextBaseline, spacing: HoTHSpacing.xs) {
                 Text(verbatim: "\(me.points)")
                     .font(.hothDisplay(56))
                     .foregroundStyle(Color.hothAccent)
                     .contentTransition(.numericText())
+                    .accessibilityIdentifier("heroPoints")
                 Text("points")
                     .font(.hothHeadline)
                     .foregroundStyle(Color.hothInkSecondary)

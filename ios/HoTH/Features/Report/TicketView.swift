@@ -120,6 +120,7 @@ struct TicketView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Routed to").font(.hothCaption).foregroundStyle(Color.hothInkSecondary)
                     Text(team.name(arabic: isArabic)).font(.hothHeadline).foregroundStyle(Color.hothInk)
+                        .accessibilityIdentifier("routedToTeam")
                 }
                 Spacer()
             }

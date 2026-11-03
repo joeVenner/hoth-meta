@@ -225,6 +225,26 @@ final class AppServices: ObservableObject {
         #endif
     }
 
+    /// DEBUG-only demo-film capture mode (`HOTH_DEMO_CAPTURE=1` launch env, see `DemoCapture`): in-memory
+    /// store and a per-launch defaults reset, with every live Meta path left on. Never implies
+    /// `isUITestRun`.
+    nonisolated static var isDemoCaptureRun: Bool {
+        #if DEBUG
+        return DemoCapture.isEnabled(environment: ProcessInfo.processInfo.environment)
+        #else
+        return false
+        #endif
+    }
+
+    /// DEBUG-only: capture mode with `HOTH_CAPTURE_SKIP_SPLASH=1`, for scenes that start mid-app.
+    nonisolated static var skipsCaptureSplash: Bool {
+        #if DEBUG
+        return DemoCapture.skipsSplash(environment: ProcessInfo.processInfo.environment)
+        #else
+        return false
+        #endif
+    }
+
     /// Locale override for the SwiftUI environment; nil follows the system.
     var localeOverride: Locale? {
         switch Language(rawValue: preferredLanguage) ?? .system {

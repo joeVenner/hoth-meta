@@ -10,7 +10,7 @@ final class PriorityAgentTests: XCTestCase {
     func testChildEquipmentSharpEdgeFloorsToHigh() {
         let decision = PriorityAgent.decide(PriorityInput(vision: childEquipment))
         XCTAssertEqual(decision.level, .high)
-        XCTAssertEqual(decision.floorApplied, "HIGH — child equipment")
+        XCTAssertEqual(decision.floorAppliedEN, "HIGH — child equipment")
         XCTAssertTrue(decision.signals.contains { $0.id == "child_equipment_hazard" })
     }
 
@@ -25,13 +25,13 @@ final class PriorityAgentTests: XCTestCase {
                                 scene: .park, proposal: .low)
         let decision = PriorityAgent.decide(PriorityInput(vision: vision))
         XCTAssertEqual(decision.level, .low)
-        XCTAssertNil(decision.floorApplied)
+        XCTAssertNil(decision.floorAppliedEN)
     }
 
     func testChildEquipmentInPlaygroundIsCriticalChildSafety() {
         let decision = PriorityAgent.decide(PriorityInput(vision: childEquipment, location: .playground))
         XCTAssertEqual(decision.level, .critical)
-        XCTAssertEqual(decision.floorApplied, "CRITICAL — child safety")
+        XCTAssertEqual(decision.floorAppliedEN, "CRITICAL — child safety")
         XCTAssertEqual(decision.reasonEN,
                        "Sharp metal on equipment children use, in a playground — escalated to critical.")
         XCTAssertTrue(decision.reasonAR.contains("حرجة"))
@@ -74,7 +74,7 @@ final class PriorityAgentTests: XCTestCase {
         let vision = makeVision(category: .openManhole, scene: .street, proposal: .low)
         let decision = PriorityAgent.decide(PriorityInput(vision: vision))
         XCTAssertEqual(decision.level, .critical)
-        XCTAssertEqual(decision.floorApplied, "CRITICAL — open manhole")
+        XCTAssertEqual(decision.floorAppliedEN, "CRITICAL — open manhole")
     }
 
     // MARK: Electrical
@@ -83,7 +83,7 @@ final class PriorityAgentTests: XCTestCase {
         let vision = makeVision(category: .electricalHazard, hazards: [.electrical], scene: .street, proposal: .low)
         let decision = PriorityAgent.decide(PriorityInput(vision: vision))
         XCTAssertEqual(decision.level, .high)
-        XCTAssertEqual(decision.floorApplied, "HIGH — electrical")
+        XCTAssertEqual(decision.floorAppliedEN, "HIGH — electrical")
     }
 
     func testElectricalHazardKindInOtherCategoryAlsoFloors() {
@@ -95,7 +95,7 @@ final class PriorityAgentTests: XCTestCase {
         let vision = makeVision(category: .electricalHazard, hazards: [.electrical], scene: .street, proposal: .medium)
         let decision = PriorityAgent.decide(PriorityInput(vision: vision, location: .playground))
         XCTAssertEqual(decision.level, .critical)
-        XCTAssertEqual(decision.floorApplied, "CRITICAL — electrical danger")
+        XCTAssertEqual(decision.floorAppliedEN, "CRITICAL — electrical danger")
     }
 
     func testElectricalNearSchoolOrChildPresentIsCritical() {
@@ -123,13 +123,60 @@ final class PriorityAgentTests: XCTestCase {
         XCTAssertEqual(decision.signals.map(\.id), ["not_an_issue"])
     }
 
+    // MARK: Floor labels (en + ar)
+
+    func testEveryFloorHasMatchingArabicLabel() {
+        let electrical = makeVision(category: .electricalHazard, hazards: [.electrical], scene: .street, proposal: .low)
+        let cases: [(PriorityInput, String, String)] = [
+            (PriorityInput(vision: childEquipment), "HIGH — child equipment", "مرتفع — لعبة أطفال"),
+            (PriorityInput(vision: childEquipment, location: .playground),
+             "CRITICAL — child safety", "حرج — سلامة الأطفال"),
+            (PriorityInput(vision: makeVision(category: .openManhole, scene: .street, proposal: .low)),
+             "CRITICAL — open manhole", "حرج — فتحة صرف مكشوفة"),
+            (PriorityInput(vision: electrical), "HIGH — electrical", "مرتفع — خطر كهربائي"),
+            (PriorityInput(vision: electrical, answers: ["sparking": "yes"]),
+             "CRITICAL — electrical danger", "حرج — خطر كهربائي داهم"),
+        ]
+        for (input, english, arabic) in cases {
+            let decision = PriorityAgent.decide(input)
+            XCTAssertEqual(decision.floorAppliedEN, english)
+            XCTAssertEqual(decision.floorAppliedAR, arabic)
+        }
+    }
+
+    func testArabicFloorLabelsHaveNoLatinLetters() {
+        let inputs = [
+            PriorityInput(vision: childEquipment),
+            PriorityInput(vision: childEquipment, location: .playground),
+            PriorityInput(vision: makeVision(category: .openManhole, scene: .street, proposal: .low)),
+            PriorityInput(vision: makeVision(category: .electricalHazard, hazards: [.electrical], scene: .street,
+                                             proposal: .low), answers: ["near_water": "yes"]),
+        ]
+        for input in inputs {
+            let label = PriorityAgent.decide(input).floorAppliedAR ?? ""
+            XCTAssertFalse(label.isEmpty)
+            let hasLatin = label.unicodeScalars.contains { ("A"..."Z").contains($0) || ("a"..."z").contains($0) }
+            XCTAssertFalse(hasLatin, "Arabic floor label contains Latin letters: \(label)")
+        }
+    }
+
+    func testFloorLabelsAreNilTogetherWhenNoFloorApplies() {
+        let noFloor = makeVision(category: .potholePavement, hazards: [.trip], scene: .street, proposal: .critical)
+        let notAnIssue = makeVision(category: .notAnIssue, proposal: .high)
+        for input in [PriorityInput(vision: noFloor), PriorityInput(vision: notAnIssue)] {
+            let decision = PriorityAgent.decide(input)
+            XCTAssertNil(decision.floorAppliedEN)
+            XCTAssertNil(decision.floorAppliedAR)
+        }
+    }
+
     // MARK: Score, thresholds, community
 
     func testFloorsNeverLowerTheLLMProposal() {
         let vision = makeVision(category: .potholePavement, hazards: [.trip], scene: .street, proposal: .critical)
         let decision = PriorityAgent.decide(PriorityInput(vision: vision))
         XCTAssertEqual(decision.level, .critical)
-        XCTAssertNil(decision.floorApplied)
+        XCTAssertNil(decision.floorAppliedEN)
     }
 
     func testThresholds() {

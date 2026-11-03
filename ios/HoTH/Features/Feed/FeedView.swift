@@ -176,7 +176,6 @@ struct FeedView: View {
                 }
                 .environment(\.layoutDirection, .leftToRight)
                 Spacer(minLength: HoTHSpacing.s)
-                if services.demoMode { DemoBadge() }
             }
             Text("حيّ · Hay = neighbourhood")
                 .font(.hothCaption)

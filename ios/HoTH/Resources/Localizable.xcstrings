@@ -601,6 +601,7 @@
       }
     },
     "App reset, but the Meta API key could not be removed." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -752,6 +753,7 @@
       }
     },
     "Checking places nearby…" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -768,6 +770,7 @@
       }
     },
     "Checking reports nearby…" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -898,6 +901,7 @@
       }
     },
     "Comment" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1032,6 +1036,7 @@
       }
     },
     "Couldn't record audio. Please type your answer." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1048,6 +1053,7 @@
       }
     },
     "Couldn't turn your voice into text right now. Please type your answer." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1244,22 +1250,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Demo analysis (offline)"
-          }
-        }
-      }
-    },
-    "Demo community" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "مجتمع تجريبي"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Demo community"
           }
         }
       }
@@ -1746,6 +1736,7 @@
       }
     },
     "Hold to talk" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1762,6 +1753,7 @@
       }
     },
     "HoTH assistant" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1778,6 +1770,7 @@
       }
     },
     "I didn't catch that. Hold the button and speak." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1861,6 +1854,7 @@
       }
     },
     "Interview finished" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1974,6 +1968,7 @@
       }
     },
     "Listening" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1990,6 +1985,7 @@
       }
     },
     "Listening… release to send" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -2006,6 +2002,7 @@
       }
     },
     "Listening… tap to send" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -2189,6 +2186,23 @@
         }
       }
     },
+    "Meta Model API key" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مفتاح Meta Model API"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meta Model API key"
+          }
+        }
+      }
+    },
     "Microphone" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2207,6 +2221,7 @@
       }
     },
     "Microphone access is off. Turn it on in Settings, or type your answer." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -2603,19 +2618,19 @@
         }
       }
     },
-    "Meta Model API key" : {
+    "Other" : {
       "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "مفتاح Meta Model API"
+            "value" : "أخرى"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Meta Model API key"
+            "value" : "Other"
           }
         }
       }
@@ -2637,6 +2652,7 @@
       }
     },
     "Outlines the hazard on your photo." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -2652,73 +2668,8 @@
         }
       }
     },
-    "Photo understanding, the interview agent, fix checks and comment moderation; voice to text; hazard outlines." : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "فهم الصور ووكيل المقابلة والتحقق من الإصلاحات ومراجعة التعليقات؛ تحويل الصوت إلى نص؛ تحديد الأخطار على الصور."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Photo understanding, the interview agent, fix checks and comment moderation; voice to text; hazard outlines."
-          }
-        }
-      }
-    },
-    "Powered by Meta AI" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "مدعوم بالذكاء الاصطناعي من Meta"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Powered by Meta AI"
-          }
-        }
-      }
-    },
-    "Powers Meta's Muse Spark: photo analysis, chat and repair checks." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يشغّل نموذج Muse Spark من Meta: تحليل الصور والمحادثة وفحص الإصلاحات."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Powers Meta's Muse Spark: photo analysis, chat and repair checks."
-          }
-        }
-      }
-    },
-    "Other" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "أخرى"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Other"
-          }
-        }
-      }
-    },
     "Outlining with SAM 3.1…" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -2774,6 +2725,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Partial repair"
+          }
+        }
+      }
+    },
+    "Photo understanding, the interview agent, fix checks and comment moderation; voice to text; hazard outlines." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فهم الصور ووكيل المقابلة والتحقق من الإصلاحات ومراجعة التعليقات؛ تحويل الصوت إلى نص؛ تحديد الأخطار على الصور."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photo understanding, the interview agent, fix checks and comment moderation; voice to text; hazard outlines."
           }
         }
       }
@@ -2943,6 +2910,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pothole / pavement"
+          }
+        }
+      }
+    },
+    "Powered by Meta AI" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مدعوم بالذكاء الاصطناعي من Meta"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Powered by Meta AI"
+          }
+        }
+      }
+    },
+    "Powers Meta's Muse Spark: photo analysis, chat and repair checks." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يشغّل نموذج Muse Spark من Meta: تحليل الصور والمحادثة وفحص الإصلاحات."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Powers Meta's Muse Spark: photo analysis, chat and repair checks."
           }
         }
       }
@@ -3231,6 +3230,7 @@
       }
     },
     "Reset" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -3344,6 +3344,7 @@
       }
     },
     "Reset failed. Please try again." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -3554,6 +3555,7 @@
       }
     },
     "Share" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -3569,18 +3571,18 @@
         }
       }
     },
-    "Shows a fictional demo community, clearly labelled." : {
+    "Shows a fictional demo community." : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "يعرض مجتمعًا تجريبيًا خياليًا مع تسمية واضحة."
+            "value" : "يعرض مجتمعًا تجريبيًا خياليًا."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Shows a fictional demo community, clearly labelled."
+            "value" : "Shows a fictional demo community."
           }
         }
       }
@@ -3635,6 +3637,7 @@
       }
     },
     "Speaking… hold to interrupt" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -3915,6 +3918,23 @@
         }
       }
     },
+    "Text model" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "نموذج النص"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text model"
+          }
+        }
+      }
+    },
     "Thanks, neighbour. Priority updated." : {
       "localizations" : {
         "ar" : {
@@ -3932,6 +3952,7 @@
       }
     },
     "The assistant is speaking" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -3947,19 +3968,19 @@
         }
       }
     },
-    "The demo community is fictional and labelled as such." : {
+    "The demo community is fictional." : {
       "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "المجتمع التجريبي خيالي ومُعلَّم بذلك."
+            "value" : "المجتمع التجريبي خيالي."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The demo community is fictional and labelled as such."
+            "value" : "The demo community is fictional."
           }
         }
       }
@@ -3998,6 +4019,7 @@
       }
     },
     "Thinking" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -4014,6 +4036,7 @@
       }
     },
     "Thinking…" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -4180,6 +4203,7 @@
       }
     },
     "Transcribing" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -4196,6 +4220,7 @@
       }
     },
     "Transcribing…" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -4263,6 +4288,7 @@
       }
     },
     "Turns your Arabic or English voice into text." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -4279,6 +4305,7 @@
       }
     },
     "Type instead" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -4312,6 +4339,7 @@
       }
     },
     "Understands your photo, runs the interview agent, checks fixes and moderates comments." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -4428,23 +4456,6 @@
         }
       }
     },
-    "Text model" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "نموذج النص"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Text model"
-          }
-        }
-      }
-    },
     "Voice note added to the report" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4463,6 +4474,7 @@
       }
     },
     "Voice unavailable" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

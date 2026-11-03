@@ -41,6 +41,7 @@ struct SettingsView: View {
                 titleVisibility: .visible
             ) {
                 Button(role: .destructive, action: resetDemo) { Text("Reset everything") }
+                    .accessibilityIdentifier("resetConfirmButton")
                 Button(role: .cancel) {} label: { Text("Cancel") }
             } message: {
                 Text("This deletes all reports, comments and points on this device and reloads the demo community.")
@@ -140,7 +141,7 @@ struct SettingsView: View {
                     Toggle(isOn: $services.demoMode) {
                         VStack(alignment: .leading, spacing: 2) {
                             Text("Demo mode").font(.hothHeadline).foregroundStyle(Color.hothInk)
-                            Text("Shows a fictional demo community, clearly labelled.")
+                            Text("Shows a fictional demo community.")
                                 .font(.hothCaption)
                                 .foregroundStyle(Color.hothInkSecondary)
                         }
@@ -192,6 +193,7 @@ struct SettingsView: View {
                         Label { Text("Reset demo community") } icon: { Image(systemName: "arrow.counterclockwise") }
                     }
                     .buttonStyle(SecondaryButtonStyle())
+                    .accessibilityIdentifier("resetDemoButton")
                     if let resetMessage {
                         Text(resetMessage).font(.hothCaption).foregroundStyle(Color.hothSuccess)
                     }
@@ -269,7 +271,7 @@ struct SettingsView: View {
                     privacyRow(symbol: "iphone", text: "Reports, comments and points live on this device. There is no HoTH server.")
                     privacyRow(symbol: "eye.slash", text: "Faces and number plates are blurred on your phone before anything is posted to the neighbourhood. To analyse the hazard, the photo is sent to Meta's Muse Spark model.")
                     privacyRow(symbol: "network", text: "Photos and voice go directly to the Meta Model API with your own key, only when you report.")
-                    privacyRow(symbol: "person.2", text: "The demo community is fictional and labelled as such.")
+                    privacyRow(symbol: "person.2", text: "The demo community is fictional.")
                     HStack {
                         Text(verbatim: "HoTH · Heroes of the Hay")
                         Spacer()
