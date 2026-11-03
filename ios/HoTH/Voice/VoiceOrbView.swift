@@ -3,8 +3,9 @@ import SwiftUI
 /// What the voice interview is doing, as far as the orb cares.
 enum VoiceOrbState: Equatable {
     case idle
-    case connecting
     case listening
+    case transcribing
+    case thinking
     case assistantSpeaking
     case done
     case failed
@@ -22,11 +23,14 @@ struct VoiceOrbView: View {
         switch state {
         case .assistantSpeaking: return (.hothAccent, .hothHigh, .hothSand)
         case .listening: return (.hothTeal, .hothLow, .hothSand)
-        case .connecting, .idle: return (.hothSand, .hothTeal.opacity(0.5), .hothInkSecondary.opacity(0.3))
+        case .transcribing, .thinking, .idle: return (.hothSand, .hothTeal.opacity(0.5), .hothInkSecondary.opacity(0.3))
         case .done: return (.hothSuccess, .hothLow, .hothSand)
         case .failed: return (.hothInkSecondary.opacity(0.5), .hothSand, .hothInkSecondary.opacity(0.2))
         }
     }
+
+    /// Transcribing or waiting for the reply: faster breathing and a spinner.
+    private var isWorking: Bool { state == .transcribing || state == .thinking }
 
     /// Perceptual boost: mic and speech levels are small, so lift quiet speech into visible motion.
     private var amplitude: CGFloat {
@@ -37,7 +41,7 @@ struct VoiceOrbView: View {
     var body: some View {
         TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: reduceMotion)) { timeline in
             let time = timeline.date.timeIntervalSinceReferenceDate
-            let breathing = reduceMotion ? 0 : (sin(time * (state == .connecting ? 2.4 : 1.2)) + 1) / 2
+            let breathing = reduceMotion ? 0 : (sin(time * (isWorking ? 2.4 : 1.2)) + 1) / 2
             let scale = 0.92 + 0.04 * breathing + 0.22 * amplitude
 
             ZStack {
@@ -66,7 +70,7 @@ struct VoiceOrbView: View {
                 .shadow(color: palette.core.opacity(0.35), radius: 24, x: 0, y: 12)
                 .scaleEffect(scale)
 
-                if state == .connecting {
+                if isWorking {
                     ProgressView().tint(Color.hothInk.opacity(0.6))
                 }
             }
@@ -89,8 +93,10 @@ struct VoiceOrbView: View {
 
     private var accessibilityText: LocalizedStringKey {
         switch state {
-        case .idle, .connecting: return "Connecting to the HoTH assistant"
+        case .idle: return "Hold to talk"
         case .listening: return "Listening"
+        case .transcribing: return "Transcribing"
+        case .thinking: return "Thinking"
         case .assistantSpeaking: return "The assistant is speaking"
         case .done: return "Interview finished"
         case .failed: return "Voice unavailable"

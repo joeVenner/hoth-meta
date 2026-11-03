@@ -551,23 +551,6 @@
         }
       }
     },
-    "All done, thank you" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "خلصنا، شكراً لك"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "All done, thank you"
-          }
-        }
-      }
-    },
     "All teams" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -585,19 +568,18 @@
         }
       }
     },
-    "Assistant" : {
-      "extractionState" : "stale",
+    "Answer by voice" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "المساعد"
+            "value" : "جاوب بالصوت"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Assistant"
+            "value" : "Answer by voice"
           }
         }
       }
@@ -666,23 +648,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Call 999"
-          }
-        }
-      }
-    },
-    "Call ended before the report was finished. You can type it instead, or try voice again." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "انتهت المكالمة قبل ما يكتمل البلاغ. تقدر تكتبه، أو تجرّب الصوت مرة ثانية."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Call ended before the report was finished. You can type it instead, or try voice again."
           }
         }
       }
@@ -919,40 +884,6 @@
         }
       }
     },
-    "Connecting to the HoTH assistant" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "جارٍ الاتصال بمساعد HoTH"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Connecting to the HoTH assistant"
-          }
-        }
-      }
-    },
-    "Connecting…" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "جارٍ الاتصال…"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Connecting…"
-          }
-        }
-      }
-    },
     "Continue" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1020,19 +951,34 @@
         }
       }
     },
-    "Couldn't connect to the voice assistant. Try again, or type instead." : {
-      "extractionState" : "stale",
+    "Couldn't record audio. Please type your answer." : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ما قدرت أتصل بالمساعد الصوتي. حاول مرة ثانية، أو اكتب بدلاً من ذلك."
+            "value" : "ما قدرت أسجّل الصوت. اكتب جوابك لو سمحت."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Couldn't connect to the voice assistant. Try again, or type instead."
+            "value" : "Couldn't record audio. Please type your answer."
+          }
+        }
+      }
+    },
+    "Couldn't turn your voice into text right now. Please type your answer." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ما قدرت أحوّل صوتك لنص الحين. اكتب جوابك لو سمحت."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't turn your voice into text right now. Please type your answer."
           }
         }
       }
@@ -1354,23 +1300,6 @@
         }
       }
     },
-    "End" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "إنهاء"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "End"
-          }
-        }
-      }
-    },
     "Everything stays on this device." : {
       "localizations" : {
         "ar" : {
@@ -1621,23 +1550,6 @@
         }
       }
     },
-    "Go to Settings" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "اذهب إلى الإعدادات"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Go to Settings"
-          }
-        }
-      }
-    },
     "Hay = neighbourhood" : {
       "localizations" : {
         "ar" : {
@@ -1721,6 +1633,22 @@
         }
       }
     },
+    "Hold to talk" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اضغط مطوّل وتكلّم"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hold to talk"
+          }
+        }
+      }
+    },
     "HoTH assistant" : {
       "localizations" : {
         "ar" : {
@@ -1737,53 +1665,18 @@
         }
       }
     },
-    "I can't reach the voice assistant on this connection. Try again, or type instead." : {
-      "extractionState" : "stale",
+    "I didn't catch that. Hold the button and speak." : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ما قدرت أوصل للمساعد الصوتي على هذا الاتصال. حاول مرة ثانية، أو اكتب بدلاً من ذلك."
+            "value" : "ما سمعتك زين. اضغط على الزر مطوّل وتكلّم."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "I can't reach the voice assistant on this connection. Try again, or type instead."
-          }
-        }
-      }
-    },
-    "I can't reach the voice assistant on this connection. You can type instead." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ما أقدر أوصل للمساعد الصوتي على هذا الاتصال. تقدر تكتب بدلاً من ذلك."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "I can't reach the voice assistant on this connection. You can type instead."
-          }
-        }
-      }
-    },
-    "I need the microphone to listen. You can allow it in Settings, or type instead." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "أحتاج الميكروفون عشان أسمعك. تقدر تسمح به من الإعدادات، أو تكتب بدلاً من ذلك."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "I need the microphone to listen. You can allow it in Settings, or type instead."
+            "value" : "I didn't catch that. Hold the button and speak."
           }
         }
       }
@@ -1840,7 +1733,6 @@
       }
     },
     "Interview finished" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1852,23 +1744,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Interview finished"
-          }
-        }
-      }
-    },
-    "Interview mode" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "طريقة المقابلة"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Interview mode"
           }
         }
       }
@@ -1971,7 +1846,6 @@
       }
     },
     "Listening" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1987,19 +1861,34 @@
         }
       }
     },
-    "Listening, speak in any language" : {
-      "extractionState" : "stale",
+    "Listening… release to send" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "أسمعك، تكلّم بأي لغة"
+            "value" : "أسمعك… اترك الزر للإرسال"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Listening, speak in any language"
+            "value" : "Listening… release to send"
+          }
+        }
+      }
+    },
+    "Listening… tap to send" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أسمعك… اضغط للإرسال"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listening… tap to send"
           }
         }
       }
@@ -2189,70 +2078,18 @@
         }
       }
     },
-    "Microphone access is off for HoTH. Turn it on in Settings to talk, or type instead." : {
-      "extractionState" : "stale",
+    "Microphone access is off. Turn it on in Settings, or type your answer." : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "الوصول إلى الميكروفون مقفل لتطبيق HoTH. فعّله من الإعدادات عشان تتكلم، أو اكتب بدلاً من ذلك."
+            "value" : "الميكروفون مقفل. شغّله من الإعدادات، أو اكتب جوابك."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Microphone access is off for HoTH. Turn it on in Settings to talk, or type instead."
-          }
-        }
-      }
-    },
-    "Mute" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "كتم"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mute"
-          }
-        }
-      }
-    },
-    "Muted" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الميكروفون مكتوم"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Muted"
-          }
-        }
-      }
-    },
-    "Muted. Tap the mic to talk" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الميكروفون مكتوم. اضغط على الميكروفون لتتكلم"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Muted. Tap the mic to talk"
+            "value" : "Microphone access is off. Turn it on in Settings, or type your answer."
           }
         }
       }
@@ -2622,23 +2459,6 @@
         }
       }
     },
-    "Open Settings" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "افتح الإعدادات"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open Settings"
-          }
-        }
-      }
-    },
     "Meta Model API key" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2997,6 +2817,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Repair photo"
+          }
+        }
+      }
+    },
+    "Replies are read aloud and you hold the mic to answer. You can always switch to typing." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المساعد يقرأ ردوده بصوت، وتضغط على الميكروفون مطوّل عشان تجاوب. تقدر تحوّل للكتابة في أي وقت."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replies are read aloud and you hold the mic to answer. You can always switch to typing."
           }
         }
       }
@@ -3478,19 +3314,18 @@
         }
       }
     },
-    "Speaking…" : {
-      "extractionState" : "stale",
+    "Speaking… hold to interrupt" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "يتحدث…"
+            "value" : "أتكلم… اضغط مطوّل للمقاطعة"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Speaking…"
+            "value" : "Speaking… hold to interrupt"
           }
         }
       }
@@ -3712,7 +3547,6 @@
       }
     },
     "Talk" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -3762,7 +3596,6 @@
       }
     },
     "The assistant is speaking" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -3774,22 +3607,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The assistant is speaking"
-          }
-        }
-      }
-    },
-    "The assistant talks first. You can always switch to typing." : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "المساعد يبدأ بالكلام. تقدر تحوّل للكتابة في أي وقت."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The assistant talks first. You can always switch to typing."
           }
         }
       }
@@ -3844,53 +3661,18 @@
         }
       }
     },
-    "The voice assistant isn't connected right now. Let's type instead, it only takes a moment." : {
-      "extractionState" : "stale",
+    "Thinking" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "المساعد الصوتي غير متصل الحين. خلّنا نكتب بدلاً من ذلك، ما ياخذ إلا لحظة."
+            "value" : "يفكر"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The voice assistant isn't connected right now. Let's type instead, it only takes a moment."
-          }
-        }
-      }
-    },
-    "The voice assistant isn't set up on this phone yet. Let's type instead." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "المساعد الصوتي غير مُعدّ على هذا الهاتف بعد. خلّنا نكتب بدلاً من ذلك."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The voice assistant isn't set up on this phone yet. Let's type instead."
-          }
-        }
-      }
-    },
-    "The voice line dropped before we could start. Let's type instead." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "انقطع الخط الصوتي قبل ما نبدأ. خلّنا نكتب بدلاً من ذلك."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The voice line dropped before we could start. Let's type instead."
+            "value" : "Thinking"
           }
         }
       }
@@ -4045,6 +3827,38 @@
         }
       }
     },
+    "Transcribing" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يكتب الكلام"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transcribing"
+          }
+        }
+      }
+    },
+    "Transcribing…" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أكتب كلامك…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transcribing…"
+          }
+        }
+      }
+    },
     "Trust" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4079,23 +3893,6 @@
         }
       }
     },
-    "Try voice again" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "جرّب الصوت مرة ثانية"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Try voice again"
-          }
-        }
-      }
-    },
     "Turn on camera access for HoTH in Settings to report a hazard." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4113,25 +3910,7 @@
         }
       }
     },
-    "Type" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "اكتب"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Type"
-          }
-        }
-      }
-    },
     "Type instead" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -4160,23 +3939,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Type your answer…"
-          }
-        }
-      }
-    },
-    "Unmute" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "إلغاء الكتم"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unmute"
           }
         }
       }
@@ -4299,23 +4061,6 @@
         }
       }
     },
-    "Voice is unavailable" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الصوت غير متاح"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Voice is unavailable"
-          }
-        }
-      }
-    },
     "Voice note added to the report" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4334,7 +4079,6 @@
       }
     },
     "Voice unavailable" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -4479,23 +4223,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Why this priority"
-          }
-        }
-      }
-    },
-    "You" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "أنت"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You"
           }
         }
       }

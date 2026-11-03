@@ -3,8 +3,8 @@ import HoTHCore
 
 /// Everything an interview (voice or chat) needs to know about the report so far.
 ///
-/// Shared contract between the report flow (`ReportFlowModel`) and the voice agent
-/// (`VoiceInterviewView`). Keep this shape stable: the voice files import it.
+/// Shared contract between the report flow (`ReportFlowModel`) and the interview (`ChatIntakeModel`,
+/// typed or push-to-talk).
 struct InterviewContext: Sendable {
     /// What the vision model found in the live photo.
     let analysis: VisionAnalysis

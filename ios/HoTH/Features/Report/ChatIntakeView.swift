@@ -1,91 +1,68 @@
 import HoTHCore
 import SwiftUI
 
-/// Builds the voice interview screen. Supplied by the parent so this file never names the voice type.
-typealias VoiceInterviewBuilder = (
-    _ context: InterviewContext,
-    _ onComplete: @escaping (SubmitReportArgs) -> Void,
-    _ onUrgent: @escaping (String) -> Void,
-    _ onSwitchToText: @escaping () -> Void
-) -> AnyView
-
-/// Interview step host: "Talk" (voice, when available) or "Type" (chat fallback).
+/// Interview step host: the chat, with push-to-talk voice when the Meta client is available.
 struct InterviewStepView: View {
     let context: InterviewContext
     let slots: [SlotQuestion]
     let client: MetaModelClient?
     let prompts: Prompts
     let textModel: String?
-    let voiceBuilder: VoiceInterviewBuilder?
+    let startsWithVoice: Bool
     let onComplete: (SubmitReportArgs) -> Void
     let onUrgent: (String) -> Void
 
-    enum Mode: Hashable { case talk, type }
-
-    @State private var mode: Mode
-
-    /// - Parameter initialMode: the segment selected on entry (see `initialMode(prefersVoice:isUITestRun:)`).
-    ///   Talk is used even without a key: the voice screen then explains why it can't start instead of
-    ///   silently switching to Type.
+    /// - Parameter startsWithVoice: see `startsWithVoice(prefersVoice:isUITestRun:)`. Without a client
+    ///   (no key, UI tests) there is no transcription, so the interview is text only either way.
     init(context: InterviewContext, slots: [SlotQuestion], client: MetaModelClient?, prompts: Prompts,
-         textModel: String? = nil, voiceBuilder: VoiceInterviewBuilder?, initialMode: Mode = .talk,
+         textModel: String? = nil, startsWithVoice: Bool = true,
          onComplete: @escaping (SubmitReportArgs) -> Void, onUrgent: @escaping (String) -> Void) {
         self.context = context
         self.slots = slots
         self.client = client
         self.prompts = prompts
         self.textModel = textModel
-        self.voiceBuilder = voiceBuilder
+        self.startsWithVoice = startsWithVoice
         self.onComplete = onComplete
         self.onUrgent = onUrgent
-        _mode = State(initialValue: voiceBuilder == nil ? .type : initialMode)
     }
 
-    /// Talk unless the resident turned off "Start interview with voice". UI tests always start in Type
-    /// (no mic prompt, no live voice call).
-    static func initialMode(prefersVoice: Bool, isUITestRun: Bool) -> Mode {
-        prefersVoice && !isUITestRun ? .talk : .type
+    /// Voice unless the resident turned off "Start interview with voice". UI tests always start typing
+    /// (no mic prompt, no speech).
+    static func startsWithVoice(prefersVoice: Bool, isUITestRun: Bool) -> Bool {
+        prefersVoice && !isUITestRun
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            if voiceBuilder != nil {
-                Picker("Interview mode", selection: $mode) {
-                    Label("Talk", systemImage: "waveform").tag(Mode.talk)
-                    Label("Type", systemImage: "keyboard").tag(Mode.type)
-                }
-                .pickerStyle(.segmented)
-                .padding(.horizontal, HoTHSpacing.m)
-                .padding(.vertical, HoTHSpacing.s)
-                .accessibilityIdentifier("interviewModePicker")
-            }
-            Group {
-                if mode == .talk, let voiceBuilder {
-                    voiceBuilder(context, onComplete, onUrgent, { mode = .type })
-                } else {
-                    ChatIntakeView(context: context, slots: slots, client: client, prompts: prompts,
-                                   textModel: textModel, onComplete: onComplete, onUrgent: onUrgent)
-                }
-            }
-            .transition(.opacity)
-        }
-        .animation(HoTHMotion.spring, value: mode)
-        .background(Color.hothBackground.ignoresSafeArea())
+        ChatIntakeView(context: context, slots: slots, client: client, prompts: prompts, textModel: textModel,
+                       transcriber: client.map {
+                           MetaSpeechTranscriber(client: $0, model: prompts.models.transcribe,
+                                                 languageHint: context.language)
+                       },
+                       startsWithVoice: startsWithVoice,
+                       onComplete: onComplete, onUrgent: onUrgent)
+            .background(Color.hothBackground.ignoresSafeArea())
     }
 }
 
-/// Text quick-chat fallback (P0-15): bubbles, quick replies, read-back + confirm.
+/// Quick-chat interview (P0-15): bubbles, quick replies, read-back + confirm. With a transcriber the
+/// resident can answer by push-to-talk instead of typing, and replies are read aloud.
 struct ChatIntakeView: View {
     @StateObject private var model: ChatIntakeModel
+    @StateObject private var voice: PushToTalkModel
     @State private var draft = ""
+    @State private var isPressingMic = false
     @FocusState private var isFocused: Bool
 
     init(context: InterviewContext, slots: [SlotQuestion], client: MetaModelClient?, prompts: Prompts,
-         textModel: String? = nil,
+         textModel: String? = nil, transcriber: SpeechTranscribing? = nil, startsWithVoice: Bool = false,
          onComplete: @escaping (SubmitReportArgs) -> Void, onUrgent: @escaping (String) -> Void) {
         _model = StateObject(wrappedValue: ChatIntakeModel(
             context: context, slots: slots, client: client, prompts: prompts, model: textModel,
             onComplete: onComplete, onUrgent: onUrgent))
+        _voice = StateObject(wrappedValue: PushToTalkModel(
+            transcriber: transcriber, recorder: WAVVoiceRecorder(), speaker: SystemSpeechSpeaker(),
+            startsInVoice: startsWithVoice))
     }
 
     var body: some View {
@@ -117,7 +94,22 @@ struct ChatIntakeView: View {
             inputArea
         }
         .background(Color.hothBackground)
-        .onAppear { model.start() }
+        .onAppear {
+            // Wired here (not in init) so both closures reach the StateObjects SwiftUI actually keeps.
+            model.onAssistantMessage = { [weak voice] text in voice?.assistantSaid(text) }
+            voice.onTranscript = { [weak model] text in model?.send(text) }
+            model.start()
+        }
+        .onDisappear { voice.shutDown() }
+        .onChange(of: model.isThinking) { _, isThinking in
+            if !isThinking { voice.chatSettled() }
+        }
+        .onChange(of: model.isFinished) { _, isFinished in
+            if isFinished { voice.conversationFinished() }
+        }
+        .onChange(of: voice.notice) { _, notice in
+            if notice?.fallsBackToTyping == true { isFocused = true }
+        }
     }
 
     private func bubbleView(_ bubble: ChatBubble) -> some View {
@@ -160,11 +152,22 @@ struct ChatIntakeView: View {
 
     private var inputArea: some View {
         VStack(spacing: HoTHSpacing.s) {
+            if let notice = voice.notice {
+                Label(notice.message, systemImage: notice.fallsBackToTyping ? "mic.slash" : "ear")
+                    .font(.hothCaption)
+                    .foregroundStyle(Color.hothInkSecondary)
+                    .padding(.horizontal, HoTHSpacing.m)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .accessibilityIdentifier("voiceNotice")
+            }
             if !model.quickReplies.isEmpty && !model.isFinished {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: HoTHSpacing.s) {
                         ForEach(model.quickReplies, id: \.self) { reply in
-                            Button(reply) { model.send(reply) }
+                            Button(reply) {
+                                voice.stopSpeaking()
+                                model.send(reply)
+                            }
                                 .font(.hothHeadline)
                                 .foregroundStyle(Color.hothTeal)
                                 .padding(.horizontal, 16)
@@ -176,6 +179,18 @@ struct ChatIntakeView: View {
                     .padding(.horizontal, HoTHSpacing.m)
                 }
             }
+            if voice.isVoiceMode {
+                voiceControls
+            } else {
+                textRow
+            }
+        }
+        .padding(.vertical, HoTHSpacing.s)
+        .disabled(model.isFinished)
+        .opacity(model.isFinished ? 0.5 : 1)
+    }
+
+    private var textRow: some View {
             HStack(spacing: HoTHSpacing.s) {
                 TextField("Type your answer…", text: $draft, axis: .vertical)
                     .font(.hothBody)
@@ -198,12 +213,75 @@ struct ChatIntakeView: View {
                 .disabled(draft.trimmingCharacters(in: .whitespaces).isEmpty || model.isThinking)
                 .accessibilityLabel(Text("Send"))
                 .accessibilityIdentifier("chatSendButton")
+                if voice.isAvailable {
+                    Button {
+                        voice.switchToVoice()
+                        isFocused = false
+                    } label: {
+                        Image(systemName: "mic.fill")
+                            .font(.system(size: 17, weight: .bold))
+                            .foregroundStyle(Color.hothTeal)
+                            .frame(width: 42, height: 42)
+                            .background(Circle().strokeBorder(Color.hothTeal, lineWidth: 1.5))
+                    }
+                    .accessibilityLabel(Text("Answer by voice"))
+                    .accessibilityIdentifier("chatMicButton")
+                }
             }
             .padding(.horizontal, HoTHSpacing.m)
+    }
+
+    /// Hold the orb to talk (or tap, then tap again to send); the status line says what happens next.
+    private var voiceControls: some View {
+        let isMicEnabled = voice.canRecord && !model.isThinking && !model.isFinished
+        return VStack(spacing: HoTHSpacing.xs) {
+            ZStack {
+                VoiceOrbView(state: voice.phase.orbState, level: voice.phase == .speaking ? 0.3 : voice.level)
+                    .scaleEffect(0.5)
+                    .frame(width: 140, height: 140)
+                Image(systemName: voice.phase == .listening ? "waveform" : "mic.fill")
+                    .font(.system(size: 28, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .shadow(color: .black.opacity(0.2), radius: 4)
+            }
+            .contentShape(Circle())
+            .gesture(
+                DragGesture(minimumDistance: 0)
+                    .onChanged { _ in
+                        guard !isPressingMic else { return }
+                        isPressingMic = true
+                        voice.pressBegan()
+                    }
+                    .onEnded { _ in
+                        isPressingMic = false
+                        voice.pressEnded()
+                    }
+            )
+            .allowsHitTesting(isMicEnabled)
+            .opacity(isMicEnabled || voice.phase != .idle ? 1 : 0.6)
+            .accessibilityElement()
+            .accessibilityLabel(Text("Talk"))
+            .accessibilityValue(Text(voice.phase.statusText(isLatched: voice.isLatched)))
+            .accessibilityAddTraits(.isButton)
+            .accessibilityAction { if isMicEnabled { voice.toggleRecording() } }
+            .accessibilityIdentifier("pushToTalkButton")
+
+            Text(voice.phase.statusText(isLatched: voice.isLatched))
+                .font(.hothCaption)
+                .foregroundStyle(Color.hothInkSecondary)
+                .accessibilityHidden(true)
+
+            Button {
+                voice.switchToTyping()
+                isFocused = true
+            } label: {
+                Label("Type instead", systemImage: "keyboard")
+                    .font(.hothHeadline)
+                    .foregroundStyle(Color.hothTeal)
+            }
+            .accessibilityIdentifier("typeInsteadButton")
         }
-        .padding(.vertical, HoTHSpacing.s)
-        .disabled(model.isFinished)
-        .opacity(model.isFinished ? 0.5 : 1)
+        .frame(maxWidth: .infinity)
     }
 
     private func sendDraft() {

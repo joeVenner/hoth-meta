@@ -44,9 +44,6 @@ final class ReportFlowModel: ObservableObject {
     struct SafetyAlert: Identifiable, Equatable {
         let id = UUID()
         let reason: String
-        /// True when raised mid voice call: the sheet sits over the live interview and dismissing it
-        /// returns to the call instead of jumping to the ticket (tearing down WebRTC would drop the call).
-        var keepsInterview = false
         /// True when raised from the analysis card: "Continue report" then starts the interview.
         var resumesInterview = false
     }
@@ -79,8 +76,6 @@ final class ReportFlowModel: ObservableObject {
     private var blurTask: Task<FaceAndPlateBlur.Result, Never>?
     private var nearbyPlaceTask: Task<LocationType?, Never>?
     private var hasShownSafety = false
-    /// Answers recovered from a voice `flag_urgent` reason, merged into the final priority.
-    private var urgentAnswers: [String: String] = [:]
     /// Identifies the current submit run; regenerated on every reset so results from an abandoned run
     /// (retake / close while a model call is in flight) are dropped instead of overwriting the new one.
     private var runID = UUID()
@@ -202,7 +197,7 @@ final class ReportFlowModel: ObservableObject {
 
     /// Called from the analysis card's "Continue". Danger shows the safety sheet first; its
     /// "Continue report" (or a swipe down) then starts the interview. The step stays `.analysis` while
-    /// the sheet is up so the voice call does not start talking behind it.
+    /// the sheet is up so the interview (and its spoken first reply) does not start behind it.
     func continueFromAnalysis() {
         if !hasShownSafety, let reason = preInterviewSafetyReason() {
             hasShownSafety = true
@@ -236,7 +231,7 @@ final class ReportFlowModel: ObservableObject {
         }
         submitArgs = args
         guard let analysis else { return }
-        let answers = args.answers.merging(urgentAnswers) { spoken, _ in spoken }
+        let answers = args.answers
         let refined = PriorityAgent.decide(PriorityInput(vision: analysis, answers: answers, nearbyPlace: nearbyPlace))
         priority = refined
         if !hasShownSafety, let reason = postInterviewSafetyReason(answers: answers, decision: refined) {
@@ -246,31 +241,16 @@ final class ReportFlowModel: ObservableObject {
         step = .ticket
     }
 
-    /// Chat urgency (the chat has already finished): keep what was said, show safety, ticket behind it.
+    /// Interview urgency (the chat, typed or spoken, has already finished): keep what was said, show safety, ticket behind it.
     func interviewFlaggedUrgent(_ reason: String) {
         guard voiceNoteTarget == nil else { return }  // a note on a merged report never files a new ticket
         presentSafety(reason: reason, answers: Self.answers(fromUrgentReason: reason))
     }
 
-    /// Voice `flag_urgent`: show the safety sheet over the live call. The step stays `.interview` so the
-    /// WebRTC session keeps running and the assistant can calm the resident and still submit the report.
-    func voiceFlaggedUrgent(_ reason: String) {
-        guard step == .interview, let analysis else { return interviewFlaggedUrgent(reason) }
-        guard voiceNoteTarget == nil else { return }
-        let alreadyShown = hasShownSafety
-        hasShownSafety = true
-        urgentAnswers.merge(Self.answers(fromUrgentReason: reason)) { existing, _ in existing }
-        priority = PriorityAgent.decide(PriorityInput(vision: analysis, answers: urgentAnswers, nearbyPlace: nearbyPlace))
-        // Already shown before the interview: keep the call going instead of covering it again.
-        guard !alreadyShown else { return }
-        safetyAlert = SafetyAlert(reason: reason, keepsInterview: true)
-    }
-
-    /// "Continue report" on the safety sheet: back to the call, or to the ticket already behind the sheet.
+    /// "Continue report" on the safety sheet: into the interview, or to the ticket already behind the sheet.
     func continueAfterSafety() {
         let alert = safetyAlert
         safetyAlert = nil
-        if alert?.keepsInterview == true, step == .interview { return }
         if alert?.resumesInterview == true || (alert == nil && step == .analysis && hasShownSafety) {
             step = .interview
             return
@@ -537,7 +517,6 @@ final class ReportFlowModel: ObservableObject {
         safetyAlert = nil
         hasShownSafety = false
         voiceNoteTarget = nil
-        urgentAnswers = [:]
         reportID = UUID()
         runID = UUID()
         if !keepingStep { step = .capture }
