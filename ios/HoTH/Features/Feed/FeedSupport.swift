@@ -1,5 +1,6 @@
 import CoreLocation
 import HoTHCore
+import SwiftData
 import SwiftUI
 import UIKit
 
@@ -45,13 +46,9 @@ enum FeedGeography {
     static let nearMeRadius: CLLocationDistance = 1500
 
     /// - Parameter locale: pass the SwiftUI environment locale so the in-app language override applies.
+    /// Always metric ("233 m", "1.3 km"), whatever the device region: see `DistanceFormatting`.
     static func formattedDistance(_ metres: CLLocationDistance, locale: Locale = .autoupdatingCurrent) -> String {
-        let measurement = Measurement(value: metres, unit: UnitLength.meters)
-        let formatter = MeasurementFormatter()
-        formatter.locale = locale
-        formatter.unitOptions = .naturalScale
-        formatter.numberFormatter.maximumFractionDigits = metres < 1000 ? 0 : 1
-        return formatter.string(from: measurement)
+        DistanceFormatting.string(metres: metres, locale: locale)
     }
 }
 
@@ -248,5 +245,35 @@ extension Report {
             let confirmationSignal = "confirmed_x\(confirmations)"
             signals = signals.filter { !$0.hasPrefix("confirmed_x") } + [confirmationSignal]
         }
+    }
+}
+
+// MARK: - "I saw it too"
+
+/// The "I saw it too" confirmation, shared by the feed card and the case detail so both pay points once
+/// and recompute priority the same way.
+@MainActor
+enum SightingConfirmation {
+    /// False for your own report, a fixed case, or one you already confirmed.
+    static func canConfirm(_ report: Report, by user: Neighbour?, defaults: UserDefaults = .standard) -> Bool {
+        report.reporter?.isCurrentUser != true
+            && report.status != .fixed
+            && !ConfirmedReports.contains(report.id, defaults: defaults)
+            && user != nil
+    }
+
+    /// +1 confirmation, priority recompute, confirmation points for `user`. Does not save the context.
+    /// - Returns: false when the confirmation was not allowed (see `canConfirm`).
+    @discardableResult
+    static func confirm(_ report: Report, by user: Neighbour?, context: ModelContext,
+                        defaults: UserDefaults = .standard) -> Bool {
+        guard let user, canConfirm(report, by: user, defaults: defaults) else { return false }
+        report.confirmations += 1
+        report.recomputePriority()
+        ConfirmedReports.insert(report.id, defaults: defaults)
+        user.points += Rewards.confirmationPoints
+        context.insert(PointsEvent(user: user, delta: Rewards.confirmationPoints, reason: .confirmation,
+                                   reportID: report.id))
+        return true
     }
 }

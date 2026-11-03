@@ -253,4 +253,17 @@ final class AppServices: ObservableObject {
         try keyProvider.delete()
         objectWillChange.send()
     }
+
+    /// Bumped after "Reset app"; the root view uses it as an identity so every tab and pushed screen is
+    /// rebuilt on the fresh store (no view keeps a deleted record).
+    @Published private(set) var resetGeneration = 0
+
+    /// Shown in Settings after a reset that did not fully succeed; survives the rebuild.
+    @Published var appResetNotice: LocalizedStringKey?
+
+    /// Rebuilds the root (also after a failed reset, so no screen keeps a record the reset deleted).
+    func didResetApp(notice: LocalizedStringKey? = nil) {
+        appResetNotice = notice
+        resetGeneration += 1
+    }
 }

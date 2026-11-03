@@ -568,6 +568,22 @@
         }
       }
     },
+    "Anonymous neighbour" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جار مجهول"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anonymous neighbour"
+          }
+        }
+      }
+    },
     "Answer by voice" : {
       "localizations" : {
         "ar" : {
@@ -580,6 +596,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Answer by voice"
+          }
+        }
+      }
+    },
+    "App reset, but the Meta API key could not be removed." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تمت إعادة ضبط التطبيق، لكن تعذّر حذف مفتاح Meta API."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App reset, but the Meta API key could not be removed."
           }
         }
       }
@@ -861,6 +893,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Close"
+          }
+        }
+      }
+    },
+    "Comment" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعليق"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment"
           }
         }
       }
@@ -1151,6 +1199,22 @@
         }
       }
     },
+    "Deletes all reports, comments, points, photos and settings on this device, reloads the demo community and shows the welcome screens again. Your Meta API key is kept unless you remove it." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يحذف كل البلاغات والتعليقات والنقاط والصور والإعدادات على هذا الجهاز، ويعيد تحميل المجتمع التجريبي، ويعرض شاشات الترحيب من جديد. يبقى مفتاح Meta API محفوظًا ما لم تختر حذفه."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deletes all reports, comments, points, photos and settings on this device, reloads the demo community and shows the welcome screens again. Your Meta API key is kept unless you remove it."
+          }
+        }
+      }
+    },
     "Demo" : {
       "localizations" : {
         "ar" : {
@@ -1311,6 +1375,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Done"
+          }
+        }
+      }
+    },
+    "Each one has a single job in HoTH. You always review the report before it is posted." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لكل نموذج مهمة واحدة في HoTH، وأنت تراجع البلاغ دائمًا قبل نشره."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Each one has a single job in HoTH. You always review the report before it is posted."
           }
         }
       }
@@ -2556,6 +2636,54 @@
         }
       }
     },
+    "Outlines the hazard on your photo." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يحدّد مكان الخطر على صورتك."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outlines the hazard on your photo."
+          }
+        }
+      }
+    },
+    "Photo understanding, the interview agent, fix checks and comment moderation; voice to text; hazard outlines." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فهم الصور ووكيل المقابلة والتحقق من الإصلاحات ومراجعة التعليقات؛ تحويل الصوت إلى نص؛ تحديد الأخطار على الصور."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photo understanding, the interview agent, fix checks and comment moderation; voice to text; hazard outlines."
+          }
+        }
+      }
+    },
+    "Powered by Meta AI" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مدعوم بالذكاء الاصطناعي من Meta"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Powered by Meta AI"
+          }
+        }
+      }
+    },
     "Powers Meta's Muse Spark: photo analysis, chat and repair checks." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3102,6 +3230,54 @@
         }
       }
     },
+    "Reset" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إعادة الضبط"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset"
+          }
+        }
+      }
+    },
+    "Reset app" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إعادة ضبط التطبيق"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset app"
+          }
+        }
+      }
+    },
+    "Reset app and remove Meta API key" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إعادة ضبط التطبيق وحذف مفتاح Meta API"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset app and remove Meta API key"
+          }
+        }
+      }
+    },
     "Reset demo community" : {
       "localizations" : {
         "ar" : {
@@ -3163,6 +3339,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reset failed."
+          }
+        }
+      }
+    },
+    "Reset failed. Please try again." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فشلت إعادة الضبط. يُرجى المحاولة مرة أخرى."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset failed. Please try again."
+          }
+        }
+      }
+    },
+    "Reset HoTH?" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إعادة ضبط HoTH؟"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset HoTH?"
           }
         }
       }
@@ -3345,6 +3553,22 @@
         }
       }
     },
+    "Share" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مشاركة"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share"
+          }
+        }
+      }
+    },
     "Shows a fictional demo community, clearly labelled." : {
       "localizations" : {
         "ar" : {
@@ -3471,6 +3695,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Start interview with voice"
+          }
+        }
+      }
+    },
+    "Start over as on first launch. Your Meta API key stays unless you choose to remove it." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ابدأ من جديد كما في أول تشغيل. يبقى مفتاح Meta API محفوظًا ما لم تختر حذفه."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start over as on first launch. Your Meta API key stays unless you choose to remove it."
           }
         }
       }
@@ -3822,6 +4062,22 @@
         }
       }
     },
+    "Three Meta models, one neighbourhood." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ثلاثة نماذج من Meta، وحيّ واحد."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Three Meta models, one neighbourhood."
+          }
+        }
+      }
+    },
     "Ticket saved" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4006,6 +4262,22 @@
         }
       }
     },
+    "Turns your Arabic or English voice into text." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يحوّل صوتك بالعربية أو الإنجليزية إلى نص."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turns your Arabic or English voice into text."
+          }
+        }
+      }
+    },
     "Type instead" : {
       "localizations" : {
         "ar" : {
@@ -4035,6 +4307,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Type your answer…"
+          }
+        }
+      }
+    },
+    "Understands your photo, runs the interview agent, checks fixes and moderates comments." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يفهم صورتك، ويدير وكيل المقابلة، ويتحقق من الإصلاحات، ويراجع التعليقات."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Understands your photo, runs the interview agent, checks fixes and moderates comments."
           }
         }
       }
@@ -4323,6 +4611,22 @@
         }
       }
     },
+    "You" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أنت"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You"
+          }
+        }
+      }
+    },
     "You confirmed this" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4384,6 +4688,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Your photo and location are sent to Meta's Muse Spark model to analyse the hazard."
+          }
+        }
+      }
+    },
+    "Your photo and voice go to the Meta Model API only when you report." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا تُرسَل صورتك وصوتك إلى Meta Model API إلا عندما تُبلغ."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your photo and voice go to the Meta Model API only when you report."
           }
         }
       }

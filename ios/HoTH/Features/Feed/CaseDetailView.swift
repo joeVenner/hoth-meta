@@ -8,6 +8,8 @@ struct CaseDetailView: View {
     @Bindable var report: Report
     /// Injected moderator; nil uses the live Muse Spark-backed one (local checks when offline / no key).
     var moderator: CommentModerator?
+    /// Opened from a feed card's Comment button: scroll to the comments once shown.
+    var focusesComments = false
 
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
@@ -20,6 +22,7 @@ struct CaseDetailView: View {
     @FocusState private var isComposerFocused: Bool
 
     private static let logger = Logger(subsystem: "io.fomy.hoth", category: "CaseDetail")
+    private static let commentsAnchor = "caseComments"
 
     private var currentUser: Neighbour? { currentUsers.first }
     private var arabic: Bool { services.isArabic }
@@ -28,19 +31,27 @@ struct CaseDetailView: View {
     private var isOwnReport: Bool { report.reporter?.isCurrentUser == true }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: HoTHSpacing.l) {
-                hero
+        ScrollViewReader { proxy in
+            ScrollView {
                 VStack(alignment: .leading, spacing: HoTHSpacing.l) {
-                    titleBlock
-                    actionRow
-                    priorityReasonCard
-                    timelineCard
-                    commentsSection
+                    hero
+                    VStack(alignment: .leading, spacing: HoTHSpacing.l) {
+                        titleBlock
+                        actionRow
+                        priorityReasonCard
+                        timelineCard
+                        commentsSection.id(Self.commentsAnchor)
+                    }
+                    .padding(.horizontal, HoTHSpacing.m)
                 }
-                .padding(.horizontal, HoTHSpacing.m)
+                .padding(.bottom, 140)
             }
-            .padding(.bottom, 140)
+            .task {
+                guard focusesComments else { return }
+                // Let the push transition finish before scrolling.
+                try? await Task.sleep(for: .milliseconds(350))
+                withAnimation(HoTHMotion.spring) { proxy.scrollTo(Self.commentsAnchor, anchor: .top) }
+            }
         }
         .background(Color.hothBackground.ignoresSafeArea())
         .ignoresSafeArea(edges: .top)
@@ -322,27 +333,16 @@ struct CaseDetailView: View {
         save()
     }
 
-    /// "I saw it too": +1 confirmation, then recompute priority with the PriorityAgent when the
-    /// original vision analysis is available, else apply the agent's fixed confirmation bump.
+    /// "I saw it too": +1 confirmation and priority recompute (shared with the feed card).
     private func confirmSighting() {
         guard !hasConfirmed, !isOwnReport else { return }
-        Haptics.success()
+        var didConfirm = false
         withAnimation(HoTHMotion.spring) {
-            report.confirmations += 1
-            report.recomputePriority()
-            confirmedIDsRaw = (confirmedIDsRaw.split(separator: ",").map(String.init) + [report.id.uuidString])
-                .joined(separator: ",")
-            if let currentUser {
-                currentUser.points += Rewards.confirmationPoints
-                modelContext.insert(PointsEvent(
-                    user: currentUser,
-                    delta: Rewards.confirmationPoints,
-                    reason: .confirmation,
-                    reportID: report.id
-                ))
-            }
-            showConfirmToast = true
+            didConfirm = SightingConfirmation.confirm(report, by: currentUser, context: modelContext)
+            if didConfirm { showConfirmToast = true }
         }
+        guard didConfirm else { return }
+        Haptics.success()
         save()
         Task {
             try? await Task.sleep(for: .seconds(2.2))

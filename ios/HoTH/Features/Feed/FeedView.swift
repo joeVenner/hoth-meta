@@ -40,6 +40,7 @@ struct FeedView: View {
     @State private var filter: Filter = .all
     @State private var layout: Layout = .list
     @State private var hasAppeared = false
+    @State private var path = NavigationPath()
 
     private var currentUser: Neighbour? { currentUsers.first }
 
@@ -64,7 +65,7 @@ struct FeedView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             Group {
                 switch layout {
                 case .list: listContent
@@ -72,9 +73,15 @@ struct FeedView: View {
                 }
             }
             .background(Color.hothBackground.ignoresSafeArea())
+            .hothStatusBarBackdrop()
             .navigationDestination(for: UUID.self) { id in
                 if let report = reports.first(where: { $0.id == id }) {
                     CaseDetailView(report: report)
+                }
+            }
+            .navigationDestination(for: CaseCommentsRoute.self) { route in
+                if let report = reports.first(where: { $0.id == route.reportID }) {
+                    CaseDetailView(report: report, focusesComments: true)
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
@@ -109,14 +116,17 @@ struct FeedView: View {
                 header
                 layoutPicker
                 filterBar
-                LazyVStack(spacing: HoTHSpacing.l) {
+                LazyVStack(spacing: HoTHSpacing.m) {
                     ForEach(Array(visibleReports.enumerated()), id: \.element.id) { index, report in
                         NavigationLink(value: report.id) {
                             FeedCard(
                                 report: report,
                                 arabic: services.isArabic,
                                 hasVoted: currentUser.map { report.hasVote(from: $0) } ?? false,
-                                onVote: { toggleVote(on: report) }
+                                canConfirm: SightingConfirmation.canConfirm(report, by: currentUser),
+                                onVote: { toggleVote(on: report) },
+                                onConfirm: { confirmSighting(on: report) },
+                                onComment: { path.append(CaseCommentsRoute(reportID: report.id)) }
                             )
                         }
                         .buttonStyle(.plain)
@@ -150,8 +160,8 @@ struct FeedView: View {
                 // The Latin wordmark keeps its shape (dot after the H) in Arabic too.
                 HStack(alignment: .firstTextBaseline, spacing: 3) {
                     Text(verbatim: "HoTH")
-                        .font(.hothDisplay(44))
-                        .tracking(-1.2)
+                        .font(.hothDisplay(38))
+                        .tracking(-1)
                         .foregroundStyle(Color.hothInk)
                         .accessibilityIdentifier("hothWordmark")
                         // Hidden demo trigger: replay a neighbour's critical report arriving.
@@ -220,6 +230,21 @@ struct FeedView: View {
         }
         try? modelContext.save()
     }
+
+    private func confirmSighting(on report: Report) {
+        var didConfirm = false
+        withAnimation(HoTHMotion.spring) {
+            didConfirm = SightingConfirmation.confirm(report, by: currentUser, context: modelContext)
+        }
+        guard didConfirm else { return }
+        Haptics.success()
+        try? modelContext.save()
+    }
+}
+
+/// Feed card Comment button: opens the case scrolled to its comments.
+struct CaseCommentsRoute: Hashable {
+    let reportID: UUID
 }
 
 // MARK: - Filter bar
@@ -241,8 +266,8 @@ struct FeedFilterBar: View {
                             .font(.hothCaption.weight(.semibold))
                             .padding(.horizontal, 14)
                             .padding(.vertical, 9)
-                            .foregroundStyle(isSelected ? Color.hothBackground : Color.hothInk)
-                            .background(Capsule().fill(isSelected ? Color.hothInk : Color.hothSurface))
+                            .foregroundStyle(isSelected ? Color.hothAccent : Color.hothInk)
+                            .background(Capsule().fill(isSelected ? Color.hothAccent.opacity(0.14) : Color.hothSurface))
                             .overlay(Capsule().strokeBorder(Color.hothInk.opacity(isSelected ? 0 : 0.08)))
                     }
                     .buttonStyle(.plain)
@@ -256,108 +281,262 @@ struct FeedFilterBar: View {
 
 // MARK: - Card
 
+/// One report as a social post: reporter header, text, full-width photo, badges, counts and an
+/// action bar (I saw it too / Comment / Share).
 private struct FeedCard: View {
     @Environment(\.locale) private var locale
     let report: Report
     let arabic: Bool
     let hasVoted: Bool
+    let canConfirm: Bool
     let onVote: () -> Void
+    let onConfirm: () -> Void
+    let onComment: () -> Void
+
+    private var hasConfirmed: Bool { ConfirmedReports.contains(report.id) }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            ZStack(alignment: .topLeading) {
-                ReportPhotoView(
-                    fileName: report.displayPhotoFileName,
-                    category: report.category,
-                    priority: report.priority
-                )
-                .frame(height: 190)
-                .frame(maxWidth: .infinity)
-                .clipped()
+            postHeader
+                .padding(.horizontal, HoTHSpacing.m)
+                .padding(.top, HoTHSpacing.m)
 
-                HStack {
-                    PriorityBadge(levelRaw: report.priorityRaw)
-                        .background(Capsule().fill(Color.hothSurface))
-                    Spacer()
-                    if report.status == .fixed || report.status == .inProgress {
-                        StatusPill(status: report.status)
-                            .background(Capsule().fill(Color.hothSurface))
-                    }
-                }
-                .padding(HoTHSpacing.m)
-            }
-            .clipShape(RoundedRectangle(cornerRadius: HoTHRadius.card - 6, style: .continuous))
-            .padding(6)
+            postText
+                .padding(.horizontal, HoTHSpacing.m)
+                .padding(.top, HoTHSpacing.s + 2)
 
-            VStack(alignment: .leading, spacing: HoTHSpacing.s) {
-                CategoryChip(categoryRaw: report.categoryRaw)
-                Text(report.title(arabic: arabic))
-                    .font(.system(size: 21, weight: .semibold, design: .serif))
-                    .foregroundStyle(Color.hothInk)
-                    .multilineTextAlignment(.leading)
-                    .fixedSize(horizontal: false, vertical: true)
-                HStack(spacing: HoTHSpacing.xs) {
-                    Image(systemName: "mappin.and.ellipse")
-                    Text(verbatim: report.placeName)
-                    Text(verbatim: "·")
-                    Text(verbatim: FeedGeography.formattedDistance(report.distanceFromHome, locale: locale))
-                    Text(verbatim: "·")
-                    Text(report.createdAt, style: .relative)
-                }
-                .font(.hothCaption)
-                .foregroundStyle(Color.hothInkSecondary)
-                .lineLimit(1)
+            photo.padding(.top, HoTHSpacing.s + 4)
 
-                Divider().overlay(Color.hothInk.opacity(0.04)).padding(.vertical, HoTHSpacing.xs)
+            badgeRow
+                .padding(.horizontal, HoTHSpacing.m)
+                .padding(.top, HoTHSpacing.s + 4)
 
-                HStack(spacing: HoTHSpacing.m) {
-                    Label {
-                        Text("\(report.confirmations + 1) neighbours saw this")
-                    } icon: {
-                        Image(systemName: "eye.fill")
-                    }
-                    .foregroundStyle(Color.hothInkSecondary)
+            countsRow
+                .padding(.horizontal, HoTHSpacing.m)
+                .padding(.top, HoTHSpacing.s + 2)
 
-                    Label {
-                        Text(verbatim: "\(report.visibleComments.count)")
-                    } icon: {
-                        Image(systemName: "bubble.left.fill")
-                    }
-                    .foregroundStyle(Color.hothInkSecondary)
-                    .accessibilityLabel(Text("\(report.visibleComments.count) comments"))
+            Divider()
+                .overlay(Color.hothInk.opacity(0.06))
+                .padding(.horizontal, HoTHSpacing.m)
+                .padding(.top, HoTHSpacing.s + 2)
 
-                    Spacer()
-
-                    Button(action: onVote) {
-                        HStack(spacing: HoTHSpacing.xs) {
-                            Image(systemName: hasVoted ? "hand.thumbsup.fill" : "hand.thumbsup")
-                                .symbolEffect(.bounce, value: hasVoted)
-                            Text(verbatim: "\(report.voteCount)")
-                                .contentTransition(.numericText())
-                        }
-                        .font(.hothCaption.weight(.bold))
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 7)
-                        .foregroundStyle(hasVoted ? Color.white : Color.hothAccent)
-                        .background(Capsule().fill(hasVoted ? Color.hothAccent : Color.hothAccent.opacity(0.12)))
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(Text(hasVoted ? "Remove vote" : "Vote"))
-                }
-                .font(.hothCaption)
-            }
-            .padding(.horizontal, HoTHSpacing.m)
-            .padding(.top, HoTHSpacing.s)
-            .padding(.bottom, HoTHSpacing.m)
+            actionBar
+                .padding(.horizontal, HoTHSpacing.xs)
+                .padding(.vertical, HoTHSpacing.xs)
         }
         .background(
             RoundedRectangle(cornerRadius: HoTHRadius.card, style: .continuous).fill(Color.hothSurface)
         )
+        .clipShape(RoundedRectangle(cornerRadius: HoTHRadius.card, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: HoTHRadius.card, style: .continuous)
-                .strokeBorder(Color.hothInk.opacity(0.06), lineWidth: 1)
+                .strokeBorder(Color.hothInk.opacity(0.06), lineWidth: 0.5)
         )
-        .shadow(color: Color.black.opacity(0.03), radius: 2, x: 0, y: 1)
-        .shadow(color: Color.black.opacity(0.05), radius: 20, x: 0, y: 12)
+        .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+    }
+
+    // MARK: Header
+
+    private var postHeader: some View {
+        HStack(alignment: .center, spacing: HoTHSpacing.s + 2) {
+            ReporterAvatar(reporter: report.isAnonymous ? nil : report.reporter)
+            VStack(alignment: .leading, spacing: 2) {
+                reporterName
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(Color.hothInk)
+                    .lineLimit(1)
+                HStack(spacing: HoTHSpacing.xs) {
+                    Text(report.createdAt, format: .relative(presentation: .named))
+                    Text(verbatim: "·")
+                    Image(systemName: "mappin.and.ellipse").font(.system(size: 10, weight: .semibold))
+                    Text(verbatim: report.placeName)
+                    Text(verbatim: "·")
+                    Text(verbatim: FeedGeography.formattedDistance(report.distanceFromHome, locale: locale))
+                }
+                .font(.system(size: 12, weight: .regular))
+                .foregroundStyle(Color.hothInkSecondary)
+                .lineLimit(1)
+            }
+            Spacer(minLength: 0)
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    @ViewBuilder private var reporterName: some View {
+        if report.isAnonymous || report.reporter == nil {
+            Text("Anonymous neighbour")
+        } else if let reporter = report.reporter, reporter.isCurrentUser {
+            Text("You")
+        } else {
+            Text(verbatim: report.reporter?.displayName ?? "")
+        }
+    }
+
+    // MARK: Text
+
+    private var postText: some View {
+        VStack(alignment: .leading, spacing: HoTHSpacing.xs) {
+            Text(report.title(arabic: arabic))
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(Color.hothInk)
+                .multilineTextAlignment(.leading)
+                .fixedSize(horizontal: false, vertical: true)
+            let summary = report.summary(arabic: arabic)
+            if !summary.isEmpty {
+                Text(verbatim: summary)
+                    .font(.system(size: 15))
+                    .foregroundStyle(Color.hothInk.opacity(0.85))
+                    .multilineTextAlignment(.leading)
+                    .lineLimit(3)
+            }
+        }
+    }
+
+    // MARK: Photo
+
+    private var photo: some View {
+        ReportPhotoView(
+            fileName: report.displayPhotoFileName,
+            category: report.category,
+            priority: report.priority
+        )
+        .frame(height: 220)
+        .frame(maxWidth: .infinity)
+        .clipped()
+        .overlay(alignment: .topTrailing) {
+            if report.status == .fixed || report.status == .inProgress {
+                StatusPill(status: report.status)
+                    .background(Capsule().fill(Color.hothSurface))
+                    .padding(HoTHSpacing.s + 2)
+            }
+        }
+    }
+
+    // MARK: Badges & counts
+
+    private var badgeRow: some View {
+        HStack(spacing: HoTHSpacing.s) {
+            PriorityBadge(levelRaw: report.priorityRaw)
+            CategoryChip(categoryRaw: report.categoryRaw)
+            Spacer(minLength: HoTHSpacing.xs)
+            Button(action: onVote) {
+                HStack(spacing: HoTHSpacing.xs) {
+                    Image(systemName: hasVoted ? "hand.thumbsup.fill" : "hand.thumbsup")
+                        .symbolEffect(.bounce, value: hasVoted)
+                    Text(verbatim: "\(report.voteCount)")
+                        .contentTransition(.numericText())
+                }
+                .font(.hothCaption.weight(.bold))
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .foregroundStyle(hasVoted ? Color.white : Color.hothAccent)
+                .background(Capsule().fill(hasVoted ? Color.hothAccent : Color.hothAccent.opacity(0.12)))
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text(hasVoted ? "Remove vote" : "Vote"))
+        }
+    }
+
+    private var countsRow: some View {
+        HStack(spacing: HoTHSpacing.xs) {
+            Image(systemName: "eye.fill")
+                .font(.system(size: 10, weight: .bold))
+                .foregroundStyle(Color.white)
+                .frame(width: 18, height: 18)
+                .background(Circle().fill(Color.hothAccent))
+            Text("\(report.confirmations + 1) neighbours saw this")
+            Text(verbatim: "·")
+            Text("\(report.visibleComments.count) comments")
+            Spacer(minLength: 0)
+        }
+        .font(.system(size: 13))
+        .foregroundStyle(Color.hothInkSecondary)
+        .lineLimit(1)
+        .minimumScaleFactor(0.85)
+        .accessibilityElement(children: .combine)
+    }
+
+    // MARK: Action bar
+
+    private var actionBar: some View {
+        HStack(spacing: 0) {
+            Button(action: onConfirm) {
+                actionLabel(hasConfirmed ? "You confirmed this" : "I saw it too",
+                            symbol: hasConfirmed ? "checkmark.circle.fill" : "eye")
+                    .foregroundStyle(hasConfirmed ? Color.hothAccent : Color.hothInkSecondary)
+            }
+            .disabled(!canConfirm)
+            .opacity(canConfirm || hasConfirmed ? 1 : 0.45)
+            .accessibilityIdentifier("feedConfirmButton")
+
+            Button(action: onComment) {
+                actionLabel("Comment", symbol: "bubble.left")
+                    .foregroundStyle(Color.hothInkSecondary)
+            }
+            .accessibilityIdentifier("feedCommentButton")
+
+            ShareLink(item: shareText, subject: Text(verbatim: report.title(arabic: arabic))) {
+                actionLabel("Share", symbol: "square.and.arrow.up")
+                    .foregroundStyle(Color.hothInkSecondary)
+            }
+            .accessibilityIdentifier("feedShareButton")
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func actionLabel(_ title: LocalizedStringKey, symbol: String) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: symbol).font(.system(size: 15, weight: .semibold))
+            Text(title).font(.system(size: 14, weight: .semibold)).lineLimit(1).minimumScaleFactor(0.75)
+        }
+        .frame(maxWidth: .infinity, minHeight: 40)
+        .contentShape(Rectangle())
+    }
+
+    /// Public post content only: title, summary and the place name already shown in the feed.
+    /// Never the reporter, coordinates or photo.
+    private var shareText: String {
+        [report.title(arabic: arabic), report.summary(arabic: arabic), report.placeName]
+            .filter { !$0.isEmpty }
+            .joined(separator: "\n")
+    }
+}
+
+// MARK: - Avatar
+
+/// Initials circle for a reporter; a person glyph for anonymous posts.
+private struct ReporterAvatar: View {
+    let reporter: Neighbour?
+
+    private static let palette: [Color] = [.hothAccent, .hothTeal, .hothSuccess, .hothHigh, .hothLow]
+
+    private var initials: String {
+        guard let name = reporter?.displayName else { return "" }
+        let letters = name.split(separator: " ").prefix(2).compactMap(\.first)
+        return String(letters).uppercased()
+    }
+
+    /// Stable colour per neighbour (sum of the name's scalars; `hashValue` changes per launch).
+    private var color: Color {
+        guard let name = reporter?.displayName, !name.isEmpty else { return .hothInkSecondary }
+        let sum = name.unicodeScalars.reduce(0) { $0 + Int($1.value) }
+        return Self.palette[sum % Self.palette.count]
+    }
+
+    var body: some View {
+        ZStack {
+            Circle().fill(color.opacity(reporter == nil ? 0.18 : 1))
+            if reporter == nil || initials.isEmpty {
+                Image(systemName: "person.fill")
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundStyle(Color.hothInkSecondary)
+            } else {
+                Text(verbatim: initials)
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundStyle(Color.white)
+            }
+        }
+        .frame(width: 40, height: 40)
+        .accessibilityHidden(true)
     }
 }
