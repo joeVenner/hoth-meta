@@ -719,6 +719,38 @@
         }
       }
     },
+    "Checking places nearby…" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أتحقق من الأماكن القريبة…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checking places nearby…"
+          }
+        }
+      }
+    },
+    "Checking reports nearby…" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أتحقق من البلاغات القريبة…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checking reports nearby…"
+          }
+        }
+      }
+    },
     "Checking the repair against the original photo…" : {
       "localizations" : {
         "ar" : {
@@ -1732,6 +1764,22 @@
         }
       }
     },
+    "Interview agent tools" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أدوات مساعد المقابلة"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interview agent tools"
+          }
+        }
+      }
+    },
     "Interview finished" : {
       "localizations" : {
         "ar" : {
@@ -2090,6 +2138,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Microphone access is off. Turn it on in Settings, or type your answer."
+          }
+        }
+      }
+    },
+    "Muse Spark can check reports and places nearby on your phone and outline the photo with SAM 3.1 while it interviews you." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يقدر Muse Spark يتحقق من البلاغات والأماكن القريبة على جوالك ويحدّد الخطر في الصورة بـ SAM 3.1 أثناء المقابلة."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muse Spark can check reports and places nearby on your phone and outline the photo with SAM 3.1 while it interviews you."
           }
         }
       }
@@ -2522,6 +2586,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Other"
+          }
+        }
+      }
+    },
+    "Outlining with SAM 3.1…" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أحدّد المكان بـ SAM 3.1…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outlining with SAM 3.1…"
           }
         }
       }

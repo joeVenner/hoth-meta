@@ -100,6 +100,8 @@ final class PushToTalkModel: ObservableObject {
     private var isPressed = false
     private var isConversationFinished = false
     private var speechQueue: [String] = []
+    /// Bumped by every new or cancelled turn; a transcript that comes back for an older turn is dropped.
+    private var turnID = 0
     private var meterTask: Task<Void, Never>?
     /// Exposed so tests can await the press / release work.
     private(set) var work: Task<Void, Never>?
@@ -219,10 +221,17 @@ final class PushToTalkModel: ObservableObject {
             return
         }
         phase = .transcribing
-        work = Task { await transcribe(fileAt: url) }
+        turnID += 1
+        let turn = turnID
+        work = Task { await transcribe(fileAt: url, turn: turn) }
     }
 
-    private func transcribe(fileAt url: URL) async {
+    /// False once the resident switched to typing, left, or started another turn.
+    private func isCurrent(_ turn: Int) -> Bool {
+        turn == turnID && !Task.isCancelled
+    }
+
+    private func transcribe(fileAt url: URL, turn: Int) async {
         defer { Self.removeTemporaryFile(url) }
         let wav: PCMWAV
         do {
@@ -238,7 +247,7 @@ final class PushToTalkModel: ObservableObject {
         guard let transcriber else { return fail(.transcriptionFailed, detail: "no transcriber") }
         do {
             let text = try await transcriber.transcribe(wav: wav.data).trimmingCharacters(in: .whitespacesAndNewlines)
-            guard phase == .transcribing else { return }  // the resident switched to typing meanwhile
+            guard isCurrent(turn), phase == .transcribing else { return }  // switched to typing, left, or re-recorded
             guard !text.isEmpty else {
                 notice = .didNotCatch
                 phase = .idle
@@ -247,6 +256,8 @@ final class PushToTalkModel: ObservableObject {
             phase = .thinking
             onTranscript?(text)
         } catch {
+            // A turn the resident abandoned is not a failure: no notice, no switch to typing.
+            guard isCurrent(turn) else { return }
             fail(.transcriptionFailed, detail: String(describing: error))
         }
     }
@@ -309,6 +320,7 @@ final class PushToTalkModel: ObservableObject {
     private func cancelTurn() {
         stopSpeaking()
         cancelRecording()
+        turnID += 1
         work?.cancel()
         if phase == .transcribing || phase == .thinking { phase = .idle }
     }

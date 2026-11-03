@@ -43,6 +43,30 @@ public struct HazardSegmenter: Sendable {
     /// - Throws: `Failure.timedOut` past `timeout`, or the client's `ModelAPIError`.
     public func outline(jpegData: Data, category: ReportCategory) async throws -> SegmentOutline? {
         guard let concept = prompts.segmentConcept(for: category) else { return nil }
+        return try await segment(jpegData: jpegData, concept: concept)
+    }
+
+    /// Outlines a free-form concept, e.g. one the intake agent asked for ("broken swing chain").
+    ///
+    /// - Returns: nil (no network call) when `concept` is not a short noun phrase; see `sanitizedConcept`.
+    /// - Throws: as `outline(jpegData:category:)`.
+    public func outline(jpegData: Data, concept: String) async throws -> SegmentOutline? {
+        guard let phrase = Self.sanitizedConcept(concept) else { return nil }
+        return try await segment(jpegData: jpegData, concept: phrase)
+    }
+
+    /// Model-written concepts are untrusted: SAM wants one short noun phrase, so anything longer than
+    /// 4 words / 40 characters, or with characters other than letters, digits, spaces, `-` and `'`, is refused.
+    public static func sanitizedConcept(_ raw: String) -> String? {
+        let words = raw.split(whereSeparator: { $0.isWhitespace })
+        let phrase = words.joined(separator: " ")
+        guard !phrase.isEmpty, words.count <= 4, phrase.count <= 40 else { return nil }
+        let allowed = CharacterSet.letters.union(.decimalDigits).union(CharacterSet(charactersIn: " -'"))
+        guard phrase.unicodeScalars.allSatisfy(allowed.contains) else { return nil }
+        return phrase
+    }
+
+    private func segment(jpegData: Data, concept: String) async throws -> SegmentOutline {
         let client = client
         let model = prompts.models.segment
         let instances = try await Self.withTimeout(timeout) {

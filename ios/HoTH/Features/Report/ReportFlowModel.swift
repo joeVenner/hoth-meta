@@ -83,7 +83,7 @@ final class ReportFlowModel: ObservableObject {
     private var hasShownSafety = false
     /// Identifies the current submit run; regenerated on every reset so results from an abandoned run
     /// (retake / close while a model call is in flight) are dropped instead of overwriting the new one.
-    private var runID = UUID()
+    private(set) var runID = UUID()
     /// Re-entrancy guard for `post`: `step` only changes after the blur await, so a double tap needs this.
     private var isPosting = false
     private static let logger = Logger(subsystem: "io.fomy.hoth", category: "ReportFlow")
@@ -232,7 +232,9 @@ final class ReportFlowModel: ObservableObject {
         step = .interview
     }
 
-    func interviewCompleted(_ args: SubmitReportArgs, context: ModelContext? = nil) {
+    /// - Parameter run: the `runID` the interview started in; a reply from an abandoned run is dropped.
+    func interviewCompleted(_ args: SubmitReportArgs, context: ModelContext? = nil, run: UUID? = nil) {
+        guard isCurrentInterview(run) else { return }
         if let target = voiceNoteTarget {
             voiceNoteTarget = nil
             if let context { attachVoiceNote(args, to: target.reportID, context: context) }
@@ -253,9 +255,40 @@ final class ReportFlowModel: ObservableObject {
         step = .ticket
     }
 
+    /// The resident told the intake agent to confirm a nearby report instead of filing a new one. This is
+    /// the resident's own "same issue" decision, so it merges like "I saw it too" in every mode (the
+    /// automatic `mergePolicy` is for merges nobody confirmed). Only open reports still in range merge;
+    /// anything else files a new ticket from `args` through `interviewCompleted` (priority floors, safety).
+    func interviewConfirmedExisting(_ reportID: UUID, args: SubmitReportArgs, context: ModelContext, run: UUID? = nil) {
+        guard isCurrentInterview(run), step == .interview, voiceNoteTarget == nil, let photo else { return }
+        var descriptor = FetchDescriptor<Report>(predicate: #Predicate { $0.id == reportID })
+        descriptor.fetchLimit = 1
+        let match: Report?
+        do {
+            match = try context.fetch(descriptor).first
+        } catch {
+            Self.logger.error("Confirm-from-chat fetch failed: \(String(describing: error))")
+            match = nil
+        }
+        let here = coordinate(for: photo)
+        guard let match, match.status == .open || match.status == .inProgress else {
+            Self.logger.error("Confirm-from-chat target is gone or closed; filing a new report")
+            interviewCompleted(args, context: context)
+            return
+        }
+        let distance = Dedup.haversineMeters(here, Coordinate(latitude: match.latitude, longitude: match.longitude))
+        guard distance <= Double(IntakeToolbox.radiusRange.upperBound) else {
+            Self.logger.error("Confirm-from-chat target is out of range; filing a new report")
+            interviewCompleted(args, context: context)
+            return
+        }
+        cancelOutline()
+        step = .duplicate(merge(into: match, distance: distance, context: context))
+    }
+
     /// Interview urgency (the chat, typed or spoken, has already finished): keep what was said, show safety, ticket behind it.
-    func interviewFlaggedUrgent(_ reason: String) {
-        guard voiceNoteTarget == nil else { return }  // a note on a merged report never files a new ticket
+    func interviewFlaggedUrgent(_ reason: String, run: UUID? = nil) {
+        guard isCurrentInterview(run), voiceNoteTarget == nil else { return }  // a note on a merged report never files a new ticket
         presentSafety(reason: reason, answers: Self.answers(fromUrgentReason: reason))
     }
 
@@ -393,6 +426,58 @@ final class ReportFlowModel: ObservableObject {
             return "child_on_equipment"
         }
         return preInterviewSafetyReason()
+    }
+
+    // MARK: Intake agent tools
+
+    /// The tools for this report's interview, or nil (no analysis yet, a voice note on a merged report,
+    /// or a prompts file without `intake_agent`).
+    func intakeToolbox(context: ModelContext, outliner: HazardOutlining?) -> IntakeToolbox? {
+        guard let agent = prompts.intakeAgent, voiceNoteTarget == nil, let photo, let analysis else { return nil }
+        let jpegData = photo.jpegData
+        let here = coordinate(for: photo)
+        let place = nearbyPlace
+        return IntakeToolbox(
+            specs: agent.tools,
+            nearbyReports: { radius in Self.nearbyOpenReports(around: here, radius: radius, context: context) },
+            placeContext: {
+                PlaceContextSummary(nearbyPlace: place, sceneType: analysis.sceneType,
+                                    childUseEquipment: analysis.childUseEquipment)
+            },
+            segment: outliner.map { outliner in
+                { [weak self] concept in
+                    // The card's outline (read live: SAM may finish after the interview starts) already
+                    // answers its own concept, so no second SAM call.
+                    if let existingOutline = self?.outline,
+                       existingOutline.concept.caseInsensitiveCompare(concept) == .orderedSame {
+                        return existingOutline
+                    }
+                    return try await outliner.outline(jpegData: jpegData, concept: concept)
+                }
+            })
+    }
+
+    /// Open or in-progress reports within `radius` metres, nearest first.
+    static func nearbyOpenReports(around here: Coordinate, radius: Int, context: ModelContext) -> [NearbyReportSummary] {
+        let reports: [Report]
+        do {
+            reports = try context.fetch(FetchDescriptor<Report>())
+        } catch {
+            logger.error("Nearby reports fetch failed: \(String(describing: error))")
+            return []
+        }
+        return reports
+            .filter { $0.status == .open || $0.status == .inProgress }
+            .map { report in
+                (report, Dedup.haversineMeters(here, Coordinate(latitude: report.latitude, longitude: report.longitude)))
+            }
+            .filter { $0.1 <= Double(radius) }
+            .sorted { $0.1 < $1.1 }
+            .map { report, distance in
+                NearbyReportSummary(id: report.id, category: report.categoryRaw, titleEN: report.titleEN,
+                                    titleAR: report.titleAR, distanceMeters: Int(distance.rounded()),
+                                    confirmations: report.confirmations, status: report.statusRaw)
+            }
     }
 
     // MARK: Dedup
@@ -539,6 +624,13 @@ final class ReportFlowModel: ObservableObject {
     }
 
     // MARK: Helpers
+
+    /// Nil means the caller did not tag the interview (tests, older call sites).
+    private func isCurrentInterview(_ run: UUID?) -> Bool {
+        guard let run, run != runID else { return true }
+        Self.logger.error("Dropping an interview result from an abandoned report")
+        return false
+    }
 
     private func reset(keepingStep: Bool) {
         cancelOutline()

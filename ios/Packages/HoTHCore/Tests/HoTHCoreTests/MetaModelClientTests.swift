@@ -8,6 +8,12 @@ final class MetaModelClientTests: XCTestCase {
         super.setUp()
         StubURLProtocol.handler = nil
         StubURLProtocol.captured = []
+        StubURLProtocol.failure = nil
+    }
+
+    override func tearDown() {
+        StubURLProtocol.failure = nil
+        super.tearDown()
     }
 
     private func makeClient(key: APIKeyProvider? = nil) -> MetaModelClient {
@@ -60,6 +66,7 @@ final class MetaModelClientTests: XCTestCase {
         XCTAssertTrue(image["image_url"]?.stringValue?.hasPrefix("data:image/jpeg;base64,") ?? false)
         XCTAssertNil(image["detail"], "Meta documents no image detail parameter")
         XCTAssertEqual(body["reasoning"]?["effort"], .string("low"))
+        XCTAssertEqual(body["store"], .bool(false), "Photos must not be kept server-side")
         guard case .array(let systemContent)? = input.first?["content"] else { return XCTFail("no system") }
         let systemText = systemContent.first?["text"]?.stringValue ?? ""
         XCTAssertFalse(systemText.contains("{{user_language}}"))
@@ -186,6 +193,47 @@ final class MetaModelClientTests: XCTestCase {
         let empty = #"{"status":"completed","output":[]}"#
         StubURLProtocol.handler = { _ in (200, Data(empty.utf8)) }
         await assertDecodingError()
+    }
+
+    func testCancelledRequestThrowsCancellationNotNetwork() async throws {
+        StubURLProtocol.failure = URLError(.cancelled)
+        do {
+            let _: SameIssueVerdict = try await makeClient().structured(
+                model: "m", system: "s", user: "u", schema: try Fixtures.prompts().sameIssue.jsonSchema!)
+            XCTFail("expected cancellation")
+        } catch {
+            XCTAssertTrue(error is CancellationError, "got \(error)")
+        }
+    }
+
+    func testTimeoutStaysANetworkError() async throws {
+        StubURLProtocol.failure = URLError(.timedOut)
+        await assertThrows(.network(String(URLError.Code.timedOut.rawValue)))
+    }
+
+    func testCancellingTheCallingTaskThrowsCancellation() async throws {
+        let envelope = try Fixtures.responsesEnvelope(payload: Fixtures.data("same_issue_check"))
+        StubURLProtocol.handler = { _ in (200, envelope) }
+        let client = makeClient()
+        let schema = try XCTUnwrap(try Fixtures.prompts().sameIssue.jsonSchema)
+        let task = Task {
+            let _: SameIssueVerdict = try await client.structured(model: "m", system: "s", user: "u", schema: schema)
+        }
+        task.cancel()
+        do {
+            try await task.value
+            XCTFail("expected cancellation")
+        } catch {
+            XCTAssertTrue(error is CancellationError, "got \(error)")
+        }
+    }
+
+    func testTransportErrorMapping() {
+        XCTAssertTrue(MetaModelClient.transportError(CancellationError(), isTaskCancelled: false) is CancellationError)
+        XCTAssertTrue(MetaModelClient.transportError(URLError(.notConnectedToInternet), isTaskCancelled: true)
+            is CancellationError)
+        XCTAssertEqual(MetaModelClient.transportError(URLError(.notConnectedToInternet), isTaskCancelled: false)
+            as? ModelAPIError, .network("-1009"))
     }
 
     func testSanitizerScrubsBearerAndLegacyTokens() {

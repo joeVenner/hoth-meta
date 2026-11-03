@@ -16,6 +16,13 @@ struct ChatBubble: Identifiable, Equatable {
 /// Uses the `chat_intake` prompt on Muse Spark through `MetaModelClient` when a key is available; on a missing key or
 /// any API/network error it switches, mid-conversation if needed, to a deterministic local flow that
 /// asks the category's slot questions in order, reads back, and asks about posting.
+///
+/// With an `IntakeToolbox` (and prompts.json `intake_agent`), each model turn is a small tool-calling agent:
+/// Muse Spark may call `find_nearby_reports`, `segment_hazard` and `get_place_context` (at most
+/// `max_tool_rounds` rounds) before the same structured turn output. A request the API rejects (400) or
+/// a turn that does not decode switches tools off for the session and retries single-turn; a round limit
+/// finishes that one turn single-turn with the tool results in the prompt. Priority stays with
+/// `PriorityAgent`: the agent has no priority output, only answers that go through the safety floors.
 @MainActor
 final class ChatIntakeModel: ObservableObject {
     enum Mode { case model, local }
@@ -33,6 +40,10 @@ final class ChatIntakeModel: ObservableObject {
     @Published private(set) var isThinking = false
     @Published private(set) var mode: Mode
     @Published private(set) var isFinished = false
+    /// The tool the agent is running right now, for the typing indicator.
+    @Published private(set) var toolActivity: IntakeToolbox.Activity?
+    /// True while turns go through the tool-calling agent (false after a fallback to single-turn).
+    @Published private(set) var usesTools: Bool
 
     let context: InterviewContext
     /// Every new assistant message, e.g. for the push-to-talk voice to read aloud.
@@ -43,15 +54,26 @@ final class ChatIntakeModel: ObservableObject {
     private let model: String
     private let onComplete: (SubmitReportArgs) -> Void
     private let onUrgent: (String) -> Void
+    private let toolbox: IntakeToolbox?
+    private let onConfirmExisting: ((UUID, SubmitReportArgs) -> Void)?
+    /// Tool results from earlier turns, resent as text so the agent does not call them again.
+    private var toolNotes: [String] = []
+    /// The model turn in flight; `cancel()` stops it (exposed so tests can await it).
+    private(set) var turnTask: Task<Void, Never>?
 
     private var answers: [String: String] = [:]
     private var phase: LocalPhase = .asking(0)
     private static let logger = Logger(subsystem: "io.fomy.hoth", category: "ChatIntake")
 
     /// - Parameter model: text model override (Settings); blank or nil uses `prompts.models.text`.
+    /// - Parameters:
+    ///   - toolbox: the agent's tools; nil (Settings off, no key, UI tests) keeps single-turn chat.
+    ///   - onConfirmExisting: the resident chose to confirm a nearby report `find_nearby_reports` returned; the
+    ///     args carry the answers so far, for a new ticket (through the safety floors) if that report is gone.
     init(context: InterviewContext, slots: [SlotQuestion], client: MetaModelClient?, prompts: Prompts,
-         model: String? = nil,
-         onComplete: @escaping (SubmitReportArgs) -> Void, onUrgent: @escaping (String) -> Void) {
+         model: String? = nil, toolbox: IntakeToolbox? = nil,
+         onComplete: @escaping (SubmitReportArgs) -> Void, onUrgent: @escaping (String) -> Void,
+         onConfirmExisting: ((UUID, SubmitReportArgs) -> Void)? = nil) {
         self.context = context
         self.slots = Array(slots.prefix(2))
         self.client = client
@@ -60,6 +82,9 @@ final class ChatIntakeModel: ObservableObject {
         self.onComplete = onComplete
         self.onUrgent = onUrgent
         self.mode = client == nil ? .local : .model
+        self.toolbox = toolbox
+        self.onConfirmExisting = onConfirmExisting
+        self.usesTools = client != nil && toolbox != nil && prompts.intakeAgent != nil
     }
 
     private var arabic: Bool { context.isArabic }
@@ -70,7 +95,7 @@ final class ChatIntakeModel: ObservableObject {
         guard bubbles.isEmpty else { return }
         switch mode {
         case .model:
-            Task { await sendToModel(userMessage: arabic ? "(ابدأ المحادثة)" : "(start the conversation)", echo: false) }
+            turnTask = Task { await sendToModel(userMessage: arabic ? "(ابدأ المحادثة)" : "(start the conversation)", echo: false) }
         case .local:
             startLocal()
         }
@@ -81,11 +106,17 @@ final class ChatIntakeModel: ObservableObject {
         guard !text.isEmpty, !isThinking, !isFinished else { return }
         switch mode {
         case .model:
-            Task { await sendToModel(userMessage: text, echo: true) }
+            turnTask = Task { await sendToModel(userMessage: text, echo: true) }
         case .local:
             appendResident(text)
             handleLocal(text)
         }
+    }
+
+    /// The interview screen went away: a late reply must not add bubbles or finish a reset report.
+    func cancel() {
+        turnTask?.cancel()
+        turnTask = nil
     }
 
     // MARK: Local deterministic flow
@@ -234,9 +265,12 @@ final class ChatIntakeModel: ObservableObject {
         let userLanguage: String
         let wantsToPost: Bool
         let anonymous: Bool
+        /// A `find_nearby_reports` id the resident chose to confirm; "" for none.
+        let confirmReportID: String?
 
         enum CodingKeys: String, CodingKey {
             case reply, done, urgent, answers, anonymous
+            case confirmReportID = "confirm_report_id"
             case urgentReason = "urgent_reason"
             case summaryEN = "summary_en"
             case summaryAR = "summary_ar"
@@ -248,7 +282,7 @@ final class ChatIntakeModel: ObservableObject {
     /// Strict output schema for one chat turn. `answers` is an array because strict mode needs fixed keys.
     private static let turnSchemaJSON = """
     {"name":"chat_turn","strict":true,"schema":{"type":"object","additionalProperties":false,
-    "required":["reply","done","urgent","urgent_reason","summary_en","summary_ar","answers","user_language","wants_to_post","anonymous"],
+    "required":["reply","done","urgent","urgent_reason","summary_en","summary_ar","answers","user_language","wants_to_post","anonymous","confirm_report_id"],
     "properties":{
     "reply":{"type":"string"},
     "done":{"type":"boolean"},
@@ -260,7 +294,8 @@ final class ChatIntakeModel: ObservableObject {
       "properties":{"id":{"type":"string"},"answer":{"type":"string"}}}},
     "user_language":{"type":"string"},
     "wants_to_post":{"type":"boolean"},
-    "anonymous":{"type":"boolean"}}}}
+    "anonymous":{"type":"boolean"},
+    "confirm_report_id":{"type":"string"}}}}
     """
 
     private static let turnSchema: JSONSchemaSpec? = {
@@ -293,8 +328,22 @@ final class ChatIntakeModel: ObservableObject {
         Output format override: every turn is ONE JSON object matching the schema. Put your chat message \
         in "reply". Keep done=false until the resident has confirmed the read-back AND answered the posting \
         question; then set done=true and fill every field. Use slot ids as answer ids. If urgent, set \
-        urgent=true with urgent_reason and give safety advice in reply.
+        urgent=true with urgent_reason and give safety advice in reply. Set confirm_report_id to "" unless \
+        you were given tools and the resident confirmed a report a tool returned.
         """
+    }
+
+    /// The system prompt plus the agent's tool rules and the tool results gathered so far.
+    private func agentSystemPrompt(_ agent: IntakeAgentSpec) -> String {
+        var text = systemPrompt() + "\n\n" + agent.instructions
+        if !toolNotes.isEmpty {
+            text += "\n\nTool results so far:\n" + toolNotes.joined(separator: "\n")
+        }
+        return text
+    }
+
+    private static func note(for record: ToolCallRecord) -> String {
+        "- \(record.name)(\(record.arguments.prefix(120))) -> \(record.output.prefix(800))"
     }
 
     private func transcript(appending userMessage: String) -> String {
@@ -310,19 +359,70 @@ final class ChatIntakeModel: ObservableObject {
         let userText = transcript(appending: userMessage)
         if echo { appendResident(userMessage) }
         isThinking = true
-        defer { isThinking = false }
+        defer {
+            isThinking = false
+            toolActivity = nil
+        }
+        let user = Prompts.fill(prompts.chatIntake.userTemplate, ["user_message": userText])
         do {
-            let turn: ModelTurn = try await client.structured(
-                model: model,
-                system: systemPrompt(),
-                user: Prompts.fill(prompts.chatIntake.userTemplate, ["user_message": userText]),
-                schema: schema,
-                as: ModelTurn.self
-            )
+            let turn: ModelTurn
+            if usesTools, let toolbox, let agent = prompts.intakeAgent {
+                turn = try await agentTurn(client: client, toolbox: toolbox, agent: agent, user: user, schema: schema)
+            } else {
+                turn = try await client.structured(model: model, system: systemPrompt(), user: user,
+                                                   schema: schema, as: ModelTurn.self)
+            }
+            guard !Task.isCancelled else { return }
             apply(turn)
         } catch {
+            // Cancelled on purpose (screen dismissed): not a reason to switch to the local flow.
+            guard !Task.isCancelled, !(error is CancellationError) else { return }
             Self.logger.error("Chat model unavailable, using local flow: \(String(describing: error))")
             switchToLocal(pending: echo ? userMessage : nil, alreadyEchoed: echo)
+        }
+    }
+
+    /// One resident turn through the tool loop, with the single-turn call as its fallback.
+    private func agentTurn(client: MetaModelClient, toolbox: IntakeToolbox, agent: IntakeAgentSpec,
+                           user: String, schema: JSONSchemaSpec) async throws -> ModelTurn {
+        let outcome: ToolLoop.Outcome<ModelTurn>
+        do {
+            outcome = try await ToolLoop.run(
+                client: client, model: model, system: agentSystemPrompt(agent), user: user,
+                tools: toolbox.tools, schema: schema, maxRounds: max(agent.maxToolRounds, 0)
+            ) { [weak self] call in
+                self?.toolActivity = IntakeToolbox.activity(for: call.name)
+                let output = await toolbox.run(call)
+                self?.toolActivity = nil
+                return output
+            }
+        } catch let error as ModelAPIError where Self.fallsBackToSingleTurn(error) {
+            // Tool calling (or tools + json_schema) rejected or not decodable: keep chatting without tools.
+            Self.logger.error("Intake agent off, single-turn chat: \(String(describing: error))")
+            usesTools = false
+            return try await client.structured(model: model, system: systemPrompt(), user: user,
+                                               schema: schema, as: ModelTurn.self)
+        }
+        switch outcome {
+        case .final(let turn, let rounds, let calls):
+            toolNotes += calls.map(Self.note(for:))
+            Self.logger.info("Intake agent turn: \(rounds) tool round(s), calls \(calls.map(\.name).joined(separator: ","))")
+            return turn
+        case .roundLimit(let calls):
+            toolNotes += calls.map(Self.note(for:))
+            Self.logger.info("Intake agent hit the round limit; finishing this turn single-turn")
+            return try await client.structured(model: model, system: agentSystemPrompt(agent), user: user,
+                                               schema: schema, as: ModelTurn.self)
+        }
+    }
+
+    /// Request-shape problems (and turns that do not decode) are worth one retry without tools; key, billing,
+    /// rate-limit and network errors would fail single-turn too, so those go to the local flow.
+    nonisolated static func fallsBackToSingleTurn(_ error: ModelAPIError) -> Bool {
+        switch error {
+        case .http(let code, _): return code == 400 || code == 404 || code == 422
+        case .decoding, .refused: return true
+        case .missingKey, .invalidKey, .rateLimited, .network, .incomplete: return false
         }
     }
 
@@ -336,19 +436,40 @@ final class ChatIntakeModel: ObservableObject {
             onUrgent((pairs + [turn.urgentReason.isEmpty ? "urgent" : turn.urgentReason]).joined(separator: "; "))
             return
         }
+        if let id = confirmableReportID(turn.confirmReportID), let onConfirmExisting {
+            isFinished = true
+            quickReplies = []
+            onConfirmExisting(id, submitArgs(from: turn))
+            return
+        }
         if turn.done {
             isFinished = true
             quickReplies = []
-            onComplete(SubmitReportArgsFactory.make(
-                summaryEN: turn.summaryEN.isEmpty ? context.analysis.titleEN : turn.summaryEN,
-                summaryAR: turn.summaryAR.isEmpty ? context.analysis.titleAR : turn.summaryAR,
-                answers: answers,
-                userLanguage: turn.userLanguage.isEmpty ? context.language : turn.userLanguage,
-                wantsToPost: turn.wantsToPost,
-                anonymous: turn.anonymous))
+            onComplete(submitArgs(from: turn))
             return
         }
         quickReplies = arabic ? ["إي", "لا", "مب متأكد"] : ["Yes", "No", "Not sure"]
+    }
+
+    private func submitArgs(from turn: ModelTurn) -> SubmitReportArgs {
+        SubmitReportArgsFactory.make(
+            summaryEN: turn.summaryEN.isEmpty ? context.analysis.titleEN : turn.summaryEN,
+            summaryAR: turn.summaryAR.isEmpty ? context.analysis.titleAR : turn.summaryAR,
+            answers: answers,
+            userLanguage: turn.userLanguage.isEmpty ? context.language : turn.userLanguage,
+            wantsToPost: turn.wantsToPost,
+            anonymous: turn.anonymous)
+    }
+
+    /// Only an id the tool actually returned this session counts; a made-up one is ignored.
+    private func confirmableReportID(_ raw: String?) -> UUID? {
+        let text = (raw ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else { return nil }
+        guard let id = UUID(uuidString: text), toolbox?.offeredReportIDs.contains(id) == true else {
+            Self.logger.error("Ignoring confirm_report_id the tools never returned")
+            return nil
+        }
+        return id
     }
 
     /// Falls back to the local flow, resuming at the first unanswered slot.

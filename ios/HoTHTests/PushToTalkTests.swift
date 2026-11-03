@@ -41,6 +41,25 @@ final class PushToTalkTests: XCTestCase {
         }
     }
 
+    /// Holds every transcription until the test resumes it, like a slow network.
+    private final class GatedTranscriber: SpeechTranscribing, @unchecked Sendable {
+        private let lock = NSLock()
+        private var pending: [CheckedContinuation<String, Error>] = []
+
+        var waitingCount: Int { lock.withLock { pending.count } }
+
+        func transcribe(wav: Data) async throws -> String {
+            try await withCheckedThrowingContinuation { continuation in
+                lock.withLock { pending.append(continuation) }
+            }
+        }
+
+        func resumeOldest(with result: Result<String, Error>) {
+            let continuation = lock.withLock { pending.removeFirst() }
+            continuation.resume(with: result)
+        }
+    }
+
     private final class StubSpeaker: SpeechSpeaking {
         private(set) var spoken: [(text: String, language: String)] = []
         private(set) var stopCount = 0
@@ -66,9 +85,9 @@ final class PushToTalkTests: XCTestCase {
 
     private func makeModel(transcript: Result<String, Error> = .success("The swing chain is broken"),
                            hasTranscriber: Bool = true, startsInVoice: Bool = true,
-                           grantOnRequest: Bool = true) -> PushToTalkModel {
+                           grantOnRequest: Bool = true, transcriber: SpeechTranscribing? = nil) -> PushToTalkModel {
         PushToTalkModel(
-            transcriber: hasTranscriber ? StubTranscriber(result: transcript) : nil,
+            transcriber: hasTranscriber ? (transcriber ?? StubTranscriber(result: transcript)) : nil,
             recorder: recorder, speaker: speaker, startsInVoice: startsInVoice,
             micStatus: { [unowned self] in self.micStatus },
             requestMic: { grantOnRequest },
@@ -301,6 +320,64 @@ final class PushToTalkTests: XCTestCase {
         XCTAssertEqual(recorder.cancelCount, 1)
         XCTAssertEqual(model.phase, .idle)
         XCTAssertFalse(model.isVoiceMode)
+    }
+
+    /// Records one turn and returns once the gated transcriber holds its request.
+    private func startTranscribing(_ model: PushToTalkModel, gate: GatedTranscriber) async {
+        let waitingBefore = gate.waitingCount
+        model.pressBegan()
+        await model.work?.value
+        clock.addTimeInterval(1)
+        model.pressEnded()
+        XCTAssertEqual(model.phase, .transcribing)
+        for _ in 0..<1_000 where gate.waitingCount == waitingBefore { await Task.yield() }
+        XCTAssertEqual(gate.waitingCount, waitingBefore + 1, "Transcription request never started")
+    }
+
+    func testSwitchingToTypingDuringTranscriptionIsNotAFailure() async {
+        for late in [Result<String, Error>.success("late words"), .failure(ModelAPIError.network("-999"))] {
+            let gate = GatedTranscriber()
+            let model = makeModel(transcriber: gate)
+            var sent: [String] = []
+            model.onTranscript = { sent.append($0) }
+            await startTranscribing(model, gate: gate)
+            let inFlight = model.work
+            let stopsBefore = speaker.stopCount
+
+            model.switchToTyping()
+            gate.resumeOldest(with: late)
+            await inFlight?.value
+
+            XCTAssertNil(model.notice, "Typing on purpose must not show a voice error")
+            XCTAssertEqual(sent, [])
+            XCTAssertFalse(model.isVoiceMode)
+            XCTAssertEqual(model.phase, .idle)
+            XCTAssertEqual(speaker.stopCount, stopsBefore + 1, "Only the switch itself stops the speaker")
+        }
+    }
+
+    func testStaleTranscriptFromAnAbandonedTurnIsDropped() async {
+        let gate = GatedTranscriber()
+        let model = makeModel(transcriber: gate)
+        var sent: [String] = []
+        model.onTranscript = { sent.append($0) }
+        await startTranscribing(model, gate: gate)
+        let firstTurn = model.work
+
+        model.switchToTyping()
+        model.switchToVoice()
+        await startTranscribing(model, gate: gate)
+        let secondTurn = model.work
+
+        gate.resumeOldest(with: .success("old turn"))
+        await firstTurn?.value
+        XCTAssertEqual(sent, [])
+        XCTAssertEqual(model.phase, .transcribing, "The new turn is still waiting")
+
+        gate.resumeOldest(with: .success("new turn"))
+        await secondTurn?.value
+        XCTAssertEqual(sent, ["new turn"])
+        XCTAssertEqual(model.phase, .thinking)
     }
 
     func testFinishedConversationEndsAfterLastReply() async {
