@@ -3,8 +3,8 @@ import HoTHCore
 import MapKit
 import OSLog
 
-/// P2-02: on-device MapKit lookup of child-relevant places (playground / school / park) within 100 m
-/// of the capture. No network call of ours: MapKit answers on device. Bounded by a short timeout so
+/// P2-02: MapKit lookup of child-relevant places (playground / school / park) within 100 m
+/// of the capture. No network call of ours: MapKit queries Apple's servers itself. Bounded by a short timeout so
 /// it can never hold up the report flow; on any miss the vision `scene_type` decides.
 enum NearbyPlaces {
     static let searchRadius: CLLocationDistance = 100
