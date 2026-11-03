@@ -78,7 +78,7 @@ public final class MetaModelClient: Sendable {
 
     /// POST /v1/responses with optional images and a json_schema output, decoded into `T`.
     /// Sends `store: false`: Responses default to `store: true` (kept server-side for retrieval), and
-    /// these one-shot calls carry residents' unblurred photos and never read a stored response back.
+    /// these one-shot calls carry residents' photos (blurred on device first) and never read a stored response back.
     public func structured<T: Decodable>(
         model: String,
         system: String,
